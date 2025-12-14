@@ -191,7 +191,7 @@ async def create_secret(
     db.refresh(secret)
     
     # Build response with frontend URL (Vercel)
-    frontend_url = os.getenv("FRONTEND_URL", "https://onetimeview-git-main-vrushabhdadabaravkar2005-2102s-projects.vercel.app")
+    frontend_url = os.getenv("FRONTEND_URL", "https://onetimeview-sooty.vercel.app")
     return SecretResponse(
         id=secret.id,
         url=f"{frontend_url}/view/{secret.id}",
