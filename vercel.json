@@ -2,31 +2,31 @@
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "/frontend/static/$1"
+      "dest": "/static/$1"
     },
     {
       "src": "/view/([^/]+)",
-      "dest": "/frontend/view.html"
+      "dest": "/view.html"
     },
     {
       "src": "/create",
-      "dest": "/frontend/create.html"
+      "dest": "/create.html"
     },
     {
       "src": "/privacy",
-      "dest": "/frontend/privacy.html"
+      "dest": "/privacy.html"
     },
     {
       "src": "/terms",
-      "dest": "/frontend/terms.html"
+      "dest": "/terms.html"
     },
     {
       "src": "/expired",
-      "dest": "/frontend/expired.html"
+      "dest": "/expired.html"
     },
     {
       "src": "/",
-      "dest": "/frontend/index.html"
+      "dest": "/index.html"
     }
   ]
 }
