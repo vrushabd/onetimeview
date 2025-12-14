@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Content Expired - OneTimeView</title>
+    <meta name="description" content="This secret has already been viewed or expired.">
+    <meta name="robots" content="noindex, nofollow">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/static/tailwind-config.js"></script>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+
+<body class="bg-background min-h-screen text-text-primary flex items-center justify-center">
+    <div class="container mx-auto px-6">
+        <div class="max-w-2xl mx-auto text-center">
+            <div class="flex justify-center mb-6 animate-fade-in">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </div>
+            <h1 class="text-5xl font-bold mb-6 animate-fade-in">Secret Destroyed</h1>
+            <p class="text-xl text-text-secondary mb-8 animate-fade-in">
+                This secret has either already been viewed or has expired.
+            </p>
+
+            <div
+                class="bg-card backdrop-blur-lg rounded-2xl p-8 mb-8 text-left animate-fade-in border border-card-border">
+                <h2 class="text-2xl font-bold mb-4">Why can't I view this?</h2>
+                <ul class="space-y-3 text-text-secondary">
+                    <li class="flex items-start">
+                        <span class="text-primary-light mr-3 text-xl">•</span>
+                        <span><strong>Already viewed:</strong> OneTimeView secrets can only be opened once. After the
+                            first view, they're permanently deleted.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-primary-light mr-3 text-xl">•</span>
+                        <span><strong>Time expired:</strong> The secret may have exceeded its expiration time.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-primary-light mr-3 text-xl">•</span>
+                        <span><strong>Invalid link:</strong> The link may be incorrect or the secret never
+                            existed.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="space-y-4 animate-fade-in">
+                <p class="text-text-secondary">
+                    If you need to access this information, please contact the person who sent you this link.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="/create"
+                        class="bg-cta hover:bg-cta-hover text-white font-bold py-3 px-6 rounded-lg transition">
+                        Create Your Own Secret
+                    </a>
+                    <a href="/"
+                        class="bg-card hover:bg-card/80 border border-card-border text-white font-bold py-3 px-6 rounded-lg transition">
+                        Go to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animate elements on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const elements = document.querySelectorAll('.animate-fade-in');
+            elements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(20px)';
+                    el.style.transition = 'all 0.6s ease-out';
+                    setTimeout(() => {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+
+</html>

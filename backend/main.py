@@ -1,0 +1,516 @@
+from fastapi import FastAPI, UploadFile, File, Form, Depends, HTTPException, Request, BackgroundTasks
+from fastapi.responses import HTMLResponse, FileResponse, JSONResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
+from pathlib import Path
+import os
+import asyncio
+from typing import Optional
+
+from backend.database import get_db, init_db
+from backend.models import Secret
+from backend.schemas import SecretCreate, SecretResponse, SecretView, PasswordVerify
+from backend.security import (
+    hash_password, verify_password, sanitize_text, 
+    sanitize_filename, get_mime_type, validate_file_type
+)
+from backend.cleanup import cleanup_expired_secrets, delete_secret_immediately
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Initialize FastAPI app
+app = FastAPI(
+    title="OneTimeView API",
+    description="Secure one-time message and file sharing",
+    version="1.0.0"
+)
+
+# Rate limiting
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# CORS configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=os.getenv("ALLOWED_ORIGINS", "http://localhost:8000").split(","),
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Configuration
+UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", "./uploads"))
+MAX_FILE_SIZE_FREE = int(os.getenv("MAX_FILE_SIZE_FREE", 104857600))  # 100MB
+MAX_FILE_SIZE_PREMIUM = int(os.getenv("MAX_FILE_SIZE_PREMIUM", 524288000))  # 500MB
+
+# Ensure upload directory exists
+UPLOAD_DIR.mkdir(exist_ok=True)
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database and start cleanup task"""
+    init_db()
+    asyncio.create_task(cleanup_expired_secrets())
+
+
+# Serve static frontend files
+app.mount("/static", StaticFiles(directory="frontend"), name="static")
+
+
+@app.get("/", response_class=HTMLResponse)
+async def read_root():
+    """Serve home page"""
+    with open("frontend/index.html", "r") as f:
+        return f.read()
+
+
+@app.get("/create", response_class=HTMLResponse)
+async def create_page():
+    """Serve create secret page"""
+    with open("frontend/create.html", "r") as f:
+        return f.read()
+
+
+@app.get("/view/{secret_id}", response_class=HTMLResponse)
+async def view_page(secret_id: str):
+    """Serve view secret page"""
+    with open("frontend/view.html", "r") as f:
+        return f.read()
+
+
+@app.get("/expired", response_class=HTMLResponse)
+async def expired_page():
+    """Serve expired page"""
+    with open("frontend/expired.html", "r") as f:
+        return f.read()
+
+
+@app.get("/privacy", response_class=HTMLResponse)
+async def privacy_page():
+    """Serve privacy policy page"""
+    with open("frontend/privacy.html", "r") as f:
+        return f.read()
+
+
+@app.get("/terms", response_class=HTMLResponse)
+async def terms_page():
+    """Serve terms of service page"""
+    with open("frontend/terms.html", "r") as f:
+        return f.read()
+
+
+@app.get("/robots.txt", response_class=HTMLResponse)
+async def robots_txt():
+    """Serve robots.txt for SEO"""
+    with open("frontend/robots.txt", "r") as f:
+        return f.read()
+
+
+@app.get("/sitemap.xml", response_class=HTMLResponse)
+async def sitemap_xml():
+    """Serve sitemap.xml for SEO"""
+    with open("frontend/sitemap.xml", "r") as f:
+        return f.read()
+
+
+@app.post("/api/secrets", response_model=SecretResponse)
+@limiter.limit("10/minute")
+async def create_secret(
+    request: Request,
+    content_type: str = Form(...),
+    content: Optional[str] = Form(None),
+    password: Optional[str] = Form(None),
+    expiry_hours: Optional[int] = Form(None),
+    max_views: Optional[int] = Form(1),
+    is_premium: bool = Form(False),
+    file: Optional[UploadFile] = File(None),
+    db: Session = Depends(get_db)
+):
+    """Create a new secret"""
+    
+    # Validate content type
+    if content_type not in ["text", "image", "video", "file"]:
+        raise HTTPException(status_code=400, detail="Invalid content type")
+    
+    # For text secrets, content is required
+    if content_type == "text":
+        if not content:
+            raise HTTPException(status_code=400, detail="Content is required for text secrets")
+        content = sanitize_text(content)
+    
+    # For file-based secrets, file is required
+    if content_type in ["image", "video", "file"]:
+        if not file:
+            raise HTTPException(status_code=400, detail="File is required")
+        
+        # Check if premium features are being used
+        # (Files/Images/Videos are now available for free users)
+
+    
+    # Validate and set max_views
+    if max_views is None or max_views < 1:
+        max_views = 1
+    if max_views > 10:
+        max_views = 10
+    
+    # Create secret object
+    secret = Secret(
+        content_type=content_type,
+        max_views=max_views,
+        is_premium=is_premium
+    )
+    
+    # Handle text content
+    if content_type == "text":
+        secret.content = content
+    
+    # Handle file upload
+    if file:
+        # Validate file type
+        is_valid, detected_type = validate_file_type(file.filename)
+        if not is_valid:
+            raise HTTPException(status_code=400, detail="File type not allowed")
+        
+        # Check file size
+        # Check file size - 100MB limit as requested
+        max_size = 104857600  # 100MB
+        file.file.seek(0, 2)  # Seek to end
+        file_size = file.file.tell()
+        file.file.seek(0)  # Reset to beginning
+        
+        if file_size > max_size:
+            raise HTTPException(
+                status_code=413, 
+                detail=f"File size exceeds limit ({max_size / 1024 / 1024}MB)"
+            )
+        
+        # Save file
+        safe_filename = sanitize_filename(file.filename)
+        file_path = UPLOAD_DIR / safe_filename
+        
+        with open(file_path, "wb") as f:
+            f.write(await file.read())
+        
+        secret.file_path = str(file_path)
+        secret.file_name = file.filename
+        secret.mime_type = get_mime_type(file.filename)
+    
+    # Handle password
+    if password:
+        # Password protection is now free
+        secret.password_hash = hash_password(password)
+    
+    # Handle expiry
+    if expiry_hours is not None:
+        if expiry_hours == 0:
+            # "No Expiry" (Infinite time) is a Premium feature
+            if not is_premium:
+                raise HTTPException(
+                    status_code=403, 
+                    detail="No Expiry option requires premium subscription"
+                )
+            secret.expiry_time = None
+        else:
+            # Custom expiry (30 days, 6 months) is now free
+            secret.expiry_time = datetime.utcnow() + timedelta(hours=expiry_hours)
+    else:
+        # Default: 24 hours for free users
+        secret.expiry_time = datetime.utcnow() + timedelta(hours=24)
+    
+    # Save to database
+    db.add(secret)
+    db.commit()
+    db.refresh(secret)
+    
+    # Build response
+    base_url = str(request.base_url).rstrip('/')
+    return SecretResponse(
+        id=secret.id,
+        url=f"{base_url}/view/{secret.id}",
+        expires_at=secret.expiry_time,
+        has_password=bool(secret.password_hash),
+        content_type=secret.content_type,
+        max_views=secret.max_views
+    )
+
+
+@app.post("/api/secrets/{secret_id}/verify")
+@limiter.limit("10/minute")
+async def verify_password_endpoint(
+    request: Request,
+    secret_id: str,
+    data: PasswordVerify,
+    db: Session = Depends(get_db)
+):
+    """Verify password for a secret (does not check view count, only time expiry)"""
+    secret = db.query(Secret).filter(Secret.id == secret_id).first()
+    
+    if not secret:
+        raise HTTPException(status_code=404, detail="Secret not found")
+    
+    # Only check time-based expiry here, NOT view count
+    # View count is checked when actually retrieving the secret
+    if secret.expiry_time and datetime.utcnow() > secret.expiry_time:
+        raise HTTPException(status_code=404, detail="Secret has expired")
+    
+    if not secret.password_hash:
+        return {"verified": True}
+    
+    if verify_password(data.password, secret.password_hash):
+        return {"verified": True}
+    
+    return {"verified": False}
+
+
+@app.get("/api/secrets/{secret_id}", response_model=SecretView)
+@limiter.limit("10/minute")
+async def get_secret(
+    request: Request,
+    secret_id: str,
+    password: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """Retrieve a secret (ONE-TIME VIEW)"""
+    secret = db.query(Secret).filter(Secret.id == secret_id).first()
+    
+    if not secret:
+        raise HTTPException(status_code=404, detail="Secret not found")
+    
+    # Check if already viewed or expired
+    if secret.is_expired():
+        # Delete immediately
+        delete_secret_immediately(secret_id)
+        raise HTTPException(status_code=404, detail="Secret has expired or already been viewed")
+    
+    # Verify password if required
+    if secret.password_hash:
+        if not password:
+            raise HTTPException(status_code=401, detail="Password required")
+        if not verify_password(password, secret.password_hash):
+            raise HTTPException(status_code=401, detail="Invalid password")
+    
+    # Increment view count
+    secret.increment_view()
+    db.commit()
+    
+    # Calculate remaining views
+    remaining_views = secret.max_views - secret.view_count
+    
+    # Prepare response
+    response = SecretView(
+        content_type=secret.content_type,
+        content=secret.content if secret.content_type == "text" else None,
+        file_name=secret.file_name,
+        mime_type=secret.mime_type,
+        remaining_views=remaining_views
+    )
+    
+    # For files, provide download URL
+    if secret.file_path:
+        base_url = str(request.base_url).rstrip('/')
+        response.download_url = f"{base_url}/api/download/{secret_id}"
+    
+    # Delete secret only if max views reached
+    if secret.view_count >= secret.max_views:
+        delete_secret_immediately(secret_id)
+    
+    return response
+
+
+@app.get("/api/image/{secret_id}")
+@limiter.limit("10/minute")
+async def serve_image(
+    request: Request,
+    secret_id: str,
+    password: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """Serve image file (view count already handled by /api/secrets endpoint)"""
+    secret = db.query(Secret).filter(Secret.id == secret_id).first()
+    
+    if not secret:
+        raise HTTPException(status_code=404, detail="Secret not found")
+    
+    # Check if already viewed or expired
+    if secret.is_expired():
+        raise HTTPException(status_code=404, detail="Secret has expired or already been viewed")
+    
+    # Verify password if required
+    if secret.password_hash:
+        if not password:
+            raise HTTPException(status_code=401, detail="Password required")
+        if not verify_password(password, secret.password_hash):
+            raise HTTPException(status_code=401, detail="Invalid password")
+    
+    # Verify this is an image secret
+    if secret.content_type != "image":
+        raise HTTPException(status_code=400, detail="This secret is not an image")
+    
+    if not secret.file_path:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    file_path = Path(secret.file_path)
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    # Note: View count is incremented by /api/secrets endpoint, not here
+    # This prevents double-counting when the image is loaded
+    
+    return FileResponse(
+        path=file_path,
+        media_type=secret.mime_type
+    )
+
+
+@app.get("/api/video/{secret_id}")
+@limiter.limit("10/minute")
+async def serve_video(
+    request: Request,
+    secret_id: str,
+    password: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """Serve video file with range request support (view count already handled by /api/secrets endpoint)"""
+    secret = db.query(Secret).filter(Secret.id == secret_id).first()
+    
+    if not secret:
+        raise HTTPException(status_code=404, detail="Secret not found")
+    
+    # Check if already viewed or expired
+    if secret.is_expired():
+        raise HTTPException(status_code=404, detail="Secret has expired or already been viewed")
+    
+    # Verify password if required
+    if secret.password_hash:
+        if not password:
+            raise HTTPException(status_code=401, detail="Password required")
+        if not verify_password(password, secret.password_hash):
+            raise HTTPException(status_code=401, detail="Invalid password")
+    
+    # Verify this is a video secret
+    if secret.content_type != "video":
+        raise HTTPException(status_code=400, detail="This secret is not a video")
+    
+    if not secret.file_path:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    file_path = Path(secret.file_path)
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    # Note: View count is incremented by /api/secrets endpoint, not here
+    # This prevents double-counting when the video is loaded
+    
+    # Get file size
+    file_size = file_path.stat().st_size
+    
+    # Parse Range header for video streaming support
+    range_header = request.headers.get("range")
+    
+    if range_header:
+        # Parse range header (e.g., "bytes=0-1023")
+        range_match = range_header.replace("bytes=", "").split("-")
+        start = int(range_match[0]) if range_match[0] else 0
+        end = int(range_match[1]) if len(range_match) > 1 and range_match[1] else file_size - 1
+        
+        # Ensure end doesn't exceed file size
+        end = min(end, file_size - 1)
+        chunk_size = end - start + 1
+        
+        # Create streaming response with range
+        def file_iterator():
+            with open(file_path, "rb") as f:
+                f.seek(start)
+                remaining = chunk_size
+                while remaining > 0:
+                    chunk = f.read(min(8192, remaining))
+                    if not chunk:
+                        break
+                    remaining -= len(chunk)
+                    yield chunk
+        
+        headers = {
+            "Content-Range": f"bytes {start}-{end}/{file_size}",
+            "Accept-Ranges": "bytes",
+            "Content-Length": str(chunk_size),
+            "Content-Type": secret.mime_type or "video/mp4",
+        }
+        
+        return StreamingResponse(
+            file_iterator(),
+            status_code=206,  # Partial Content
+            headers=headers,
+            media_type=secret.mime_type or "video/mp4"
+        )
+    else:
+        # No range header - return full file
+        return FileResponse(
+            path=file_path,
+            media_type=secret.mime_type or "video/mp4",
+            headers={"Accept-Ranges": "bytes"}
+        )
+
+
+@app.get("/api/file/{secret_id}")
+@limiter.limit("10/minute")
+async def serve_file(
+    request: Request,
+    secret_id: str,
+    password: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """Serve file for download (view count already handled by /api/secrets endpoint)"""
+    secret = db.query(Secret).filter(Secret.id == secret_id).first()
+    
+    if not secret:
+        raise HTTPException(status_code=404, detail="Secret not found")
+    
+    # Check if already viewed or expired
+    if secret.is_expired():
+        raise HTTPException(status_code=404, detail="Secret has expired or already been viewed")
+    
+    # Verify password if required
+    if secret.password_hash:
+        if not password:
+            raise HTTPException(status_code=401, detail="Password required")
+        if not verify_password(password, secret.password_hash):
+            raise HTTPException(status_code=401, detail="Invalid password")
+    
+    # Verify this is a file secret
+    if secret.content_type != "file":
+        raise HTTPException(status_code=400, detail="This secret is not a file")
+    
+    if not secret.file_path:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    file_path = Path(secret.file_path)
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    # Note: View count is incremented by /api/secrets endpoint, not here
+    # This prevents double-counting when the file is downloaded
+    
+    return FileResponse(
+        path=file_path,
+        filename=secret.file_name,
+        media_type=secret.mime_type
+    )
+
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    return {"status": "healthy"}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
