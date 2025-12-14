@@ -1,6 +1,22 @@
 {
   "rewrites": [
     {
+      "source": "/static/styles.css",
+      "destination": "/frontend/styles.css"
+    },
+    {
+      "source": "/static/tailwind-config.js",
+      "destination": "/frontend/tailwind-config.js"
+    },
+    {
+      "source": "/static/config.js",
+      "destination": "/frontend/config.js"
+    },
+    {
+      "source": "/static/:path*",
+      "destination": "/frontend/:path*"
+    },
+    {
       "source": "/",
       "destination": "/frontend/index.html"
     },
@@ -23,10 +39,6 @@
     {
       "source": "/expired",
       "destination": "/frontend/expired.html"
-    },
-    {
-      "source": "/static/:path*",
-      "destination": "/frontend/:path*"
     }
   ]
 }
