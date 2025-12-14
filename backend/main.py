@@ -1,6 +1,5 @@
-from fastapi import FastAPI, UploadFile, File, Form, Depends, HTTPException, Request, BackgroundTasks
-from fastapi.responses import HTMLResponse, FileResponse, JSONResponse, StreamingResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI, UploadFile, File, Form, Depends, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
@@ -24,11 +23,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Initialize FastAPI app
+# Initialize FastAPI app - API ONLY (No frontend serving)
 app = FastAPI(
     title="OneTimeView API",
-    description="Secure one-time message and file sharing",
-    version="1.0.0"
+    description="Secure one-time message and file sharing API",
+    version="1.0.0",
+    docs_url="/docs",  # Swagger UI
+    redoc_url="/redoc"  # ReDoc
 )
 
 # Rate limiting
@@ -39,12 +40,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # CORS configuration - Allow Vercel frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:8000",
-        "https://*.vercel.app",  # Allow all Vercel preview deployments
-        "https://onetimeview.vercel.app",  # Production Vercel domain
-        "*"  # Allow all origins (remove in production for security)
-    ],
+    allow_origins=["*"],  # Allow all origins - adjust for production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -53,7 +49,6 @@ app.add_middleware(
 # Configuration
 UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", "./uploads"))
 MAX_FILE_SIZE_FREE = int(os.getenv("MAX_FILE_SIZE_FREE", 104857600))  # 100MB
-MAX_FILE_SIZE_PREMIUM = int(os.getenv("MAX_FILE_SIZE_PREMIUM", 524288000))  # 500MB
 
 # Ensure upload directory exists
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -66,64 +61,33 @@ async def startup_event():
     asyncio.create_task(cleanup_expired_secrets())
 
 
-# Serve static frontend files
-app.mount("/static", StaticFiles(directory="frontend"), name="static")
+# ============================================================================
+# API ENDPOINTS ONLY - NO FRONTEND SERVING
+# ============================================================================
+
+@app.get("/")
+async def root():
+    """API root endpoint"""
+    return {
+        "name": "OneTimeView API",
+        "version": "1.0.0",
+        "status": "running",
+        "docs": "/docs",
+        "endpoints": {
+            "create_secret": "POST /api/secrets",
+            "get_secret": "GET /api/secrets/{id}",
+            "verify_password": "POST /api/secrets/{id}/verify",
+            "serve_image": "GET /api/image/{id}",
+            "serve_video": "GET /api/video/{id}",
+            "serve_file": "GET /api/file/{id}"
+        }
+    }
 
 
-@app.get("/", response_class=HTMLResponse)
-async def read_root():
-    """Serve home page"""
-    with open("frontend/index.html", "r") as f:
-        return f.read()
-
-
-@app.get("/create", response_class=HTMLResponse)
-async def create_page():
-    """Serve create secret page"""
-    with open("frontend/create.html", "r") as f:
-        return f.read()
-
-
-@app.get("/view/{secret_id}", response_class=HTMLResponse)
-async def view_page(secret_id: str):
-    """Serve view secret page"""
-    with open("frontend/view.html", "r") as f:
-        return f.read()
-
-
-@app.get("/expired", response_class=HTMLResponse)
-async def expired_page():
-    """Serve expired page"""
-    with open("frontend/expired.html", "r") as f:
-        return f.read()
-
-
-@app.get("/privacy", response_class=HTMLResponse)
-async def privacy_page():
-    """Serve privacy policy page"""
-    with open("frontend/privacy.html", "r") as f:
-        return f.read()
-
-
-@app.get("/terms", response_class=HTMLResponse)
-async def terms_page():
-    """Serve terms of service page"""
-    with open("frontend/terms.html", "r") as f:
-        return f.read()
-
-
-@app.get("/robots.txt", response_class=HTMLResponse)
-async def robots_txt():
-    """Serve robots.txt for SEO"""
-    with open("frontend/robots.txt", "r") as f:
-        return f.read()
-
-
-@app.get("/sitemap.xml", response_class=HTMLResponse)
-async def sitemap_xml():
-    """Serve sitemap.xml for SEO"""
-    with open("frontend/sitemap.xml", "r") as f:
-        return f.read()
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    return {"status": "healthy"}
 
 
 @app.post("/api/secrets", response_model=SecretResponse)
@@ -155,10 +119,6 @@ async def create_secret(
     if content_type in ["image", "video", "file"]:
         if not file:
             raise HTTPException(status_code=400, detail="File is required")
-        
-        # Check if premium features are being used
-        # (Files/Images/Videos are now available for free users)
-
     
     # Validate and set max_views
     if max_views is None or max_views < 1:
@@ -184,8 +144,7 @@ async def create_secret(
         if not is_valid:
             raise HTTPException(status_code=400, detail="File type not allowed")
         
-        # Check file size
-        # Check file size - 100MB limit as requested
+        # Check file size - 100MB limit
         max_size = 104857600  # 100MB
         file.file.seek(0, 2)  # Seek to end
         file_size = file.file.tell()
@@ -210,13 +169,11 @@ async def create_secret(
     
     # Handle password
     if password:
-        # Password protection is now free
         secret.password_hash = hash_password(password)
     
     # Handle expiry
     if expiry_hours is not None:
         if expiry_hours == 0:
-            # "No Expiry" (Infinite time) is a Premium feature
             if not is_premium:
                 raise HTTPException(
                     status_code=403, 
@@ -224,10 +181,8 @@ async def create_secret(
                 )
             secret.expiry_time = None
         else:
-            # Custom expiry (30 days, 6 months) is now free
             secret.expiry_time = datetime.utcnow() + timedelta(hours=expiry_hours)
     else:
-        # Default: 24 hours for free users
         secret.expiry_time = datetime.utcnow() + timedelta(hours=24)
     
     # Save to database
@@ -235,11 +190,11 @@ async def create_secret(
     db.commit()
     db.refresh(secret)
     
-    # Build response
-    base_url = str(request.base_url).rstrip('/')
+    # Build response with frontend URL (Vercel)
+    frontend_url = os.getenv("FRONTEND_URL", "https://onetimeview.vercel.app")
     return SecretResponse(
         id=secret.id,
-        url=f"{base_url}/view/{secret.id}",
+        url=f"{frontend_url}/view/{secret.id}",
         expires_at=secret.expiry_time,
         has_password=bool(secret.password_hash),
         content_type=secret.content_type,
@@ -262,7 +217,6 @@ async def verify_password_endpoint(
         raise HTTPException(status_code=404, detail="Secret not found")
     
     # Only check time-based expiry here, NOT view count
-    # View count is checked when actually retrieving the secret
     if secret.expiry_time and datetime.utcnow() > secret.expiry_time:
         raise HTTPException(status_code=404, detail="Secret has expired")
     
@@ -291,7 +245,6 @@ async def get_secret(
     
     # Check if already viewed or expired
     if secret.is_expired():
-        # Delete immediately
         delete_secret_immediately(secret_id)
         raise HTTPException(status_code=404, detail="Secret has expired or already been viewed")
     
@@ -344,18 +297,15 @@ async def serve_image(
     if not secret:
         raise HTTPException(status_code=404, detail="Secret not found")
     
-    # Check if already viewed or expired
     if secret.is_expired():
         raise HTTPException(status_code=404, detail="Secret has expired or already been viewed")
     
-    # Verify password if required
     if secret.password_hash:
         if not password:
             raise HTTPException(status_code=401, detail="Password required")
         if not verify_password(password, secret.password_hash):
             raise HTTPException(status_code=401, detail="Invalid password")
     
-    # Verify this is an image secret
     if secret.content_type != "image":
         raise HTTPException(status_code=400, detail="This secret is not an image")
     
@@ -365,9 +315,6 @@ async def serve_image(
     file_path = Path(secret.file_path)
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="File not found")
-    
-    # Note: View count is incremented by /api/secrets endpoint, not here
-    # This prevents double-counting when the image is loaded
     
     return FileResponse(
         path=file_path,
@@ -389,18 +336,15 @@ async def serve_video(
     if not secret:
         raise HTTPException(status_code=404, detail="Secret not found")
     
-    # Check if already viewed or expired
     if secret.is_expired():
         raise HTTPException(status_code=404, detail="Secret has expired or already been viewed")
     
-    # Verify password if required
     if secret.password_hash:
         if not password:
             raise HTTPException(status_code=401, detail="Password required")
         if not verify_password(password, secret.password_hash):
             raise HTTPException(status_code=401, detail="Invalid password")
     
-    # Verify this is a video secret
     if secret.content_type != "video":
         raise HTTPException(status_code=400, detail="This secret is not a video")
     
@@ -410,9 +354,6 @@ async def serve_video(
     file_path = Path(secret.file_path)
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="File not found")
-    
-    # Note: View count is incremented by /api/secrets endpoint, not here
-    # This prevents double-counting when the video is loaded
     
     # Get file size
     file_size = file_path.stat().st_size
@@ -478,18 +419,15 @@ async def serve_file(
     if not secret:
         raise HTTPException(status_code=404, detail="Secret not found")
     
-    # Check if already viewed or expired
     if secret.is_expired():
         raise HTTPException(status_code=404, detail="Secret has expired or already been viewed")
     
-    # Verify password if required
     if secret.password_hash:
         if not password:
             raise HTTPException(status_code=401, detail="Password required")
         if not verify_password(password, secret.password_hash):
             raise HTTPException(status_code=401, detail="Invalid password")
     
-    # Verify this is a file secret
     if secret.content_type != "file":
         raise HTTPException(status_code=400, detail="This secret is not a file")
     
@@ -500,20 +438,11 @@ async def serve_file(
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="File not found")
     
-    # Note: View count is incremented by /api/secrets endpoint, not here
-    # This prevents double-counting when the file is downloaded
-    
     return FileResponse(
         path=file_path,
         filename=secret.file_name,
         media_type=secret.mime_type
     )
-
-
-@app.get("/health")
-async def health_check():
-    """Health check endpoint"""
-    return {"status": "healthy"}
 
 
 if __name__ == "__main__":
