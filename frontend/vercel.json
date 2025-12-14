@@ -1,6 +1,22 @@
 {
     "rewrites": [
         {
+            "source": "/create",
+            "destination": "/create.html"
+        },
+        {
+            "source": "/privacy",
+            "destination": "/privacy.html"
+        },
+        {
+            "source": "/terms",
+            "destination": "/terms.html"
+        },
+        {
+            "source": "/expired",
+            "destination": "/expired.html"
+        },
+        {
             "source": "/view/:id",
             "destination": "/view.html"
         },
