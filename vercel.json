@@ -1,6 +1,36 @@
+```json
 {
-  "buildCommand": "echo 'No build needed'",
-  "installCommand": "echo 'No install needed'",
-  "framework": null,
-  "outputDirectory": "frontend"
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/static/(.*)",
+      "destination": "/frontend/static/$1"
+    },
+    {
+      "source": "/",
+      "destination": "/frontend/index.html"
+    },
+    {
+      "source": "/create",
+      "destination": "/frontend/create.html"
+    },
+    {
+      "source": "/view/(.*)",
+      "destination": "/frontend/view.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/frontend/privacy.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/frontend/terms.html"
+    },
+    {
+      "source": "/expired",
+      "destination": "/frontend/expired.html"
+    }
+  ]
 }
+```
