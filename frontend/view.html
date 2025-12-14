@@ -21,6 +21,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/static/tailwind-config.js"></script>
+    <script src="/static/config.js"></script>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 
@@ -332,7 +333,7 @@
         async function init() {
             try {
                 // Check if password is required
-                const response = await fetch(`/api/secrets/${secretId}/verify`, {
+                const response = await fetch(`${API_BASE_URL}/api/secrets/${secretId}/verify`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -397,7 +398,7 @@
                 // For file-based secrets (image/video/file), we directly use the file endpoints
 
                 // First, check the content type by making a metadata request
-                const verifyUrl = `/api/secrets/${secretId}/verify`;
+                const verifyUrl = `${API_BASE_URL}/api/secrets/${secretId}/verify`;
                 const verifyResponse = await fetch(verifyUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -411,8 +412,8 @@
 
                 // Now get the secret metadata to know the content type
                 const metadataUrl = currentPassword
-                    ? `/api/secrets/${secretId}?password=${encodeURIComponent(currentPassword)}`
-                    : `/api/secrets/${secretId}`;
+                    ? `${API_BASE_URL}/api/secrets/${secretId}?password=${encodeURIComponent(currentPassword)}`
+                    : `${API_BASE_URL}/api/secrets/${secretId}`;
 
                 const response = await fetch(metadataUrl);
 
@@ -448,15 +449,15 @@
                     // For images, use the /api/image/{id} endpoint
                     document.getElementById('imageContent').classList.remove('hidden');
                     const imageUrl = currentPassword
-                        ? `/api/image/${secretId}?password=${encodeURIComponent(currentPassword)}`
-                        : `/api/image/${secretId}`;
+                        ? `${API_BASE_URL}/api/image/${secretId}?password=${encodeURIComponent(currentPassword)}`
+                        : `${API_BASE_URL}/api/image/${secretId}`;
                     document.getElementById('imageBody').src = imageUrl;
                 } else if (data.content_type === 'video') {
                     // For videos, use the /api/video/{id} endpoint
                     document.getElementById('videoContent').classList.remove('hidden');
                     const videoUrl = currentPassword
-                        ? `/api/video/${secretId}?password=${encodeURIComponent(currentPassword)}`
-                        : `/api/video/${secretId}`;
+                        ? `${API_BASE_URL}/api/video/${secretId}?password=${encodeURIComponent(currentPassword)}`
+                        : `${API_BASE_URL}/api/video/${secretId}`;
                     const videoElement = document.getElementById('videoBody');
                     videoElement.src = videoUrl;
                     // Force the video element to load the source
@@ -466,8 +467,8 @@
                     document.getElementById('fileContent').classList.remove('hidden');
                     document.getElementById('fileInfo').textContent = `File: ${data.file_name}`;
                     const fileUrl = currentPassword
-                        ? `/api/file/${secretId}?password=${encodeURIComponent(currentPassword)}`
-                        : `/api/file/${secretId}`;
+                        ? `${API_BASE_URL}/api/file/${secretId}?password=${encodeURIComponent(currentPassword)}`
+                        : `${API_BASE_URL}/api/file/${secretId}`;
                     document.getElementById('downloadBtn').href = fileUrl;
                     document.getElementById('downloadBtn').download = data.file_name;
                 }

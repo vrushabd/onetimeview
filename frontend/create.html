@@ -43,6 +43,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/static/tailwind-config.js"></script>
+    <script src="/static/config.js"></script>
     <link rel="stylesheet" href="/static/styles.css">
 
     <!-- JSON-LD Structured Data -->
@@ -467,7 +468,7 @@
                     simulateProgress();
                 }
 
-                const response = await fetch('/api/secrets', {
+                const response = await fetch(API_BASE_URL + '/api/secrets', {
                     method: 'POST',
                     body: formData
                 });

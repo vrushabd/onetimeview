@@ -36,10 +36,15 @@ limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# CORS configuration
+# CORS configuration - Allow Vercel frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("ALLOWED_ORIGINS", "http://localhost:8000").split(","),
+    allow_origins=[
+        "http://localhost:8000",
+        "https://*.vercel.app",  # Allow all Vercel preview deployments
+        "https://onetimeview.vercel.app",  # Production Vercel domain
+        "*"  # Allow all origins (remove in production for security)
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
