@@ -1,44 +1,6 @@
 {
-  "rewrites": [
-    {
-      "source": "/static/styles.css",
-      "destination": "/frontend/styles.css"
-    },
-    {
-      "source": "/static/tailwind-config.js",
-      "destination": "/frontend/tailwind-config.js"
-    },
-    {
-      "source": "/static/config.js",
-      "destination": "/frontend/config.js"
-    },
-    {
-      "source": "/static/:path*",
-      "destination": "/frontend/:path*"
-    },
-    {
-      "source": "/",
-      "destination": "/frontend/index.html"
-    },
-    {
-      "source": "/create",
-      "destination": "/frontend/create.html"
-    },
-    {
-      "source": "/view/:id",
-      "destination": "/frontend/view.html"
-    },
-    {
-      "source": "/privacy",
-      "destination": "/frontend/privacy.html"
-    },
-    {
-      "source": "/terms",
-      "destination": "/frontend/terms.html"
-    },
-    {
-      "source": "/expired",
-      "destination": "/frontend/expired.html"
-    }
-  ]
+  "buildCommand": "echo 'No build needed'",
+  "installCommand": "echo 'No install needed'",
+  "framework": null,
+  "outputDirectory": "frontend"
 }
