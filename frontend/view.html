@@ -346,14 +346,20 @@
                     return;
                 }
 
+                if (!response.ok) {
+                    console.error('Verify failed:', response.status);
+                    window.location.href = '/expired';
+                    return;
+                }
+
                 const data = await response.json();
-                if (!data.verified) {
+                if (data.verified === true) {
+                    // No password required - auto-load content
+                    viewSecret();
+                } else {
                     // Password is required - show password form
                     document.getElementById('loadingSpinner').classList.add('hidden');
                     document.getElementById('passwordForm').classList.remove('hidden');
-                } else {
-                    // No password required - auto-load content
-                    viewSecret();
                 }
 
             } catch (error) {
