@@ -1,0 +1,12 @@
+{
+    "rewrites": [
+        {
+            "source": "/view/:id",
+            "destination": "/view.html"
+        },
+        {
+            "source": "/view/(.*)",
+            "destination": "/view.html"
+        }
+    ]
+}
