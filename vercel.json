@@ -1,34 +1,32 @@
 {
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "rewrites": [
+  "routes": [
     {
-      "source": "/static/(.*)",
-      "destination": "/frontend/static/$1"
+      "src": "/static/(.*)",
+      "dest": "/frontend/static/$1"
     },
     {
-      "source": "/",
-      "destination": "/frontend/index.html"
+      "src": "/view/([^/]+)",
+      "dest": "/frontend/view.html"
     },
     {
-      "source": "/create",
-      "destination": "/frontend/create.html"
+      "src": "/create",
+      "dest": "/frontend/create.html"
     },
     {
-      "source": "/view/(.*)",
-      "destination": "/frontend/view.html"
+      "src": "/privacy",
+      "dest": "/frontend/privacy.html"
     },
     {
-      "source": "/privacy",
-      "destination": "/frontend/privacy.html"
+      "src": "/terms",
+      "dest": "/frontend/terms.html"
     },
     {
-      "source": "/terms",
-      "destination": "/frontend/terms.html"
+      "src": "/expired",
+      "dest": "/frontend/expired.html"
     },
     {
-      "source": "/expired",
-      "destination": "/frontend/expired.html"
+      "src": "/",
+      "dest": "/frontend/index.html"
     }
   ]
 }
