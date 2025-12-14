@@ -1,15 +1,32 @@
 {
-  "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "frontend/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
+      "source": "/",
+      "destination": "/frontend/index.html"
+    },
     {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
+      "source": "/create",
+      "destination": "/frontend/create.html"
+    },
+    {
+      "source": "/view/:id",
+      "destination": "/frontend/view.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/frontend/privacy.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/frontend/terms.html"
+    },
+    {
+      "source": "/expired",
+      "destination": "/frontend/expired.html"
+    },
+    {
+      "source": "/static/:path*",
+      "destination": "/frontend/:path*"
     }
   ]
 }
