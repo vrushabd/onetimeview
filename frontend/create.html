@@ -496,6 +496,43 @@
             });
         }
 
+        // Fallback: upload file through our API (old behavior)
+        function uploadFileViaBackend(file, contentType, onProgress) {
+            return new Promise((resolve, reject) => {
+                const formData = new FormData();
+                formData.append('content_type', contentType);
+                formData.append('file', file);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', API_BASE_URL + '/api/secrets', true);
+
+                if (xhr.upload && onProgress) {
+                    xhr.upload.onprogress = onProgress;
+                }
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            try {
+                                const data = JSON.parse(xhr.responseText);
+                                resolve({ backend_secret: data });
+                            } catch (e) {
+                                reject(new Error('Upload response parse error'));
+                            }
+                        } else {
+                            reject(new Error('Backend upload failed'));
+                        }
+                    }
+                };
+
+                xhr.onerror = function () {
+                    reject(new Error('Network error during file upload'));
+                };
+
+                xhr.send(formData);
+            });
+        }
+
         document.getElementById('secretForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -571,65 +608,92 @@
                 progressText.textContent = 'Starting upload...';
                 uploadProgress.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-                const cloudinaryResponse = await uploadFileToCloudinary(
-                    selectedFile,
-                    selectedType,
-                    function (event) {
-                        if (event.lengthComputable && event.total > 0) {
-                            const rawPercent = Math.round((event.loaded / event.total) * 100);
-                            const percent = Math.min(rawPercent, 95);
-                            progressBar.style.width = percent + '%';
-                            progressText.textContent = `Uploading... ${percent}%`;
-                        } else {
-                            progressText.textContent = 'Uploading...';
+                let finalSecretData = null;
+
+                try {
+                    // Preferred path: direct to Cloudinary
+                    const cloudinaryResponse = await uploadFileToCloudinary(
+                        selectedFile,
+                        selectedType,
+                        function (event) {
+                            if (event.lengthComputable && event.total > 0) {
+                                const rawPercent = Math.round((event.loaded / event.total) * 100);
+                                const percent = Math.min(rawPercent, 95);
+                                progressBar.style.width = percent + '%';
+                                progressText.textContent = `Uploading... ${percent}%`;
+                            } else {
+                                progressText.textContent = 'Uploading...';
+                            }
                         }
+                    );
+
+                    // Small finalization step with your API
+                    progressBar.style.width = '95%';
+                    progressText.textContent = 'Finalizing...';
+
+                    const payload = {
+                        content_type: selectedType,
+                        file_name: selectedFile.name,
+                        mime_type: selectedFile.type,
+                        cloud_url: cloudinaryResponse.secure_url,
+                        cloud_public_id: cloudinaryResponse.public_id,
+                        cloud_resource_type: cloudinaryResponse.resource_type,
+                        password,
+                        expiry_hours: expiryHours,
+                        max_views: maxViews,
+                        is_premium: isPremium
+                    };
+
+                    const res = await fetch(API_BASE_URL + '/api/secrets/from-cloudinary', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!res.ok) {
+                        const err = await res.json().catch(() => ({}));
+                        throw new Error(err.detail || 'Failed to create secret');
                     }
-                );
 
-                // Small finalization step with your API
-                progressBar.style.width = '95%';
-                progressText.textContent = 'Finalizing...';
+                    finalSecretData = await res.json();
+                } catch (cloudErr) {
+                    // Fallback: try legacy backend upload if direct upload path fails (e.g. endpoint not deployed yet)
+                    console.error('Direct cloud upload failed, falling back to backend upload:', cloudErr);
+                    progressBar.style.width = '0%';
+                    progressText.textContent = 'Uploading via server...';
 
-                const payload = {
-                    content_type: selectedType,
-                    file_name: selectedFile.name,
-                    mime_type: selectedFile.type,
-                    cloud_url: cloudinaryResponse.secure_url,
-                    cloud_public_id: cloudinaryResponse.public_id,
-                    cloud_resource_type: cloudinaryResponse.resource_type,
-                    password,
-                    expiry_hours: expiryHours,
-                    max_views: maxViews,
-                    is_premium: isPremium
-                };
+                    const backendResult = await uploadFileViaBackend(
+                        selectedFile,
+                        selectedType,
+                        function (event) {
+                            if (event.lengthComputable && event.total > 0) {
+                                const rawPercent = Math.round((event.loaded / event.total) * 100);
+                                const percent = Math.min(rawPercent, 95);
+                                progressBar.style.width = percent + '%';
+                                progressText.textContent = `Uploading... ${percent}%`;
+                            } else {
+                                progressText.textContent = 'Uploading...';
+                            }
+                        }
+                    );
 
-                const res = await fetch(API_BASE_URL + '/api/secrets/from-cloudinary', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!res.ok) {
-                    const err = await res.json().catch(() => ({}));
-                    throw new Error(err.detail || 'Failed to create secret');
+                    finalSecretData = backendResult.backend_secret;
                 }
-
-                const data = await res.json();
 
                 progressBar.style.width = '100%';
                 progressText.textContent = 'Done!';
 
                 document.getElementById('secretForm').classList.add('hidden');
                 document.getElementById('successMessage').classList.remove('hidden');
-                document.getElementById('secretLink').value = data.url;
+                document.getElementById('secretLink').value = finalSecretData.url;
 
-                if (data.expires_at) {
-                    const expiryDate = new Date(data.expires_at);
-                    const viewText = data.max_views === 1 ? 'first view' : `${data.max_views} views`;
+                if (finalSecretData.expires_at) {
+                    const expiryDate = new Date(finalSecretData.expires_at);
+                    const viewText = finalSecretData.max_views === 1 ? 'first view' : `${finalSecretData.max_views} views`;
                     document.getElementById('expiryInfo').textContent =
                         `⏰ Expires on ${expiryDate.toLocaleString()} or after ${viewText}`;
                 } else {
-                    const viewText = data.max_views === 1 ? 'first view' : `${data.max_views} views`;
+                    const viewText = finalSecretData.max_views === 1 ? 'first view' : `${finalSecretData.max_views} views`;
                     document.getElementById('expiryInfo').textContent =
                         `⚠️ Will be deleted after ${viewText}`;
                 }
