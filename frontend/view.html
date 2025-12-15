@@ -463,30 +463,45 @@
                     document.getElementById('textContent').classList.remove('hidden');
                     document.getElementById('textBody').textContent = data.content;
                 } else if (data.content_type === 'image') {
-                    // For images, use the /api/image/{id} endpoint
+                    // For images, use the download_url from response (Cloudinary URL)
                     document.getElementById('imageContent').classList.remove('hidden');
-                    const imageUrl = currentPassword
-                        ? `${API_BASE_URL}/api/image/${secretId}?password=${encodeURIComponent(currentPassword)}`
-                        : `${API_BASE_URL}/api/image/${secretId}`;
-                    document.getElementById('imageBody').src = imageUrl;
+                    if (data.download_url) {
+                        document.getElementById('imageBody').src = data.download_url;
+                    } else {
+                        // Fallback to API endpoint if no download_url
+                        const imageUrl = currentPassword
+                            ? `${API_BASE_URL}/api/image/${secretId}?password=${encodeURIComponent(currentPassword)}`
+                            : `${API_BASE_URL}/api/image/${secretId}`;
+                        document.getElementById('imageBody').src = imageUrl;
+                    }
                 } else if (data.content_type === 'video') {
-                    // For videos, use the /api/video/{id} endpoint
+                    // For videos, use the download_url from response (Cloudinary URL)
                     document.getElementById('videoContent').classList.remove('hidden');
-                    const videoUrl = currentPassword
-                        ? `${API_BASE_URL}/api/video/${secretId}?password=${encodeURIComponent(currentPassword)}`
-                        : `${API_BASE_URL}/api/video/${secretId}`;
                     const videoElement = document.getElementById('videoBody');
-                    videoElement.src = videoUrl;
+                    if (data.download_url) {
+                        videoElement.src = data.download_url;
+                    } else {
+                        // Fallback to API endpoint if no download_url
+                        const videoUrl = currentPassword
+                            ? `${API_BASE_URL}/api/video/${secretId}?password=${encodeURIComponent(currentPassword)}`
+                            : `${API_BASE_URL}/api/video/${secretId}`;
+                        videoElement.src = videoUrl;
+                    }
                     // Force the video element to load the source
                     videoElement.load();
                 } else if (data.content_type === 'file') {
-                    // For files, use the /api/file/{id} endpoint
+                    // For files, use the download_url from response (Cloudinary URL)
                     document.getElementById('fileContent').classList.remove('hidden');
                     document.getElementById('fileInfo').textContent = `File: ${data.file_name}`;
-                    const fileUrl = currentPassword
-                        ? `${API_BASE_URL}/api/file/${secretId}?password=${encodeURIComponent(currentPassword)}`
-                        : `${API_BASE_URL}/api/file/${secretId}`;
-                    document.getElementById('downloadBtn').href = fileUrl;
+                    if (data.download_url) {
+                        document.getElementById('downloadBtn').href = data.download_url;
+                    } else {
+                        // Fallback to API endpoint if no download_url
+                        const fileUrl = currentPassword
+                            ? `${API_BASE_URL}/api/file/${secretId}?password=${encodeURIComponent(currentPassword)}`
+                            : `${API_BASE_URL}/api/file/${secretId}`;
+                        document.getElementById('downloadBtn').href = fileUrl;
+                    }
                     document.getElementById('downloadBtn').download = data.file_name;
                 }
 
