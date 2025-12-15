@@ -303,6 +303,18 @@
         let passwordVerified = false;
         let currentPassword = null;
 
+        // Helpers
+        function addPasswordParam(url, password) {
+            if (!password) return url;
+            try {
+                const parsed = new URL(url);
+                parsed.searchParams.set('password', password);
+                return parsed.toString();
+            } catch (e) {
+                return url;
+            }
+        }
+
         // Auto-load secret on page load
         async function init() {
             try {
@@ -429,7 +441,7 @@
                     // For images, use the download_url from response (Cloudinary URL)
                     document.getElementById('imageContent').classList.remove('hidden');
                     if (data.download_url) {
-                        document.getElementById('imageBody').src = data.download_url;
+                        document.getElementById('imageBody').src = addPasswordParam(data.download_url, currentPassword);
                     } else {
                         // Fallback to API endpoint if no download_url
                         const imageUrl = currentPassword
@@ -442,7 +454,7 @@
                     document.getElementById('videoContent').classList.remove('hidden');
                     const videoElement = document.getElementById('videoBody');
                     if (data.download_url) {
-                        videoElement.src = data.download_url;
+                        videoElement.src = addPasswordParam(data.download_url, currentPassword);
                     } else {
                         // Fallback to API endpoint if no download_url
                         const videoUrl = currentPassword
@@ -457,7 +469,7 @@
                     document.getElementById('fileContent').classList.remove('hidden');
                     document.getElementById('fileInfo').textContent = `File: ${data.file_name}`;
                     if (data.download_url) {
-                        document.getElementById('downloadBtn').href = data.download_url;
+                        document.getElementById('downloadBtn').href = addPasswordParam(data.download_url, currentPassword);
                     } else {
                         // Fallback to API endpoint if no download_url
                         const fileUrl = currentPassword

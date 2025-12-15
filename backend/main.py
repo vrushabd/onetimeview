@@ -26,6 +26,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Helper to determine public API base URL (avoids localhost in shared links)
+def get_public_base_url(request: Request) -> str:
+    env_base = os.getenv("API_BASE_URL")
+    if env_base:
+        return env_base.rstrip("/")
+    return str(request.base_url).rstrip("/")
+
 # Initialize FastAPI app
 app = FastAPI(
     title="OneTimeView API",
@@ -359,12 +366,12 @@ async def get_secret(
     if secret.cloud_url:
         # For images, we must proxy through backend to get correct Content-Type (since we upload as raw)
         if secret.content_type == "image":
-            base_url = str(request.base_url).rstrip('/')
+            base_url = get_public_base_url(request)
             response.download_url = f"{base_url}/api/image/{secret_id}"
         else:
             response.download_url = secret.cloud_url
     elif secret.file_path:
-        base_url = str(request.base_url).rstrip('/')
+        base_url = get_public_base_url(request)
         if secret.content_type == "image":
             response.download_url = f"{base_url}/api/image/{secret_id}"
         elif secret.content_type == "video":
