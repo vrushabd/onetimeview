@@ -241,10 +241,10 @@ async def create_secret(
         
         # Upload to Cloudinary
         file_content = await file.read()
-        upload_result = cloudinary_upload(file_content, resource_type=resource_type)
-        
-        if not upload_result:
-            raise HTTPException(status_code=500, detail="Failed to upload file to cloud storage")
+        try:
+            upload_result = cloudinary_upload(file_content, resource_type=resource_type)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
         
         secret.cloud_url = upload_result["secure_url"]
         secret.cloud_public_id = upload_result["public_id"]

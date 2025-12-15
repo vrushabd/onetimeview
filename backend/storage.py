@@ -56,7 +56,7 @@ def upload_file(file_obj, resource_type="auto"):
     except Exception as e:
         logger.error(f"Cloudinary upload error: {str(e)}")
         logger.error(f"Full traceback: {traceback.format_exc()}")
-        return None
+        raise e
 
 def delete_file(public_id, resource_type="auto"):
     """
