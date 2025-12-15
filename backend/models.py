@@ -4,11 +4,19 @@ import uuid
 from backend.database import Base
 
 
+import secrets
+import string
+
+def generate_short_id(length=12):
+    """Generate a URL-safe short ID"""
+    alphabet = string.ascii_letters + string.digits
+    return ''.join(secrets.choice(alphabet) for _ in range(length))
+
 class Secret(Base):
     """Model for storing secrets with one-time view logic"""
     __tablename__ = "secrets"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(String(36), primary_key=True, default=lambda: generate_short_id(length=6))
     content_type = Column(String(20), nullable=False)  # text, image, video, file
     content = Column(Text, nullable=True)  # For text secrets
     file_path = Column(String(255), nullable=True)  # Legacy local file path
