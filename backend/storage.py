@@ -4,6 +4,12 @@ import cloudinary.uploader
 import cloudinary.api
 from dotenv import load_dotenv
 from io import BytesIO
+import traceback
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -22,8 +28,15 @@ def upload_file(file_obj, resource_type="auto"):
     Returns a dictionary with 'public_id', 'secure_url', and 'format'.
     """
     try:
+        # Log configuration (without exposing secrets)
+        logger.info(f"Cloudinary config - Cloud Name: {os.getenv('CLOUDINARY_CLOUD_NAME')}")
+        logger.info(f"API Key exists: {bool(os.getenv('CLOUDINARY_API_KEY'))}")
+        logger.info(f"API Secret exists: {bool(os.getenv('CLOUDINARY_API_SECRET'))}")
+        logger.info(f"Resource type: {resource_type}")
+        
         # If file_obj is bytes, wrap it in BytesIO
         if isinstance(file_obj, bytes):
+            logger.info(f"Converting bytes to BytesIO (size: {len(file_obj)} bytes)")
             file_obj = BytesIO(file_obj)
         
         response = cloudinary.uploader.upload(
@@ -31,6 +44,9 @@ def upload_file(file_obj, resource_type="auto"):
             resource_type=resource_type,
             folder="onetimeview_secrets"  # Keep organized
         )
+        
+        logger.info(f"Upload successful - Public ID: {response.get('public_id')}")
+        
         return {
             "public_id": response.get("public_id"),
             "secure_url": response.get("secure_url"),
@@ -38,7 +54,8 @@ def upload_file(file_obj, resource_type="auto"):
             "resource_type": response.get("resource_type")
         }
     except Exception as e:
-        print(f"Cloudinary upload error: {e}")
+        logger.error(f"Cloudinary upload error: {str(e)}")
+        logger.error(f"Full traceback: {traceback.format_exc()}")
         return None
 
 def delete_file(public_id, resource_type="auto"):

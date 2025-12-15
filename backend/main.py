@@ -119,10 +119,50 @@ async def serve_terms():
     return {"error": "Page not found"}
 
 
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy"}
+
+
+@app.get("/api/test-cloudinary")
+async def test_cloudinary():
+    """Test Cloudinary configuration"""
+    import cloudinary
+    
+    config_info = {
+        "cloud_name": os.getenv("CLOUDINARY_CLOUD_NAME"),
+        "api_key_exists": bool(os.getenv("CLOUDINARY_API_KEY")),
+        "api_secret_exists": bool(os.getenv("CLOUDINARY_API_SECRET")),
+        "cloudinary_configured": bool(cloudinary.config().cloud_name)
+    }
+    
+    # Try a simple test upload
+    try:
+        from io import BytesIO
+        test_data = BytesIO(b"test")
+        result = cloudinary.uploader.upload(
+            test_data,
+            resource_type="raw",
+            folder="onetimeview_test"
+        )
+        
+        # Delete the test file
+        cloudinary.uploader.destroy(result['public_id'], resource_type='raw')
+        
+        return {
+            "status": "success",
+            "config": config_info,
+            "test_upload": "successful"
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "config": config_info,
+            "error": str(e)
+        }
 
 
 @app.post("/api/secrets", response_model=SecretResponse)
