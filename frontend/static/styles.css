@@ -92,6 +92,29 @@ html {
     background: #805ad5;
 }
 
+/* Form sections & typography tweaks for better hierarchy */
+.bg-card label {
+    color: #EDE9FE; /* soft lavender for headings */
+}
+
+.bg-card p.text-text-secondary {
+    color: #C4B5FD; /* keep secondary but ensure consistency */
+}
+
+/* Slight card separation between stacked form sections */
+.bg-card > div + div {
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .bg-card > div + div {
+        padding-top: 0.75rem;
+        margin-top: 0.25rem;
+    }
+}
+
 /* File upload area */
 .upload-area {
     border: 2px dashed #6b46c1;
@@ -184,6 +207,20 @@ a {
 button,
 .inline-block {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Primary CTA buttons */
+.bg-cta {
+    box-shadow: 0 18px 40px rgba(124, 58, 237, 0.35);
+}
+
+.bg-cta:hover {
+    box-shadow: 0 22px 55px rgba(147, 51, 234, 0.5);
+}
+
+.bg-cta:active {
+    transform: scale(0.97);
+    box-shadow: 0 10px 25px rgba(124, 58, 237, 0.35);
 }
 
 /* Smooth icon transitions */
