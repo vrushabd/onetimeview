@@ -118,7 +118,7 @@
                 <span>This content will be <strong>permanently deleted</strong> after the first view</span>
             </p>
 
-            <div id="successMessage" class="hidden bg-green-900/50 border border-green-500 rounded-lg p-6 mb-6">
+            <div id="successMessage" class="hidden bg-green-900/50 border border-green-500 rounded-lg p-4 sm:p-6 mb-6">
                 <h3 class="text-xl font-bold mb-3 text-green-400 flex items-center gap-2">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
@@ -129,11 +129,12 @@
                     <span>Secret Created Successfully!</span>
                 </h3>
                 <p class="text-gray-300 mb-4">Share this link with your recipient:</p>
-                <div class="flex items-center space-x-3">
+                <div
+                    class="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-3">
                     <input type="text" id="secretLink" readonly
                         class="flex-1 bg-background border border-card-border rounded-lg px-4 py-3 text-white">
                     <button onclick="copyLink()"
-                        class="bg-cta hover:bg-cta-hover text-white px-6 py-3 rounded-lg font-bold transition copy-btn">
+                        class="w-full sm:w-auto bg-cta hover:bg-cta-hover text-white px-6 py-3 rounded-lg font-bold transition copy-btn whitespace-nowrap">
                         Copy Link
                     </button>
                 </div>
@@ -538,6 +539,27 @@
 
         // Initialize
         selectType('text');
+
+        // Check if redirected from homepage with success
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success') === 'true' && urlParams.get('url')) {
+            const secretUrl = decodeURIComponent(urlParams.get('url'));
+
+            // Hide the form and show success message
+            document.getElementById('secretForm').classList.add('hidden');
+            document.getElementById('successMessage').classList.remove('hidden');
+            document.getElementById('secretLink').value = secretUrl;
+
+            // Set default expiry info for quick creation
+            document.getElementById('expiryInfo').textContent =
+                '⚠️ Will be deleted after first view or in 24 hours';
+
+            // Scroll to success message
+            document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+
+            // Clean up URL
+            window.history.replaceState({}, document.title, '/create');
+        }
     </script>
 </body>
 
