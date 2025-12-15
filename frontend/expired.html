@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Content Expired - OneTimeView</title>
-    <meta name="description" content="This secret has already been viewed or expired.">
+    <title>Secret Unavailable | OneTimeView</title>
+    <meta name="description" content="This one-time link is no longer available because it was viewed, expired, or invalid. Create a new secure link in seconds.">
     <meta name="robots" content="noindex, nofollow">
 
     <!-- Favicon -->
@@ -17,76 +17,60 @@
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 
-<body class="bg-background min-h-screen text-text-primary flex items-center justify-center">
-    <div class="container mx-auto px-6">
-        <div class="max-w-2xl mx-auto text-center">
-            <div class="flex justify-center mb-4 animate-fade-in">
-                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round" class="text-primary">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                </svg>
+<body class="bg-background min-h-screen text-text-primary flex items-center justify-center px-4">
+    <div class="container mx-auto">
+        <div class="max-w-2xl mx-auto text-center space-y-6">
+            <div class="flex flex-col items-center gap-4 animate-fade-in">
+                <div class="w-14 h-14 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm uppercase tracking-[0.2em] text-primary">One-time link closed</p>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white mt-2">This secret is unavailable</h1>
+                    <p class="text-base sm:text-lg text-text-secondary mt-3">
+                        It was viewed already, hit its expiry time, or the link was invalid.
+                    </p>
+                </div>
             </div>
-            <h1 class="text-3xl sm:text-4xl font-bold mb-4 animate-fade-in">Destroyed</h1>
-            <p class="text-base sm:text-lg text-text-secondary mb-6 animate-fade-in">
-                This secret has either already been viewed or has expired.
-            </p>
 
-            <div
-                class="bg-card backdrop-blur-lg rounded-xl p-5 sm:p-6 mb-6 text-left animate-fade-in border border-card-border">
-                <h2 class="text-lg sm:text-xl font-bold mb-3">Why can't I view this?</h2>
-                <ul class="space-y-2 text-sm sm:text-base text-text-secondary">
-                    <li class="flex items-start">
-                        <span class="text-primary-light mr-3 text-xl">•</span>
-                        <span><strong>Already viewed:</strong> OneTimeView secrets can only be opened once. After the
-                            first view, they're permanently deleted.</span>
+            <div class="bg-card rounded-2xl border border-card-border p-6 sm:p-7 text-left space-y-4 shadow-soft animate-fade-in">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <h2 class="text-lg sm:text-xl font-semibold text-white">What happened?</h2>
+                    <span class="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary-light border border-primary/30">Auto-deleted by design</span>
+                </div>
+                <ul class="space-y-3 text-sm sm:text-base text-text-secondary">
+                    <li class="flex items-start gap-3">
+                        <span class="text-primary-light text-lg">•</span>
+                        <div><strong>Already viewed:</strong> OneTimeView secrets are destroyed right after the first open.</div>
                     </li>
-                    <li class="flex items-start">
-                        <span class="text-primary-light mr-3 text-xl">•</span>
-                        <span><strong>Time expired:</strong> The secret may have exceeded its expiration time.</span>
+                    <li class="flex items-start gap-3">
+                        <span class="text-primary-light text-lg">•</span>
+                        <div><strong>Time expired:</strong> It reached its scheduled expiry time and was removed.</div>
                     </li>
-                    <li class="flex items-start">
-                        <span class="text-primary-light mr-3 text-xl">•</span>
-                        <span><strong>Invalid link:</strong> The link may be incorrect or the secret never
-                            existed.</span>
+                    <li class="flex items-start gap-3">
+                        <span class="text-primary-light text-lg">•</span>
+                        <div><strong>Invalid link:</strong> The URL may be incorrect or the secret never existed.</div>
                     </li>
                 </ul>
+                <p class="text-sm text-text-muted">Need to share something sensitive? Create a fresh one-time link below.</p>
             </div>
 
-            <div class="space-y-3 animate-fade-in">
-                <p class="text-sm sm:text-base text-text-secondary">
-                    If you need to access this information, please contact the person who sent you this link.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="/create"
-                        class="bg-cta hover:bg-cta-hover text-white font-bold py-3 px-6 rounded-lg transition">
-                        Create Your Own Secret
-                    </a>
-                    <a href="/"
-                        class="bg-card hover:bg-card/80 border border-card-border text-white font-bold py-3 px-6 rounded-lg transition">
-                        Go to Home
-                    </a>
-                </div>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center animate-fade-in">
+                <a href="/create"
+                    class="bg-cta hover:bg-cta-hover text-white font-bold py-3 px-6 rounded-lg transition shadow-soft">
+                    Create a new secret
+                </a>
+                <a href="/"
+                    class="bg-card hover:bg-card/80 border border-card-border text-white font-semibold py-3 px-6 rounded-lg transition">
+                    Go to homepage
+                </a>
             </div>
         </div>
     </div>
-
-    <script>
-        // Animate elements on load
-        document.addEventListener('DOMContentLoaded', () => {
-            const elements = document.querySelectorAll('.animate-fade-in');
-            elements.forEach((el, index) => {
-                setTimeout(() => {
-                    el.style.opacity = '0';
-                    el.style.transform = 'translateY(20px)';
-                    el.style.transition = 'all 0.6s ease-out';
-                    setTimeout(() => {
-                        el.style.opacity = '1';
-                        el.style.transform = 'translateY(0)';
-                    }, 50);
-                }, index * 100);
-            });
-        });
-    </script>
+</body>
 </body>
 
 </html>
