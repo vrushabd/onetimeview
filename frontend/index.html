@@ -220,13 +220,13 @@
                                 <option value="1">1 view (recommended)</option>
                                 <option value="2">2 views</option>
                                 <option value="3">3 views</option>
-                                <option value="custom">Custom (up to 10)</option>
+                                <option value="custom">Custom (up to 100)</option>
                             </select>
                         </label>
                         <div id="customViewsWrapper" class="hidden">
                             <label class="block">
-                                <span class="text-sm text-text-primary">Custom views (1-10)</span>
-                                <input id="customViews" type="number" min="1" max="10" placeholder="Enter 1-10"
+                                <span class="text-sm text-text-primary">Custom views (1-100)</span>
+                                <input id="customViews" type="number" min="1" max="100" placeholder="Enter 1-100"
                                     class="h-14 text-base px-4 bg-background border border-card-border rounded-lg w-full" />
                             </label>
                         </div>
@@ -357,8 +357,8 @@
 
             if (maxViews === 'custom') {
                 const customVal = parseInt(customViewsInput.value, 10);
-                if (Number.isNaN(customVal) || customVal < 1 || customVal > 10) {
-                    alert('Please enter a custom view limit between 1 and 10');
+                if (Number.isNaN(customVal) || customVal < 1 || customVal > 100) {
+                    alert('Please enter a custom view limit between 1 and 100');
                     return;
                 }
                 maxViews = customVal;
