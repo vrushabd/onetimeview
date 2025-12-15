@@ -220,8 +220,16 @@
                                 <option value="1">1 view (recommended)</option>
                                 <option value="2">2 views</option>
                                 <option value="3">3 views</option>
+                                <option value="custom">Custom (up to 10)</option>
                             </select>
                         </label>
+                        <div id="customViewsWrapper" class="hidden">
+                            <label class="block">
+                                <span class="text-sm text-text-primary">Custom views (1-10)</span>
+                                <input id="customViews" type="number" min="1" max="10" placeholder="Enter 1-10"
+                                    class="h-14 text-base px-4 bg-background border border-card-border rounded-lg w-full" />
+                            </label>
+                        </div>
                     </div>
                     <button type="submit" class="btn-primary w-full">Create secret link</button>
                     <a href="/create" class="block w-full text-center bg-card hover:bg-card/80 border border-card-border text-white font-semibold py-3 px-4 rounded-lg transition">Advanced options</a>
@@ -321,15 +329,39 @@
 
     <script>
         // Handle quick secret form submission
+        const viewsSelect = document.getElementById('viewsSelect');
+        const customViewsWrapper = document.getElementById('customViewsWrapper');
+        const customViewsInput = document.getElementById('customViews');
+
+        const syncCustomViews = () => {
+            if (viewsSelect.value === 'custom') {
+                customViewsWrapper.classList.remove('hidden');
+            } else {
+                customViewsWrapper.classList.add('hidden');
+            }
+        };
+
+        viewsSelect.addEventListener('change', syncCustomViews);
+        syncCustomViews();
+
         document.getElementById('quickSecretForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const quickText = document.getElementById('quickText').value;
             const expiryHours = document.getElementById('expirySelect').value;
-            const maxViews = document.getElementById('viewsSelect').value;
+            let maxViews = document.getElementById('viewsSelect').value;
             if (!quickText.trim()) {
                 alert('Please enter a message');
                 return;
+            }
+
+            if (maxViews === 'custom') {
+                const customVal = parseInt(customViewsInput.value, 10);
+                if (Number.isNaN(customVal) || customVal < 1 || customVal > 10) {
+                    alert('Please enter a custom view limit between 1 and 10');
+                    return;
+                }
+                maxViews = customVal;
             }
 
             // Create FormData with default settings
