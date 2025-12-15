@@ -1,0 +1,18 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Eye outline representing "view" -->
+  <path d="M16 8C10 8 5 12 3 16C5 20 10 24 16 24C22 24 27 20 29 16C27 12 22 8 16 8Z" stroke="#6D5DF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- Pupil with number "1" -->
+  <circle cx="16" cy="16" r="5" fill="#6D5DF6"/>
+  
+  <!-- Number 1 inside the eye -->
+  <text x="16" y="20" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="white" text-anchor="middle">1</text>
+  
+  <!-- Disappearing effect - dots -->
+  <circle cx="8" cy="6" r="1" fill="#6D5DF6" opacity="0.6"/>
+  <circle cx="11" cy="4" r="0.8" fill="#6D5DF6" opacity="0.4"/>
+  <circle cx="14" cy="3" r="0.6" fill="#6D5DF6" opacity="0.3"/>
+  <circle cx="18" cy="3" r="0.6" fill="#6D5DF6" opacity="0.3"/>
+  <circle cx="21" cy="4" r="0.8" fill="#6D5DF6" opacity="0.4"/>
+  <circle cx="24" cy="6" r="1" fill="#6D5DF6" opacity="0.6"/>
+</svg>
