@@ -4,6 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from backend.database import SessionLocal
 from backend.models import Secret
+from backend.storage import delete_file as cloudinary_delete
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -22,15 +23,26 @@ async def cleanup_expired_secrets():
             
             for secret in secrets:
                 if secret.is_expired():
-                    # Delete associated file if exists
+                    # Delete from Cloudinary if exists
+                    if secret.cloud_public_id:
+                        try:
+                            cloudinary_delete(
+                                secret.cloud_public_id, 
+                                resource_type=secret.cloud_resource_type or "auto"
+                            )
+                            logger.info(f"Deleted Cloudinary file: {secret.cloud_public_id}")
+                        except Exception as e:
+                            logger.error(f"Error deleting Cloudinary file {secret.cloud_public_id}: {e}")
+                    
+                    # Delete local file if exists (legacy)
                     if secret.file_path:
                         file_path = Path(secret.file_path)
                         if file_path.exists():
                             try:
                                 os.remove(file_path)
-                                logger.info(f"Deleted file: {file_path}")
+                                logger.info(f"Deleted local file: {file_path}")
                             except Exception as e:
-                                logger.error(f"Error deleting file {file_path}: {e}")
+                                logger.error(f"Error deleting local file {file_path}: {e}")
                     
                     # Delete secret from database
                     db.delete(secret)
@@ -57,15 +69,26 @@ def delete_secret_immediately(secret_id: str):
         secret = db.query(Secret).filter(Secret.id == secret_id).first()
         
         if secret:
-            # Delete file if exists
+            # Delete from Cloudinary if exists
+            if secret.cloud_public_id:
+                try:
+                    cloudinary_delete(
+                        secret.cloud_public_id,
+                        resource_type=secret.cloud_resource_type or "auto"
+                    )
+                    logger.info(f"Deleted Cloudinary file: {secret.cloud_public_id}")
+                except Exception as e:
+                    logger.error(f"Error deleting Cloudinary file {secret.cloud_public_id}: {e}")
+            
+            # Delete local file if exists (legacy)
             if secret.file_path:
                 file_path = Path(secret.file_path)
                 if file_path.exists():
                     try:
                         os.remove(file_path)
-                        logger.info(f"Deleted file: {file_path}")
+                        logger.info(f"Deleted local file: {file_path}")
                     except Exception as e:
-                        logger.error(f"Error deleting file {file_path}: {e}")
+                        logger.error(f"Error deleting local file {file_path}: {e}")
             
             # Delete from database
             db.delete(secret)

@@ -11,7 +11,7 @@ class Secret(Base):
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     content_type = Column(String(20), nullable=False)  # text, image, video, file
     content = Column(Text, nullable=True)  # For text secrets
-    file_path = Column(String(255), nullable=True)  # For file-based secrets
+    file_path = Column(String(255), nullable=True)  # Legacy local file path
     file_name = Column(String(255), nullable=True)  # Original filename
     mime_type = Column(String(100), nullable=True)  # MIME type for files
     password_hash = Column(String(100), nullable=True)  # Bcrypt hash if password protected
@@ -20,6 +20,11 @@ class Secret(Base):
     max_views = Column(Integer, default=1)  # Maximum allowed views (default 1)
     is_premium = Column(Boolean, default=False)  # Premium feature flag
     created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Cloudinary fields
+    cloud_url = Column(String(500), nullable=True)  # Cloudinary secure URL
+    cloud_public_id = Column(String(255), nullable=True)  # Cloudinary public_id for deletion
+    cloud_resource_type = Column(String(20), nullable=True)  # image, video, raw
     
     def is_expired(self):
         """Check if secret has expired"""

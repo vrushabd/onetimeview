@@ -89,25 +89,55 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
         textarea,
         input {
             background-color: #0F0F1A;
             border: 1px solid #2A2C45;
             color: #FFFFFF;
             border-radius: 8px;
-            padding: 12px 16px;
+            padding: 16px 20px;
             font-size: 15px;
-            transition: border-color 0.2s ease;
+            transition: all 0.3s ease;
+            line-height: 1.6;
         }
 
         textarea:focus,
         input:focus {
             outline: none;
             border-color: #6D5DF6;
+            box-shadow: 0 0 0 3px rgba(109, 93, 246, 0.1);
         }
 
         ::placeholder {
             color: #8E90B5;
+        }
+
+        /* Smooth button transitions */
+        .btn-primary {
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(109, 93, 246, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Card smooth transitions */
+        .card {
+            transition: all 0.3s ease;
+        }
+
+        a {
+            transition: all 0.3s ease;
         }
     </style>
 </head>

@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, Form, Depends, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -16,6 +17,7 @@ from backend.security import (
     sanitize_filename, get_mime_type, validate_file_type
 )
 from backend.cleanup import cleanup_expired_secrets, delete_secret_immediately
+from backend.storage import upload_file as cloudinary_upload, delete_file as cloudinary_delete
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -23,7 +25,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Initialize FastAPI app - API ONLY (No frontend serving)
+# Initialize FastAPI app
 app = FastAPI(
     title="OneTimeView API",
     description="Secure one-time message and file sharing API",
@@ -59,29 +61,62 @@ async def startup_event():
     """Initialize database and start cleanup task"""
     init_db()
     asyncio.create_task(cleanup_expired_secrets())
-
-
 # ============================================================================
-# API ENDPOINTS ONLY - NO FRONTEND SERVING
+# SERVE STATIC FRONTEND FILES
 # ============================================================================
+
+# Mount static files (CSS, JS, etc.)
+FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
+if FRONTEND_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR / "static")), name="static")
 
 @app.get("/")
-async def root():
-    """API root endpoint"""
-    return {
-        "name": "OneTimeView API",
-        "version": "1.0.0",
-        "status": "running",
-        "docs": "/docs",
-        "endpoints": {
-            "create_secret": "POST /api/secrets",
-            "get_secret": "GET /api/secrets/{id}",
-            "verify_password": "POST /api/secrets/{id}/verify",
-            "serve_image": "GET /api/image/{id}",
-            "serve_video": "GET /api/video/{id}",
-            "serve_file": "GET /api/file/{id}"
-        }
-    }
+async def serve_index():
+    """Serve frontend index.html"""
+    index_path = FRONTEND_DIR / "index.html"
+    if index_path.exists():
+        return FileResponse(index_path)
+    return {"error": "Frontend not found"}
+
+@app.get("/create")
+async def serve_create():
+    """Serve create page"""
+    create_path = FRONTEND_DIR / "create.html"
+    if create_path.exists():
+        return FileResponse(create_path)
+    return {"error": "Page not found"}
+
+@app.get("/view/{secret_id}")
+async def serve_view(secret_id: str):
+    """Serve view page"""
+    view_path = FRONTEND_DIR / "view.html"
+    if view_path.exists():
+        return FileResponse(view_path)
+    return {"error": "Page not found"}
+
+@app.get("/expired")
+async def serve_expired():
+    """Serve expired page"""
+    expired_path = FRONTEND_DIR / "expired.html"
+    if expired_path.exists():
+        return FileResponse(expired_path)
+    return {"error": "Page not found"}
+
+@app.get("/privacy")
+async def serve_privacy():
+    """Serve privacy policy page"""
+    privacy_path = FRONTEND_DIR / "privacy.html"
+    if privacy_path.exists():
+        return FileResponse(privacy_path)
+    return {"error": "Page not found"}
+
+@app.get("/terms")
+async def serve_terms():
+    """Serve terms of service page"""
+    terms_path = FRONTEND_DIR / "terms.html"
+    if terms_path.exists():
+        return FileResponse(terms_path)
+    return {"error": "Page not found"}
 
 
 @app.get("/health")
@@ -137,7 +172,7 @@ async def create_secret(
     if content_type == "text":
         secret.content = content
     
-    # Handle file upload
+    # Handle file upload - Use Cloudinary
     if file:
         # Validate file type
         is_valid, detected_type = validate_file_type(file.filename)
@@ -156,14 +191,24 @@ async def create_secret(
                 detail=f"File size exceeds limit ({max_size / 1024 / 1024}MB)"
             )
         
-        # Save file
-        safe_filename = sanitize_filename(file.filename)
-        file_path = UPLOAD_DIR / safe_filename
+        # Determine resource type for Cloudinary
+        if content_type == "image":
+            resource_type = "image"
+        elif content_type == "video":
+            resource_type = "video"
+        else:
+            resource_type = "raw"  # For generic files
         
-        with open(file_path, "wb") as f:
-            f.write(await file.read())
+        # Upload to Cloudinary
+        file_content = await file.read()
+        upload_result = cloudinary_upload(file_content, resource_type=resource_type)
         
-        secret.file_path = str(file_path)
+        if not upload_result:
+            raise HTTPException(status_code=500, detail="Failed to upload file to cloud storage")
+        
+        secret.cloud_url = upload_result["secure_url"]
+        secret.cloud_public_id = upload_result["public_id"]
+        secret.cloud_resource_type = upload_result.get("resource_type", resource_type)
         secret.file_name = file.filename
         secret.mime_type = get_mime_type(file.filename)
     
@@ -271,8 +316,10 @@ async def get_secret(
         remaining_views=remaining_views
     )
     
-    # For files, provide download URL
-    if secret.file_path:
+    # For files, provide Cloudinary URL or fallback to download URL
+    if secret.cloud_url:
+        response.download_url = secret.cloud_url
+    elif secret.file_path:
         base_url = str(request.base_url).rstrip('/')
         response.download_url = f"{base_url}/api/download/{secret_id}"
     
@@ -309,6 +356,12 @@ async def serve_image(
     if secret.content_type != "image":
         raise HTTPException(status_code=400, detail="This secret is not an image")
     
+    # Use Cloudinary URL if available
+    if secret.cloud_url:
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url=secret.cloud_url)
+    
+    # Fallback to local file
     if not secret.file_path:
         raise HTTPException(status_code=404, detail="File not found")
     
@@ -348,6 +401,12 @@ async def serve_video(
     if secret.content_type != "video":
         raise HTTPException(status_code=400, detail="This secret is not a video")
     
+    # Use Cloudinary URL if available
+    if secret.cloud_url:
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url=secret.cloud_url)
+    
+    # Fallback to local file
     if not secret.file_path:
         raise HTTPException(status_code=404, detail="File not found")
     
@@ -431,6 +490,12 @@ async def serve_file(
     if secret.content_type != "file":
         raise HTTPException(status_code=400, detail="This secret is not a file")
     
+    # Use Cloudinary URL if available
+    if secret.cloud_url:
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url=secret.cloud_url)
+    
+    # Fallback to local file
     if not secret.file_path:
         raise HTTPException(status_code=404, detail="File not found")
     
