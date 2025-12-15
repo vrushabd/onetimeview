@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary SEO Meta Tags -->
-    <title>OneTimeView – Secure One-Time Message & File Sharing | Self-Destruct Links</title>
+    <title>OneTimeView | Create One-Time Secret Links for Messages & Files</title>
     <meta name="description"
-        content="Share confidential messages, images, and files that automatically delete after viewing. Free, secure, and no login required. Create self-destructing links in seconds.">
+        content="Generate secure one-time links for messages, images, videos, and files. Your content auto-deletes after it’s opened. No login required, optional password, free tier ready.">
     <meta name="keywords"
-        content="one time message, self destruct message, secure file sharing, burn after reading, one time link generator, private message sharing, ephemeral messaging, temporary file sharing, confidential document sharing, password protected links">
+        content="one time link, self destruct message, burn after reading, secure file sharing, one time file link, secret link, private message, temporary file sharing">
     <meta name="author" content="OneTimeView">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <link rel="canonical" href="https://onetimeview.com/">
@@ -24,17 +24,17 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://onetimeview.com/">
-    <meta property="og:title" content="OneTimeView - Secure One-Time Message & File Sharing">
+    <meta property="og:title" content="OneTimeView | One-Time Secret Links">
     <meta property="og:description"
-        content="Share confidential messages and files that self-destruct after being viewed. Free, secure, no login required.">
+        content="Send confidential messages and files with auto-delete after first view. Free, secure, and fast.">
     <meta property="og:image" content="https://onetimeview.com/static/og-image.jpg">
     <meta property="og:site_name" content="OneTimeView">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="OneTimeView - Secure One-Time Message & File Sharing">
+    <meta name="twitter:title" content="OneTimeView | One-Time Secret Links">
     <meta name="twitter:description"
-        content="Share confidential messages and files that self-destruct after being viewed. Free, secure, no login required.">
+        content="Send confidential messages and files that self-destruct after opening. No account needed.">
     <meta name="twitter:image" content="https://onetimeview.com/static/og-image.jpg">
 
     <!-- Favicon -->
@@ -59,12 +59,12 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background-color: #0F0F1A;
-            color: #C7C9E2;
+            color: #D4D6EC;
             line-height: 1.6;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1140px;
             margin: 0 auto;
             padding: 0 24px;
         }
@@ -73,74 +73,75 @@
             background-color: #6D5DF6;
             color: #FFFFFF;
             padding: 14px 32px;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: background-color 0.2s ease;
+            border-radius: 10px;
+            font-weight: 700;
             border: none;
             cursor: pointer;
             font-size: 16px;
+            transition: all 0.25s ease;
         }
 
         .btn-primary:hover {
             background-color: #5A4BE0;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(109, 93, 246, 0.35);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: #FFFFFF;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-weight: 600;
+            border: 1px solid #2A2C45;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.25s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: #6D5DF6;
+            color: #C8C9FF;
         }
 
         .card {
-            background-color: #1A1B2E;
-            border: 1px solid #2A2C45;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
+            background-color: #111223;
+            border: 1px solid #1F2238;
+            border-radius: 14px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
         }
 
         textarea,
-        input {
-            background-color: #0F0F1A;
-            border: 1px solid #2A2C45;
+        input,
+        select {
+            background-color: #0B0C18;
+            border: 1px solid #1F2238;
             color: #FFFFFF;
-            border-radius: 8px;
-            padding: 24px 20px 16px 20px;
+            border-radius: 10px;
+            padding: 18px 16px;
             font-size: 15px;
-            transition: all 0.3s ease;
-            line-height: 1.6;
+            transition: all 0.25s ease;
+            width: 100%;
         }
 
         textarea:focus,
-        input:focus {
+        input:focus,
+        select:focus {
             outline: none;
             border-color: #6D5DF6;
-            box-shadow: 0 0 0 3px rgba(109, 93, 246, 0.1);
+            box-shadow: 0 0 0 3px rgba(109, 93, 246, 0.18);
         }
 
         ::placeholder {
             color: #8E90B5;
         }
 
-        /* Smooth button transitions */
-        .btn-primary {
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(109, 93, 246, 0.3);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        /* Card smooth transitions */
-        .card {
-            transition: all 0.3s ease;
+        html {
+            scroll-behavior: smooth;
         }
 
         a {
-            transition: all 0.3s ease;
+            transition: color 0.2s ease, opacity 0.2s ease;
         }
     </style>
 </head>
@@ -148,163 +149,171 @@
 <body class="bg-background min-h-screen text-text-secondary">
     <!-- Navigation -->
     <nav class="border-b border-card-border">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex justify-between items-center">
-                <a href="/" class="flex items-center gap-2 group">
-                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"
-                        class="transition-transform group-hover:scale-110">
-                        <path d="M16 8C10 8 5 12 3 16C5 20 10 24 16 24C22 24 27 20 29 16C27 12 22 8 16 8Z"
-                            stroke="#6D5DF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            fill="none" />
-                        <circle cx="16" cy="16" r="5" fill="#6D5DF6" />
-                        <text x="16" y="20" font-family="Arial, sans-serif" font-size="8" font-weight="bold"
-                            fill="white" text-anchor="middle">1</text>
-                        <circle cx="8" cy="6" r="1" fill="#6D5DF6" opacity="0.6" />
-                        <circle cx="11" cy="4" r="0.8" fill="#6D5DF6" opacity="0.4" />
-                        <circle cx="14" cy="3" r="0.6" fill="#6D5DF6" opacity="0.3" />
-                        <circle cx="18" cy="3" r="0.6" fill="#6D5DF6" opacity="0.3" />
-                        <circle cx="21" cy="4" r="0.8" fill="#6D5DF6" opacity="0.4" />
-                        <circle cx="24" cy="6" r="1" fill="#6D5DF6" opacity="0.6" />
-                    </svg>
-                    <span
-                        class="text-xl font-semibold text-primary group-hover:text-white transition-colors">OneTimeView</span>
-                </a>
-                <div class="flex gap-6 text-sm">
-                    <a href="/privacy" class="text-text-muted hover:text-white transition-colors">Privacy</a>
-                    <a href="/terms" class="text-text-muted hover:text-white transition-colors">Terms</a>
-                </div>
+        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 group">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    class="transition-transform group-hover:scale-110">
+                    <path d="M16 8C10 8 5 12 3 16C5 20 10 24 16 24C22 24 27 20 29 16C27 12 22 8 16 8Z"
+                        stroke="#6D5DF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                    <circle cx="16" cy="16" r="5" fill="#6D5DF6" />
+                    <text x="16" y="20" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="white"
+                        text-anchor="middle">1</text>
+                </svg>
+                <span class="text-xl font-semibold text-primary group-hover:text-white transition-colors">OneTimeView</span>
+            </a>
+            <div class="flex gap-6 text-sm">
+                <a href="/create" class="text-text-muted hover:text-white transition-colors">Create</a>
+                <a href="/privacy" class="text-text-muted hover:text-white transition-colors">Privacy</a>
+                <a href="/terms" class="text-text-muted hover:text-white transition-colors">Terms</a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="container mx-auto px-6 pt-8 md:pt-12 pb-16 md:pb-24">
-        <div class="max-w-3xl mx-auto text-center">
-            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
-                Share Messages That Disappear After One View
-            </h1>
-            <p class="text-lg text-text-secondary mb-12 max-w-2xl mx-auto">
-                Send confidential messages and files that automatically delete after being viewed. No account required.
-            </p>
-
-            <!-- Quick Text Secret Form -->
-            <div class="card p-6 md:p-8 mb-8">
-                <form id="quickSecretForm">
-                    <label for="quickText" class="block text-left text-sm font-medium text-text-primary mb-3">
-                        Your Message
-                    </label>
-                    <textarea id="quickText" rows="5" class="w-full mb-4 mt-2"
-                        style="padding: 20px 20px 16px 20px !important;"
-                        placeholder="Type your secret message here..."></textarea>
-
-                    <button type="submit" class="btn-primary w-full">
-                        Create Secret Link
-                    </button>
-                </form>
-
-                <!-- Divider -->
-                <div class="relative my-6">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-card-border"></div>
-                    </div>
-                    <div class="relative flex justify-center text-xs">
-                        <span class="bg-card px-3 text-text-muted">OR</span>
-                    </div>
-                </div>
-
-                <!-- Advanced Options Link -->
-                <div class="text-center">
-                    <a href="/create"
-                        class="inline-block px-4 py-3 bg-background border border-primary rounded-lg text-primary hover:bg-primary hover:text-white transition-all text-sm font-medium w-full">
-                        Need files, password protection, or custom settings? →
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works -->
-    <section class="container mx-auto px-6 py-16 border-t border-card-border">
-        <div class="max-w-4xl mx-auto">
-            <h2 class="text-3xl font-bold text-white text-center mb-12">How It Works</h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="text-center">
-                    <div class="w-12 h-12 bg-primary rounded-lg mx-auto mb-4 flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                            </path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-white mb-2">Write</h3>
-                    <p class="text-text-secondary">Type your confidential message</p>
-                </div>
-
-                <div class="text-center">
-                    <div class="w-12 h-12 bg-primary rounded-lg mx-auto mb-4 flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z">
-                            </path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-white mb-2">Share</h3>
-                    <p class="text-text-secondary">Send the secure link to anyone</p>
-                </div>
-
-                <div class="text-center">
-                    <div class="w-12 h-12 bg-primary rounded-lg mx-auto mb-4 flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                            </path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-white mb-2">Delete</h3>
-                    <p class="text-text-secondary">Auto-deleted after viewing</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features -->
-    <section class="container mx-auto px-6 py-16">
-        <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
-            <div class="card p-6">
-                <h3 class="text-lg font-semibold text-white mb-2">Privacy First</h3>
-                <p class="text-text-secondary text-sm">Messages are permanently deleted after viewing. We don't log or
-                    store your content.</p>
-            </div>
-
-            <div class="card p-6">
-                <h3 class="text-lg font-semibold text-white mb-2">No Registration</h3>
-                <p class="text-text-secondary text-sm">Start sharing immediately. No account or login required.</p>
-            </div>
-
-            <div class="card p-6">
-                <h3 class="text-lg font-semibold text-white mb-2">Password Protection</h3>
-                <p class="text-text-secondary text-sm">Add an extra layer of security with optional password protection.
+    <!-- Hero -->
+    <section class="container mx-auto px-6 pt-12 pb-10">
+        <div class="max-w-5xl mx-auto grid lg:grid-cols-2 gap-10 items-center">
+            <div>
+                <p class="text-sm uppercase tracking-[0.2em] text-primary mb-3">Secure in seconds</p>
+                <h1 class="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
+                    Create one-time secret links for anything important
+                </h1>
+                <p class="text-lg text-text-secondary mb-6">
+                    Messages, images, videos, and files auto-delete after first view. No login.
+                    Optional password protection and custom expiry for extra safety.
                 </p>
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <span class="text-sm bg-primary/10 border border-primary/30 text-primary-light px-3 py-2 rounded-full">No account needed</span>
+                    <span class="text-sm bg-primary/10 border border-primary/30 text-primary-light px-3 py-2 rounded-full">Password optional</span>
+                    <span class="text-sm bg-primary/10 border border-primary/30 text-primary-light px-3 py-2 rounded-full">Auto-delete after view</span>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <a href="#quick-create" class="btn-primary">Create a secret</a>
+                    <a href="/create" class="btn-secondary">Advanced options</a>
+                </div>
             </div>
 
+            <div class="card p-6 md:p-8" id="quick-create">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-sm text-text-muted mb-1">Quick create</p>
+                        <h2 class="text-2xl font-semibold text-white">One-time text link</h2>
+                    </div>
+                    <span class="text-xs px-3 py-1 rounded-full bg-green-500/10 text-green-300 border border-green-400/40">Free</span>
+                </div>
+                <form id="quickSecretForm" class="space-y-4">
+                    <label class="block">
+                        <span class="text-sm text-text-primary">Message</span>
+                        <textarea id="quickText" rows="4" placeholder="Paste or write your secret here..." required></textarea>
+                    </label>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <label class="block">
+                            <span class="text-sm text-text-primary">Expires in</span>
+                            <select id="expirySelect">
+                                <option value="24">24 hours</option>
+                                <option value="168">7 days</option>
+                                <option value="720">30 days</option>
+                            </select>
+                        </label>
+                        <label class="block">
+                            <span class="text-sm text-text-primary">Views</span>
+                            <select id="viewsSelect">
+                                <option value="1">1 view (recommended)</option>
+                                <option value="2">2 views</option>
+                                <option value="3">3 views</option>
+                            </select>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn-primary w-full">Create secret link</button>
+                    <p class="text-xs text-text-muted">Need files, images, or passwords? Use the advanced creator.</p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Steps -->
+    <section class="container mx-auto px-6 py-12 border-t border-card-border">
+        <div class="max-w-4xl mx-auto text-center mb-10">
+            <p class="text-sm uppercase tracking-[0.2em] text-primary mb-2">How it works</p>
+            <h2 class="text-3xl font-bold text-white">Send it. View once. Gone.</h2>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
             <div class="card p-6">
-                <h3 class="text-lg font-semibold text-white mb-2">File Support</h3>
-                <p class="text-text-secondary text-sm">Share images, videos, and files up to 500MB.</p>
+                <div class="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center mb-3 font-semibold">1</div>
+                <h3 class="text-lg font-semibold text-white mb-2">Write or upload</h3>
+                <p class="text-text-secondary text-sm">Add your message or upload a file. Keep sensitive info off email and chat.</p>
+            </div>
+            <div class="card p-6">
+                <div class="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center mb-3 font-semibold">2</div>
+                <h3 class="text-lg font-semibold text-white mb-2">Share the one-time link</h3>
+                <p class="text-text-secondary text-sm">Send the generated URL. Add an optional password for extra security.</p>
+            </div>
+            <div class="card p-6">
+                <div class="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center mb-3 font-semibold">3</div>
+                <h3 class="text-lg font-semibold text-white mb-2">Auto-delete after view</h3>
+                <p class="text-text-secondary text-sm">Content self-destructs after the set views or expiry time—no leftovers.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits -->
+    <section class="container mx-auto px-6 py-12">
+        <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-6">
+            <div class="card p-6">
+                <h3 class="text-xl font-semibold text-white mb-2">Secure by default</h3>
+                <p class="text-text-secondary text-sm mb-3">Links are short-lived and never indexed. Password hashing, sanitization, and rate limits protect against abuse.</p>
+                <ul class="text-text-secondary text-sm space-y-2 list-disc list-inside">
+                    <li>Auto-delete on first view or after expiry</li>
+                    <li>Password protection available</li>
+                    <li>100MB free uploads; up to 500MB premium</li>
+                </ul>
+            </div>
+            <div class="card p-6">
+                <h3 class="text-xl font-semibold text-white mb-2">Built for quick sharing</h3>
+                <p class="text-text-secondary text-sm mb-3">No accounts, no friction. Perfect for credentials, handoff notes, and sensitive attachments.</p>
+                <ul class="text-text-secondary text-sm space-y-2 list-disc list-inside">
+                    <li>Share via email, chat, or ticketing tools</li>
+                    <li>Images, videos, and documents supported</li>
+                    <li>API-driven backend for reliability</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="container mx-auto px-6 py-12 border-t border-card-border">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-10">
+                <p class="text-sm uppercase tracking-[0.2em] text-primary mb-2">FAQ</p>
+                <h2 class="text-3xl font-bold text-white">Answers for fast decisions</h2>
+            </div>
+            <div class="space-y-4">
+                <details class="card p-4">
+                    <summary class="text-white font-semibold cursor-pointer">Do I need an account?</summary>
+                    <p class="text-text-secondary text-sm mt-2">No. Create and share a secret link instantly.</p>
+                </details>
+                <details class="card p-4">
+                    <summary class="text-white font-semibold cursor-pointer">How many times can a link be viewed?</summary>
+                    <p class="text-text-secondary text-sm mt-2">You choose 1–10 views in the creator. Quick create defaults to 1–3 views.</p>
+                </details>
+                <details class="card p-4">
+                    <summary class="text-white font-semibold cursor-pointer">Are files supported?</summary>
+                    <p class="text-text-secondary text-sm mt-2">Yes. Images, videos, and documents up to 100MB free or 500MB on premium.</p>
+                </details>
+                <details class="card p-4">
+                    <summary class="text-white font-semibold cursor-pointer">Can I add a password?</summary>
+                    <p class="text-text-secondary text-sm mt-2">Absolutely. Use the advanced creator to add a password for viewing.</p>
+                </details>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="border-t border-card-border mt-16">
-        <div class="container mx-auto px-6 py-8">
-            <div class="flex flex-col md:flex-row justify-between items-center text-sm text-text-muted">
-                <div class="mb-4 md:mb-0">
-                    © 2024 OneTimeView
-                </div>
-                <div class="flex gap-6">
-                    <a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a>
-                    <a href="/terms" class="hover:text-white transition-colors">Terms of Service</a>
-                </div>
+    <footer class="border-t border-card-border mt-12">
+        <div class="container mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center text-sm text-text-muted gap-3">
+            <div>© 2024 OneTimeView — one-time secrets, made simple.</div>
+            <div class="flex gap-6">
+                <a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a>
+                <a href="/terms" class="hover:text-white transition-colors">Terms of Service</a>
             </div>
         </div>
     </footer>
@@ -315,6 +324,8 @@
             e.preventDefault();
 
             const quickText = document.getElementById('quickText').value;
+            const expiryHours = document.getElementById('expirySelect').value;
+            const maxViews = document.getElementById('viewsSelect').value;
             if (!quickText.trim()) {
                 alert('Please enter a message');
                 return;
@@ -325,8 +336,8 @@
             formData.append('content_type', 'text');
             formData.append('content', quickText);
             formData.append('is_premium', false);
-            formData.append('expiry_hours', 24);
-            formData.append('max_views', 1);
+            formData.append('expiry_hours', expiryHours);
+            formData.append('max_views', maxViews);
 
             try {
                 const response = await fetch(API_BASE_URL + '/api/secrets', {
