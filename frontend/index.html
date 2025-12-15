@@ -16,7 +16,7 @@
     <link rel="canonical" href="https://onetimeview.com/">
 
     <!-- Mobile & Theme -->
-    <meta name="theme-color" content="#8B5CF6">
+    <meta name="theme-color" content="#0F0F1A">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -28,20 +28,14 @@
     <meta property="og:description"
         content="Share confidential messages and files that self-destruct after being viewed. Free, secure, no login required.">
     <meta property="og:image" content="https://onetimeview.com/static/og-image.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
     <meta property="og:site_name" content="OneTimeView">
-    <meta property="og:locale" content="en_US">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://onetimeview.com/">
     <meta name="twitter:title" content="OneTimeView - Secure One-Time Message & File Sharing">
     <meta name="twitter:description"
         content="Share confidential messages and files that self-destruct after being viewed. Free, secure, no login required.">
     <meta name="twitter:image" content="https://onetimeview.com/static/og-image.jpg">
-    <meta name="twitter:site" content="@OneTimeView">
-    <meta name="twitter:creator" content="@OneTimeView">
 
     <!-- Performance Optimization -->
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
@@ -52,661 +46,251 @@
     <script src="/static/tailwind-config.js"></script>
     <script src="/static/config.js"></script>
 
-    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <!-- JSON-LD Structured Data for SEO -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "OneTimeView",
-      "url": "https://onetimeview.com",
-      "description": "Secure one-time message and file sharing service that automatically deletes content after viewing",
-      "applicationCategory": "SecurityApplication",
-      "operatingSystem": "Any",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "featureList": [
-        "One-time view links",
-        "Self-destructing messages",
-        "Password protection",
-        "File sharing up to 500MB",
-        "No registration required",
-        "Automatic deletion"
-      ]
-    }
-    </script>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0F0F1A;
+            color: #C7C9E2;
+            line-height: 1.6;
+        }
 
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "OneTimeView",
-      "url": "https://onetimeview.com",
-      "logo": "https://onetimeview.com/static/logo.png",
-      "description": "Privacy-first secure messaging and file sharing platform",
-      "sameAs": [
-        "https://twitter.com/OneTimeView"
-      ]
-    }
-    </script>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
 
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [{
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "https://onetimeview.com/"
-      }]
-    }
-    </script>
+        .btn-primary {
+            background-color: #6D5DF6;
+            color: #FFFFFF;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-primary:hover {
+            background-color: #5A4BE0;
+        }
+
+        .card {
+            background-color: #1A1B2E;
+            border: 1px solid #2A2C45;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        textarea,
+        input {
+            background-color: #0F0F1A;
+            border: 1px solid #2A2C45;
+            color: #FFFFFF;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 15px;
+            transition: border-color 0.2s ease;
+        }
+
+        textarea:focus,
+        input:focus {
+            outline: none;
+            border-color: #6D5DF6;
+        }
+
+        ::placeholder {
+            color: #8E90B5;
+        }
+    </style>
 </head>
 
-<body class="bg-background min-h-screen text-text-primary">
+<body class="bg-background min-h-screen text-text-secondary">
     <!-- Navigation -->
-    <nav class="container mx-auto px-6 py-4">
-        <div class="flex justify-between items-center">
-            <a href="/"
-                class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent flex items-center gap-2">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-                <span class="hidden sm:inline">OneTimeView</span>
-            </a>
-            <div class="flex gap-2 sm:gap-6 text-xs sm:text-base">
-                <a href="/create" class="hover:text-primary-light transition whitespace-nowrap">Create</a>
-                <a href="/privacy" class="hover:text-primary-light transition whitespace-nowrap">Privacy</a>
-                <a href="/terms" class="hover:text-primary-light transition whitespace-nowrap">Terms</a>
+    <nav class="border-b border-card-border">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="text-xl font-semibold text-primary">OneTimeView</div>
+                <div class="flex gap-6 text-sm">
+                    <a href="/privacy" class="text-text-muted hover:text-white transition-colors">Privacy</a>
+                    <a href="/terms" class="text-text-muted hover:text-white transition-colors">Terms</a>
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="container mx-auto px-4 md:px-6 py-8 md:py-20 text-center">
-        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 animate-fade-in leading-tight">
-            Share Messages & Files That
-            <span class="bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
-                Can Be Opened Only Once
-            </span>
-        </h1>
-        <p class="text-sm sm:text-base md:text-xl text-text-secondary mb-6 md:mb-8 max-w-2xl mx-auto px-2">
-            Create a private link to share text, images, videos, or files.
-            Set view limits, then it's permanently deleted. No login required.
-        </p>
-        <div class="flex flex-col items-center">
-            <!-- Quick Text Secret Creation -->
-            <div class="w-full max-w-2xl mb-6">
-                <form id="quickSecretForm"
-                    class="bg-card backdrop-blur-lg rounded-xl p-4 sm:p-6 border border-card-border">
-                    <label for="quickText" class="block text-sm font-semibold mb-2 text-text-primary">Quick Text
-                        Secret</label>
-                    <textarea id="quickText" rows="4"
-                        class="w-full bg-background border border-card-border rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none mb-3 text-sm sm:text-base"
-                        placeholder="Type your secret message here and create a link instantly..."></textarea>
-                    <button type="submit"
-                        class="w-full bg-cta hover:bg-cta-hover text-white font-bold py-3 px-6 rounded-lg transition transform hover:scale-[1.02] flex items-center gap-2 justify-center">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                        </svg>
+    <section class="container mx-auto px-6 py-16 md:py-24">
+        <div class="max-w-3xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
+                Share Messages That Disappear After One View
+            </h1>
+            <p class="text-lg text-text-secondary mb-12 max-w-2xl mx-auto">
+                Send confidential messages and files that automatically delete after being viewed. No account required.
+            </p>
+
+            <!-- Quick Text Secret Form -->
+            <div class="card p-6 md:p-8 mb-8">
+                <form id="quickSecretForm">
+                    <label for="quickText" class="block text-left text-sm font-medium text-text-primary mb-3">
+                        Your Message
+                    </label>
+                    <textarea id="quickText" rows="5" class="w-full mb-4"
+                        placeholder="Type your secret message here..."></textarea>
+
+                    <button type="submit" class="btn-primary w-full">
                         Create Secret Link
                     </button>
                 </form>
-            </div>
 
-            <!-- OR Divider -->
-            <div class="flex items-center gap-3 mb-6 w-full max-w-2xl px-4">
-                <div class="flex-1 h-px bg-card-border"></div>
-                <span class="text-text-secondary text-sm">OR</span>
-                <div class="flex-1 h-px bg-card-border"></div>
-            </div>
+                <!-- Divider -->
+                <div class="relative my-6">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-card-border"></div>
+                    </div>
+                    <div class="relative flex justify-center text-xs">
+                        <span class="bg-card px-3 text-text-muted">OR</span>
+                    </div>
+                </div>
 
-            <a href="/create"
-                class="inline-block bg-card hover:bg-card/80 border border-card-border text-white font-bold py-3 px-6 md:py-4 md:px-8 rounded-full text-base md:text-lg transition transform hover:scale-105 mb-2 flex items-center gap-2 justify-center">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-                Advanced Options (Files, Password, etc.)
-            </a>
-            <p class="text-xs md:text-sm text-text-secondary mb-4 md:mb-6">Takes less than 10 seconds</p>
-            <div class="flex flex-wrap justify-center gap-3 md:gap-6 text-xs md:text-sm text-text-secondary px-2">
-                <span class="flex items-center gap-1">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    No login required
-                </span>
-                <span class="flex items-center gap-1">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    Free to use
-                </span>
-                <span class="flex items-center gap-1">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                    Automatically deleted
-                </span>
+                <!-- Advanced Options Link -->
+                <div class="text-center">
+                    <a href="/create"
+                        class="inline-block px-4 py-3 bg-background border border-primary rounded-lg text-primary hover:bg-primary hover:text-white transition-all text-sm font-medium w-full">
+                        Need files, password protection, or custom settings? →
+                    </a>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
+    <!-- How It Works -->
+    <section class="container mx-auto px-6 py-16 border-t border-card-border">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-white text-center mb-12">How It Works</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-primary rounded-lg mx-auto mb-4 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-2">Write</h3>
+                    <p class="text-text-secondary">Type your confidential message</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-primary rounded-lg mx-auto mb-4 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-2">Share</h3>
+                    <p class="text-text-secondary">Send the secure link to anyone</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-primary rounded-lg mx-auto mb-4 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-2">Delete</h3>
+                    <p class="text-text-secondary">Auto-deleted after viewing</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
     <section class="container mx-auto px-6 py-16">
-        <h2 class="text-4xl font-bold text-center mb-12">How It Works</h2>
-        <div class="grid md:grid-cols-3 gap-8 mb-16">
-            <div
-                class="bg-card backdrop-blur-lg rounded-2xl p-8 hover:bg-card/80 transition text-center border border-card-border">
-                <div class="flex justify-center mb-4">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round"
-                        class="text-primary-light hover:text-primary transition">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-bold mb-3">1. Create a secret</h3>
-                <p class="text-text-secondary">Write a message or upload a file</p>
+        <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold text-white mb-2">Privacy First</h3>
+                <p class="text-text-secondary text-sm">Messages are permanently deleted after viewing. We don't log or
+                    store your content.</p>
             </div>
-            <div
-                class="bg-card backdrop-blur-lg rounded-2xl p-8 hover:bg-card/80 transition text-center border border-card-border">
-                <div class="flex justify-center mb-4">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round"
-                        class="text-primary-light hover:text-primary transition">
-                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-bold mb-3">2. Share the link</h3>
-                <p class="text-text-secondary">Send the private link to anyone</p>
+
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold text-white mb-2">No Registration</h3>
+                <p class="text-text-secondary text-sm">Start sharing immediately. No account or login required.</p>
             </div>
-            <div
-                class="bg-card backdrop-blur-lg rounded-2xl p-8 hover:bg-card/80 transition text-center border border-card-border">
-                <div class="flex justify-center mb-4">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round"
-                        class="text-primary-light hover:text-primary transition">
-                        <path
-                            d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z">
-                        </path>
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-bold mb-3">3. Self-destruct</h3>
-                <p class="text-text-secondary">Deleted after reaching view limit</p>
+
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold text-white mb-2">Password Protection</h3>
+                <p class="text-text-secondary text-sm">Add an extra layer of security with optional password protection.
+                </p>
+            </div>
+
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold text-white mb-2">File Support</h3>
+                <p class="text-text-secondary text-sm">Share images, videos, and files up to 500MB.</p>
             </div>
         </div>
-
-        <!-- Example Section -->
-        <div
-            class="max-w-xl mx-auto bg-card rounded-lg p-6 border border-card-border text-center mb-12 transform -rotate-1 hover:rotate-0 transition duration-300">
-            <p class="text-text-secondary mb-2 text-sm uppercase tracking-wider font-semibold">Example Link Preview</p>
-            <div class="bg-gray-800 rounded p-4 mb-2 font-mono text-purple-400 text-lg">
-                onetimelink.in/view/7f9aXQ
-            </div>
-            <p class="text-green-400 text-sm">"Configurable view limit"</p>
-        </div>
-
-        <!-- Important Notice -->
-        <div class="max-w-2xl mx-auto bg-yellow-900/30 border border-yellow-700/50 rounded-lg p-4 text-center">
-            <p class="text-yellow-200 flex items-center justify-center gap-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
-                    </path>
-                    <line x1="12" y1="9" x2="12" y2="13"></line>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <span><span class="font-bold">Important:</span> Once the secret reaches its view limit or expires, it is
-                    permanently deleted and cannot be
-                    recovered.</span>
-            </p>
-        </div>
-    </section>
-
-    <!-- Why Choose Us -->
-    <section class="container mx-auto px-6 py-16">
-        <h2 class="text-4xl font-bold text-center mb-12">Why OneTimeView?</h2>
-        <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div class="flex items-start space-x-4">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round" class="text-primary flex-shrink-0">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-                <div>
-                    <h3 class="text-xl font-bold mb-2">Maximum Privacy</h3>
-                    <p class="text-text-secondary">Your secrets are automatically deleted after viewing. We don't log or
-                        store
-                        content.</p>
-                </div>
-            </div>
-            <div class="flex items-start space-x-4">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round" class="text-primary flex-shrink-0">
-                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                </svg>
-                <div>
-                    <h3 class="text-xl font-bold mb-2">No Registration</h3>
-                    <p class="text-text-secondary">Start sharing immediately. No account needed for basic features.</p>
-                </div>
-            </div>
-            <div class="flex items-start space-x-4">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round" class="text-primary flex-shrink-0">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                </svg>
-                <div>
-                    <h3 class="text-xl font-bold mb-2">Password Protection</h3>
-                    <p class="text-text-secondary">Add an extra layer of security with optional password protection.</p>
-                </div>
-            </div>
-            <div class="flex items-start space-x-4">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round" class="text-primary flex-shrink-0">
-                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                    <line x1="12" y1="18" x2="12.01" y2="18"></line>
-                </svg>
-                <div>
-                    <h3 class="text-xl font-bold mb-2">Mobile Friendly</h3>
-                    <p class="text-text-secondary">Works perfectly on all devices - desktop, tablet, and mobile.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Pricing Section -->
-    <section class="container mx-auto px-6 py-16">
-        <h2 class="text-4xl font-bold text-center mb-12">Simple Pricing</h2>
-        <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <!-- Free -->
-            <div class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                <h3 class="text-2xl font-bold mb-4">Free</h3>
-                <p class="text-4xl font-bold mb-6">$0<span class="text-lg text-text-secondary">/forever</span></p>
-                <ul class="space-y-3 mb-8">
-                    <li class="flex items-center">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="text-green-400 mr-2 flex-shrink-0">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        Text secrets
-                    </li>
-                    <li class="flex items-center">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="text-green-400 mr-2 flex-shrink-0">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        Images & Videos
-                    </li>
-                    <li class="flex items-center">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="text-green-400 mr-2 flex-shrink-0">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        File uploads (500MB)
-                    </li>
-                    <li class="flex items-center">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="text-green-400 mr-2 flex-shrink-0">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        Password protection
-                    </li>
-                    <li class="flex items-center">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="text-green-400 mr-2 flex-shrink-0">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        Expiry: 30 Days & 6 Months
-                    </li>
-                    <li class="flex items-center text-gray-500">
-                        <span class="mr-2">✗</span>
-                        No Expiry Option
-                    </li>
-                </ul>
-                <a href="/create"
-                    class="block text-center bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition">
-                    Get Started
-                </a>
-            </div>
-
-            <!-- Premium -->
-            <div
-                class="bg-gradient-to-br from-primary to-primary-hover rounded-2xl p-8 border-2 border-primary-light transform scale-105">
-                <div class="text-xs font-bold text-yellow-300 mb-2">MOST POPULAR</div>
-                <h3 class="text-2xl font-bold mb-4">Premium</h3>
-                <p class="text-4xl font-bold mb-6">$9<span class="text-lg text-purple-200">/month</span></p>
-                <ul class="space-y-3 mb-8">
-                    <li class="flex items-center">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="text-yellow-300 mr-2 flex-shrink-0">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        Everything in Free
-                    </li>
-                    <li class="flex items-center">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="text-yellow-300 mr-2 flex-shrink-0">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        No Expiry Option
-                    </li>
-                    <li class="flex items-center">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="text-yellow-300 mr-2 flex-shrink-0">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        No ads
-                    </li>
-                    <li class="flex items-center">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="text-yellow-300 mr-2 flex-shrink-0">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        Priority Support
-                    </li>
-                </ul>
-                <a href="/create"
-                    class="block text-center bg-white text-primary font-bold py-3 px-6 rounded-lg transition">
-                    Upgrade Now
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section with Schema Markup for SEO -->
-    <section class="container mx-auto px-6 py-16">
-        <h2 class="text-4xl font-bold text-center mb-12">Frequently Asked Questions</h2>
-        <div class="max-w-3xl mx-auto space-y-6">
-
-            <div class="bg-card backdrop-blur-lg rounded-2xl p-6 border border-card-border">
-                <h3 class="text-xl font-bold mb-3">How does OneTimeView work?</h3>
-                <p class="text-text-secondary">OneTimeView lets you create secure, self-destructing links for messages
-                    and files. Simply create your secret, set a view limit (1-10 times), and share the link. Once the
-                    recipient views it the specified number of times or the expiry time is reached, the content is
-                    permanently deleted from our servers.</p>
-            </div>
-
-            <div class="bg-card backdrop-blur-lg rounded-2xl p-6 border border-card-border">
-                <h3 class="text-xl font-bold mb-3">Is OneTimeView really free?</h3>
-                <p class="text-text-secondary">Yes! Most features are completely free including text messages, file
-                    uploads up to 500MB, password protection, and expiry options (24 hours, 30 days, 6 months). Premium
-                    ($9/month) adds the "No Expiry" option, removes ads, and provides priority support.</p>
-            </div>
-
-            <div class="bg-card backdrop-blur-lg rounded-2xl p-6 border border-card-border">
-                <h3 class="text-xl font-bold mb-3">What types of files can I share?</h3>
-                <p class="text-text-secondary">You can share any file type including images (JPEG, PNG, GIF), videos
-                    (MP4, AVI, MOV), documents (PDF, DOCX, TXT), archives (ZIP, RAR), and more. The maximum file size is
-                    500MB for all users.</p>
-            </div>
-
-            <div class="bg-card backdrop-blur-lg rounded-2xl p-6 border border-card-border">
-                <h3 class="text-xl font-bold mb-3">How secure is my data?</h3>
-                <p class="text-text-secondary">Your data is highly secure. You can add password protection for extra
-                    security. All content is automatically deleted after being viewed or when it expires. We don't log,
-                    track, or store your sensitive information beyond the lifetime of your secret link.</p>
-            </div>
-
-            <div class="bg-card backdrop-blur-lg rounded-2xl p-6 border border-card-border">
-                <h3 class="text-xl font-bold mb-3">What happens if I share the link with multiple people?</h3>
-                <p class="text-text-secondary">You can set a view limit from 1-10 views. With a one-time view (default),
-                    the secret is deleted after the first person opens it. If you set a higher limit, multiple people
-                    can view it until the maximum views are reached or the expiry time passes.</p>
-            </div>
-
-            <div class="bg-card backdrop-blur-lg rounded-2xl p-6 border border-card-border">
-                <h3 class="text-xl font-bold mb-3">Can I retrieve a secret after it's been deleted?</h3>
-                <p class="text-text-secondary">No. Once a secret reaches its view limit or expires, it is permanently
-                    and irreversibly deleted from our servers. This ensures maximum privacy and security. Make sure the
-                    recipient has access to the content before it's deleted.</p>
-            </div>
-
-            <div class="bg-card backdrop-blur-lg rounded-2xl p-6 border border-card-border">
-                <h3 class="text-xl font-bold mb-3">Do I need to create an account?</h3>
-                <p class="text-text-secondary">No account is required for free features. You can start sharing secrets
-                    immediately without any registration. This ensures your privacy and makes the service quick and easy
-                    to use.</p>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- FAQ Schema for Rich Snippets -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "How does OneTimeView work?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "OneTimeView lets you create secure, self-destructing links for messages and files. Simply create your secret, set a view limit (1-10 times), and share the link. Once the recipient views it the specified number of times or the expiry time is reached, the content is permanently deleted from our servers."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is OneTimeView really free?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes! Most features are completely free including text messages, file uploads up to 500MB, password protection, and expiry options (24 hours, 30 days, 6 months). Premium ($9/month) adds the No Expiry option, removes ads, and provides priority support."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What types of files can I share?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "You can share any file type including images (JPEG, PNG, GIF), videos (MP4, AVI, MOV), documents (PDF, DOCX, TXT), archives (ZIP, RAR), and more. The maximum file size is 500MB for all users."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How secure is my data?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Your data is highly secure. You can add password protection for extra security. All content is automatically deleted after being viewed or when it expires. We don't log, track, or store your sensitive information beyond the lifetime of your secret link."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What happens if I share the link with multiple people?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "You can set a view limit from 1-10 views. With a one-time view (default), the secret is deleted after the first person opens it. If you set a higher limit, multiple people can view it until the maximum views are reached or the expiry time passes."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can I retrieve a secret after it's been deleted?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "No. Once a secret reaches its view limit or expires, it is permanently and irreversibly deleted from our servers. This ensures maximum privacy and security. Make sure the recipient has access to the content before it's deleted."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Do I need to create an account?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "No account is required for free features. You can start sharing secrets immediately without any registration. This ensures your privacy and makes the service quick and easy to use."
-          }
-        }
-      ]
-    }
-    </script>
-
-    <!-- CTA Section -->
-    <section class="container mx-auto px-6 py-20 text-center">
-        <h2 class="text-4xl font-bold mb-6">Ready to Share Securely?</h2>
-        <p class="text-xl text-text-secondary mb-8 max-w-2xl mx-auto">
-            Join thousands of users who trust OneTimeView for their confidential communications.
-        </p>
-        <a href="/create"
-            class="inline-block bg-cta hover:bg-cta-hover text-white font-bold py-4 px-8 rounded-full text-lg transition transform hover:scale-105">
-            Create Secret Link Now
-        </a>
     </section>
 
     <!-- Footer -->
-    <footer class="container mx-auto px-6 py-8 border-t border-card-border">
-        <div class="flex flex-col md:flex-row justify-between items-center text-center">
-            <div class="mb-4 md:mb-0 text-sm text-text-secondary space-x-4">
-                <span class="inline-flex items-center gap-1">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    Privacy-first
-                </span>
-                <span>🗑 Auto-delete</span>
-                <span>❌ No account required</span>
-            </div>
-            <p class="text-text-secondary text-sm md:mr-auto md:ml-6 mb-4 md:mb-0">
-                © 2024 OneTimeView.
-            </p>
-            <div class="space-x-6">
-                <a href="/privacy" class="text-text-secondary hover:text-white transition">Privacy Policy</a>
-                <a href="/terms" class="text-text-secondary hover:text-white transition">Terms of Service</a>
+    <footer class="border-t border-card-border mt-16">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center text-sm text-text-muted">
+                <div class="mb-4 md:mb-0">
+                    © 2024 OneTimeView
+                </div>
+                <div class="flex gap-6">
+                    <a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="/terms" class="hover:text-white transition-colors">Terms of Service</a>
+                </div>
             </div>
         </div>
     </footer>
 
     <script>
-        // Enhanced smooth animations with Intersection Observer
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initial fade-in for hero elements
-            const elements = document.querySelectorAll('.animate-fade-in');
-            elements.forEach((el, index) => {
-                setTimeout(() => {
-                    el.style.opacity = '0';
-                    el.style.transform = 'translateY(20px)';
-                    el.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-                    setTimeout(() => {
-                        el.style.opacity = '1';
-                        el.style.transform = 'translateY(0)';
-                    }, 50);
-                }, index * 100);
-            });
+        // Handle quick secret form submission
+        document.getElementById('quickSecretForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-            // Intersection Observer for scroll-triggered animations
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
+            const quickText = document.getElementById('quickText').value;
+            if (!quickText.trim()) {
+                alert('Please enter a message');
+                return;
+            }
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry, index) => {
-                    if (entry.isIntersecting) {
-                        setTimeout(() => {
-                            entry.target.style.opacity = '1';
-                            entry.target.style.transform = 'translateY(0)';
-                        }, index * 100);
-                        observer.unobserve(entry.target);
-                    }
+            // Create FormData with default settings
+            const formData = new FormData();
+            formData.append('content_type', 'text');
+            formData.append('content', quickText);
+            formData.append('is_premium', false);
+            formData.append('expiry_hours', 24);
+            formData.append('max_views', 1);
+
+            try {
+                const response = await fetch(API_BASE_URL + '/api/secrets', {
+                    method: 'POST',
+                    body: formData
                 });
-            }, observerOptions);
 
-            // Observe all cards and sections for smooth appearance on scroll
-            const cards = document.querySelectorAll('.bg-card, section > div, section > h2');
-            cards.forEach((card) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(30px)';
-                card.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-                observer.observe(card);
-            });
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to create secret');
+                }
 
-            // Smooth hover effect for all links
-            const links = document.querySelectorAll('a:not(.inline-block)');
-            links.forEach(link => {
-                link.addEventListener('mouseenter', function () {
-                    this.style.transform = 'translateX(2px)';
-                });
-                link.addEventListener('mouseleave', function () {
-                    this.style.transform = 'translateX(0)';
-                });
-            });
-
-            // Add smooth scale effect to feature icons
-            const icons = document.querySelectorAll('svg');
-            icons.forEach(icon => {
-                icon.parentElement.addEventListener('mouseenter', function () {
-                    icon.style.transform = 'scale(1.1) rotate(5deg)';
-                });
-                icon.parentElement.addEventListener('mouseleave', function () {
-                    icon.style.transform = 'scale(1) rotate(0deg)';
-                });
-            });
-
-            // Handle quick secret form submission
-            const quickSecretForm = document.getElementById('quickSecretForm');
-            if (quickSecretForm) {
-                quickSecretForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-
-                    const quickText = document.getElementById('quickText').value;
-                    if (!quickText.trim()) {
-                        alert('Please enter a message');
-                        return;
-                    }
-
-                    // Create FormData with default settings
-                    const formData = new FormData();
-                    formData.append('content_type', 'text');
-                    formData.append('content', quickText);
-                    formData.append('is_premium', false);
-                    formData.append('expiry_hours', 24); // Default 24 hours
-                    formData.append('max_views', 1); // Default one-time view
-
-                    try {
-                        const response = await fetch(API_BASE_URL + '/api/secrets', {
-                            method: 'POST',
-                            body: formData
-                        });
-
-                        if (!response.ok) {
-                            const error = await response.json();
-                            throw new Error(error.detail || 'Failed to create secret');
-                        }
-
-                        const data = await response.json();
-
-                        // Redirect to a result page or show success message
-                        window.location.href = `/create?success=true&url=${encodeURIComponent(data.url)}`;
-                    } catch (error) {
-                        alert(error.message);
-                    }
-                });
+                const data = await response.json();
+                window.location.href = `/create?success=true&url=${encodeURIComponent(data.url)}`;
+            } catch (error) {
+                alert(error.message);
             }
         });
     </script>
