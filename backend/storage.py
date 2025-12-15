@@ -3,6 +3,7 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 from dotenv import load_dotenv
+from io import BytesIO
 
 load_dotenv()
 
@@ -17,9 +18,14 @@ cloudinary.config(
 def upload_file(file_obj, resource_type="auto"):
     """
     Upload a file to Cloudinary.
+    Accepts bytes or file-like objects.
     Returns a dictionary with 'public_id', 'secure_url', and 'format'.
     """
     try:
+        # If file_obj is bytes, wrap it in BytesIO
+        if isinstance(file_obj, bytes):
+            file_obj = BytesIO(file_obj)
+        
         response = cloudinary.uploader.upload(
             file_obj,
             resource_type=resource_type,
