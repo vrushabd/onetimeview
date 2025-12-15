@@ -544,21 +544,15 @@
             svgIcon.setAttribute('viewBox', '0 0 24 24');
             svgIcon.setAttribute('fill', 'none');
             svgIcon.setAttribute('stroke', 'currentColor');
-            svgIcon.setAttribute('stroke-width', '2');
+            svgIcon.setAttribute('stroke-width', '3');
             svgIcon.setAttribute('stroke-linecap', 'round');
             svgIcon.setAttribute('stroke-linejoin', 'round');
             svgIcon.style.flexShrink = '0';
 
-            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            circle.setAttribute('cx', '12');
-            circle.setAttribute('cy', '12');
-            circle.setAttribute('r', '10');
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', 'M20 6L9 17L4 12');
 
-            const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-            polyline.setAttribute('points', '9 12 11 14 15 10');
-
-            svgIcon.appendChild(circle);
-            svgIcon.appendChild(polyline);
+            svgIcon.appendChild(path);
 
             toast.appendChild(svgIcon);
             toast.appendChild(document.createTextNode(message));

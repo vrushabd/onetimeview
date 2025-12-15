@@ -232,12 +232,9 @@ async def create_secret(
             )
         
         # Determine resource type for Cloudinary
-        if content_type == "image":
-            resource_type = "image"
-        elif content_type == "video":
-            resource_type = "video"
-        else:
-            resource_type = "raw"  # For generic files
+        # Force RAW for everything to avoid "Failed to ping image" errors
+        # We will proxy images through our backend to fix headers
+        resource_type = "raw"
         
         # Upload to Cloudinary
         file_content = await file.read()
@@ -358,7 +355,12 @@ async def get_secret(
     
     # For files, provide Cloudinary URL or fallback to download URL
     if secret.cloud_url:
-        response.download_url = secret.cloud_url
+        # For images, we must proxy through backend to get correct Content-Type (since we upload as raw)
+        if secret.content_type == "image":
+             base_url = str(request.base_url).rstrip('/')
+             response.download_url = f"{base_url}/api/image/{secret_id}"
+        else:
+             response.download_url = secret.cloud_url
     elif secret.file_path:
         base_url = str(request.base_url).rstrip('/')
         response.download_url = f"{base_url}/api/download/{secret_id}"
@@ -372,13 +374,13 @@ async def get_secret(
 
 @app.get("/api/image/{secret_id}")
 @limiter.limit("10/minute")
-async def serve_image(
+def serve_image(
     request: Request,
     secret_id: str,
     password: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
-    """Serve image file (view count already handled by /api/secrets endpoint)"""
+    """Serve image file (proxy from Cloudinary if needed)"""
     secret = db.query(Secret).filter(Secret.id == secret_id).first()
     
     if not secret:
@@ -396,10 +398,24 @@ async def serve_image(
     if secret.content_type != "image":
         raise HTTPException(status_code=400, detail="This secret is not an image")
     
-    # Use Cloudinary URL if available
+    # Use Cloudinary URL if available - PROXY IT
     if secret.cloud_url:
-        from fastapi.responses import RedirectResponse
-        return RedirectResponse(url=secret.cloud_url)
+        import urllib.request
+        
+        # Proxy the raw file from Cloudinary but serve with correct mime type
+        try:
+            # Open the remote URL
+            remote = urllib.request.urlopen(secret.cloud_url)
+            
+            # Generator to stream content
+            def iterfile():
+                while chunk := remote.read(8192):
+                    yield chunk
+                remote.close()
+            
+            return StreamingResponse(iterfile(), media_type=secret.mime_type or "image/jpeg")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to fetch image: {str(e)}")
     
     # Fallback to local file
     if not secret.file_path:

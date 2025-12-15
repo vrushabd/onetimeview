@@ -38,6 +38,8 @@ def upload_file(file_obj, resource_type="auto"):
         if isinstance(file_obj, bytes):
             logger.info(f"Converting bytes to BytesIO (size: {len(file_obj)} bytes)")
             file_obj = BytesIO(file_obj)
+            file_obj.name = "upload.dat" # Cloudinary often needs a name
+            file_obj.seek(0)
         
         response = cloudinary.uploader.upload(
             file_obj,

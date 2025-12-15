@@ -214,6 +214,13 @@
             height: 100%;
             z-index: 1;
         }
+
+        /* Ensure images and videos are visible above overlay */
+        .media-overlay img,
+        .media-overlay video {
+            position: relative;
+            z-index: 0;
+        }
     </style>
 
     <script>
