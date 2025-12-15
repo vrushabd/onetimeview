@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import os
 import asyncio
+import httpx
 from typing import Optional
 
 from backend.database import get_db, init_db
@@ -383,7 +384,7 @@ async def get_secret(
 
 @app.get("/api/image/{secret_id}")
 @limiter.limit("10/minute")
-def serve_image(
+async def serve_image(
     request: Request,
     secret_id: str,
     background: BackgroundTasks,
@@ -420,19 +421,15 @@ def serve_image(
     
     # Use Cloudinary URL if available - PROXY IT
     if secret.cloud_url:
-        import urllib.request
-        
         # Proxy the raw file from Cloudinary but serve with correct mime type
         try:
-            # Open the remote URL
-            remote = urllib.request.urlopen(secret.cloud_url)
-            
-            # Generator to stream content
-            def iterfile():
-                while chunk := remote.read(8192):
-                    yield chunk
-                remote.close()
-            
+            async def iterfile():
+                async with httpx.AsyncClient() as client:
+                    async with client.stream("GET", secret.cloud_url) as response:
+                        response.raise_for_status()
+                        async for chunk in response.aiter_bytes():
+                            yield chunk
+
             return StreamingResponse(iterfile(), media_type=secret.mime_type or "image/jpeg")
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to fetch image: {str(e)}")
