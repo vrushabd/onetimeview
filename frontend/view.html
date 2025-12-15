@@ -302,6 +302,7 @@
         const secretId = window.location.pathname.split('/').pop();
         let passwordVerified = false;
         let currentPassword = null;
+        let mediaLoading = false;
 
         // Helpers
         function addPasswordParam(url, password) {
@@ -312,6 +313,18 @@
                 return parsed.toString();
             } catch (e) {
                 return url;
+            }
+        }
+
+        function showLoading() {
+            const spinner = document.getElementById('loadingSpinner');
+            if (spinner) spinner.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            const spinner = document.getElementById('loadingSpinner');
+            if (spinner && !mediaLoading) {
+                spinner.classList.add('hidden');
             }
         }
 
@@ -344,7 +357,7 @@
                     viewSecret();
                 } else {
                     // Password is required - show password form
-                    document.getElementById('loadingSpinner').classList.add('hidden');
+                    hideLoading();
                     document.getElementById('passwordForm').classList.remove('hidden');
                 }
 
@@ -373,7 +386,7 @@
                     currentPassword = password;
                     document.getElementById('passwordForm').classList.add('hidden');
                     document.getElementById('passwordError').classList.add('hidden');
-                    document.getElementById('loadingSpinner').classList.remove('hidden');
+                    showLoading();
                     viewSecret();
                 } else {
                     document.getElementById('passwordError').classList.remove('hidden');
@@ -419,8 +432,7 @@
 
                 const data = await response.json();
 
-                // Hide loading
-                document.getElementById('loadingSpinner').classList.add('hidden');
+                // Show main container (we may still keep spinner for slow media)
                 document.getElementById('contentDisplay').classList.remove('hidden');
 
                 // Display remaining views in corner
@@ -437,8 +449,12 @@
                     // Text content is returned directly in the metadata response
                     document.getElementById('textContent').classList.remove('hidden');
                     document.getElementById('textBody').textContent = data.content;
+                    mediaLoading = false;
+                    hideLoading();
                 } else if (data.content_type === 'image') {
                     // For images, use the download_url from response (Cloudinary URL)
+                    mediaLoading = true;
+                    showLoading();
                     document.getElementById('imageContent').classList.remove('hidden');
                     if (data.download_url) {
                         document.getElementById('imageBody').src = addPasswordParam(data.download_url, currentPassword);
@@ -451,6 +467,8 @@
                     }
                 } else if (data.content_type === 'video') {
                     // For videos, use the download_url from response (Cloudinary URL)
+                    mediaLoading = true;
+                    showLoading();
                     document.getElementById('videoContent').classList.remove('hidden');
                     const videoElement = document.getElementById('videoBody');
                     if (data.download_url) {
@@ -478,6 +496,8 @@
                         document.getElementById('downloadBtn').href = fileUrl;
                     }
                     document.getElementById('downloadBtn').download = data.file_name;
+                    mediaLoading = false;
+                    hideLoading();
                 }
 
             } catch (error) {
@@ -486,8 +506,37 @@
             }
         }
 
-        // Auto-load on page load
-        init();
+        // Media load handlers to hide spinner when content is ready
+        window.addEventListener('load', () => {
+            const imageEl = document.getElementById('imageBody');
+            const videoEl = document.getElementById('videoBody');
+
+            if (imageEl) {
+                imageEl.addEventListener('load', () => {
+                    mediaLoading = false;
+                    hideLoading();
+                });
+                imageEl.addEventListener('error', () => {
+                    mediaLoading = false;
+                    hideLoading();
+                });
+            }
+
+            if (videoEl) {
+                // loadeddata fires when enough data is available to start playback
+                videoEl.addEventListener('loadeddata', () => {
+                    mediaLoading = false;
+                    hideLoading();
+                });
+                videoEl.addEventListener('error', () => {
+                    mediaLoading = false;
+                    hideLoading();
+                });
+            }
+
+            // Auto-load on page load (after handlers are ready)
+            init();
+        });
 
         // Copy to clipboard function
         async function copyToClipboard() {
