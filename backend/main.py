@@ -8,11 +8,13 @@ from pathlib import Path
 import os
 import asyncio
 import httpx
+import time
+import hashlib
 from typing import Optional
 
 from backend.database import get_db, init_db
 from backend.models import Secret
-from backend.schemas import SecretCreate, SecretResponse, SecretView, PasswordVerify
+from backend.schemas import SecretCreate, SecretResponse, SecretView, PasswordVerify, CloudinarySecretCreate
 from backend.security import (
     hash_password, verify_password, sanitize_text, 
     sanitize_filename, get_mime_type, validate_file_type
@@ -134,6 +136,37 @@ async def serve_terms():
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy"}
+
+
+@app.post("/api/uploads/sign")
+async def sign_cloudinary_upload(body: dict):
+    """
+    Return signed parameters for direct browser-to-Cloudinary upload.
+    Expects JSON body with optional 'resource_type' (image, video, raw).
+    """
+    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME")
+    api_key = os.getenv("CLOUDINARY_API_KEY")
+    api_secret = os.getenv("CLOUDINARY_API_SECRET")
+
+    if not all([cloud_name, api_key, api_secret]):
+        raise HTTPException(status_code=500, detail="Cloud storage is not configured")
+
+    resource_type = body.get("resource_type") or "raw"
+    folder = "onetimeview_secrets"
+    timestamp = int(time.time())
+
+    # Only sign actual upload parameters (not resource_type, which lives in the URL path)
+    to_sign = f"folder={folder}&timestamp={timestamp}{api_secret}"
+    signature = hashlib.sha1(to_sign.encode("utf-8")).hexdigest()
+
+    return {
+        "cloud_name": cloud_name,
+        "api_key": api_key,
+        "timestamp": timestamp,
+        "signature": signature,
+        "folder": folder,
+        "resource_type": resource_type,
+    }
 
 
 @app.get("/api/test-cloudinary")
@@ -282,6 +315,72 @@ async def create_secret(
     db.refresh(secret)
     
     # Build response with frontend URL (Vercel)
+    frontend_url = os.getenv("FRONTEND_URL", "https://onetimeview-sooty.vercel.app")
+    return SecretResponse(
+        id=secret.id,
+        url=f"{frontend_url}/view/{secret.id}",
+        expires_at=secret.expiry_time,
+        has_password=bool(secret.password_hash),
+        content_type=secret.content_type,
+        max_views=secret.max_views
+    )
+
+
+@app.post("/api/secrets/from-cloudinary", response_model=SecretResponse)
+@limiter.limit("10/minute")
+async def create_secret_from_cloudinary(
+    request: Request,
+    body: CloudinarySecretCreate,
+    db: Session = Depends(get_db)
+):
+    """
+    Create a secret for a file that has already been uploaded to Cloudinary
+    directly from the client.
+    """
+    # Validate content type
+    if body.content_type not in ["image", "video", "file"]:
+        raise HTTPException(status_code=400, detail="Invalid content type for Cloudinary secret")
+
+    # Validate and normalize max_views
+    max_views = body.max_views or 1
+    if max_views < 1:
+        max_views = 1
+    if max_views > 10:
+        max_views = 10
+
+    secret = Secret(
+        content_type=body.content_type,
+        max_views=max_views,
+        is_premium=body.is_premium,
+        file_name=body.file_name,
+        mime_type=body.mime_type,
+        cloud_url=body.cloud_url,
+        cloud_public_id=body.cloud_public_id,
+        cloud_resource_type=body.cloud_resource_type,
+    )
+
+    # Handle password
+    if body.password:
+        secret.password_hash = hash_password(body.password)
+
+    # Handle expiry (same rules as create_secret)
+    if body.expiry_hours is not None:
+        if body.expiry_hours == 0:
+            if not body.is_premium:
+                raise HTTPException(
+                    status_code=403,
+                    detail="No Expiry option requires premium subscription"
+                )
+            secret.expiry_time = None
+        else:
+            secret.expiry_time = datetime.utcnow() + timedelta(hours=body.expiry_hours)
+    else:
+        secret.expiry_time = datetime.utcnow() + timedelta(hours=24)
+
+    db.add(secret)
+    db.commit()
+    db.refresh(secret)
+
     frontend_url = os.getenv("FRONTEND_URL", "https://onetimeview-sooty.vercel.app")
     return SecretResponse(
         id=secret.id,

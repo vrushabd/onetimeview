@@ -440,61 +440,142 @@
             document.getElementById('fileSize').textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
         }
 
+        async function getCloudinarySignature(resourceType) {
+            const res = await fetch(API_BASE_URL + '/api/uploads/sign', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ resource_type: resourceType })
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.detail || 'Failed to prepare upload');
+            }
+            return res.json();
+        }
+
+        function uploadFileToCloudinary(file, contentType, onProgress) {
+            const resourceType = contentType === 'video' ? 'video' : 'raw';
+            return getCloudinarySignature(resourceType).then(sign => {
+                const url = `https://api.cloudinary.com/v1_1/${sign.cloud_name}/${sign.resource_type}/upload`;
+                const fd = new FormData();
+                fd.append('file', file);
+                fd.append('api_key', sign.api_key);
+                fd.append('timestamp', sign.timestamp);
+                fd.append('signature', sign.signature);
+                fd.append('folder', sign.folder);
+
+                return new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', url, true);
+
+                    if (xhr.upload && onProgress) {
+                        xhr.upload.onprogress = onProgress;
+                    }
+
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState === XMLHttpRequest.DONE) {
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                try {
+                                    const data = JSON.parse(xhr.responseText);
+                                    resolve(data);
+                                } catch (e) {
+                                    reject(new Error('Upload response parse error'));
+                                }
+                            } else {
+                                reject(new Error('Cloud storage upload failed'));
+                            }
+                        }
+                    };
+
+                    xhr.onerror = function () {
+                        reject(new Error('Network error during file upload'));
+                    };
+
+                    xhr.send(fd);
+                });
+            });
+        }
+
         document.getElementById('secretForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const formData = new FormData();
-            formData.append('content_type', selectedType);
-            formData.append('is_premium', document.getElementById('isPremium').checked);
-            formData.append('expiry_hours', document.getElementById('expiryField').value);
-            formData.append('max_views', document.getElementById('maxViewsField').value);
+            const submitButton = document.querySelector('#secretForm button[type="submit"]');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
 
-            if (selectedType === 'text') {
-                const content = document.getElementById('contentField').value;
-                if (!content.trim()) {
-                    alert('Please enter a message');
+            const isPremium = document.getElementById('isPremium').checked;
+            const expiryHours = parseInt(document.getElementById('expiryField').value);
+            const maxViews = parseInt(document.getElementById('maxViewsField').value);
+            const password = document.getElementById('passwordField').value || null;
+
+            try {
+                submitButton.disabled = true;
+                submitButton.classList.add('opacity-70', 'cursor-not-allowed');
+
+                if (selectedType === 'text') {
+                    const content = document.getElementById('contentField').value;
+                    if (!content.trim()) {
+                        alert('Please enter a message');
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('content_type', 'text');
+                    formData.append('content', content);
+                    formData.append('is_premium', isPremium);
+                    formData.append('expiry_hours', expiryHours);
+                    formData.append('max_views', maxViews);
+                    if (password) {
+                        formData.append('password', password);
+                    }
+
+                    const res = await fetch(API_BASE_URL + '/api/secrets', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (!res.ok) {
+                        const err = await res.json().catch(() => ({}));
+                        throw new Error(err.detail || 'Failed to create secret');
+                    }
+                    const data = await res.json();
+
+                    document.getElementById('secretForm').classList.add('hidden');
+                    document.getElementById('successMessage').classList.remove('hidden');
+                    document.getElementById('secretLink').value = data.url;
+
+                    if (data.expires_at) {
+                        const expiryDate = new Date(data.expires_at);
+                        const viewText = data.max_views === 1 ? 'first view' : `${data.max_views} views`;
+                        document.getElementById('expiryInfo').textContent =
+                            `⏰ Expires on ${expiryDate.toLocaleString()} or after ${viewText}`;
+                    } else {
+                        const viewText = data.max_views === 1 ? 'first view' : `${data.max_views} views`;
+                        document.getElementById('expiryInfo').textContent =
+                            `⚠️ Will be deleted after ${viewText}`;
+                    }
+
+                    document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
                     return;
                 }
-                formData.append('content', content);
-            } else {
+
+                // File / image / video flow: direct to Cloudinary, then create secret
                 if (!selectedFile) {
                     alert('Please select a file');
                     return;
                 }
-                formData.append('file', selectedFile);
-            }
 
-            const password = document.getElementById('passwordField').value;
-            if (password) {
-                formData.append('password', password);
-            }
+                // Reset and show progress UI
+                uploadProgress.classList.remove('hidden');
+                progressBar.style.width = '0%';
+                progressText.textContent = 'Starting upload...';
+                uploadProgress.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-            try {
-                const submitButton = document.querySelector('#secretForm button[type="submit"]');
-                const uploadProgress = document.getElementById('uploadProgress');
-                const progressBar = document.getElementById('progressBar');
-                const progressText = document.getElementById('progressText');
-
-                // Disable submit to prevent double submits
-                submitButton.disabled = true;
-                submitButton.classList.add('opacity-70', 'cursor-not-allowed');
-
-                // Use XMLHttpRequest to get real upload progress
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', API_BASE_URL + '/api/secrets', true);
-
-                // Upload progress: browser -> API
-                if (xhr.upload && selectedFile) {
-                    // Reset and show progress UI if file upload
-                    uploadProgress.classList.remove('hidden');
-                    progressBar.style.width = '0%';
-                    progressText.textContent = 'Starting upload...';
-                    // Ensure user sees the progress bar (especially on mobile)
-                    uploadProgress.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-                    xhr.upload.onprogress = function (event) {
+                const cloudinaryResponse = await uploadFileToCloudinary(
+                    selectedFile,
+                    selectedType,
+                    function (event) {
                         if (event.lengthComputable && event.total > 0) {
-                            // Cap at 95% so we leave room for server processing time
                             const rawPercent = Math.round((event.loaded / event.total) * 100);
                             const percent = Math.min(rawPercent, 95);
                             progressBar.style.width = percent + '%';
@@ -502,70 +583,64 @@
                         } else {
                             progressText.textContent = 'Uploading...';
                         }
-                    };
+                    }
+                );
+
+                // Small finalization step with your API
+                progressBar.style.width = '95%';
+                progressText.textContent = 'Finalizing...';
+
+                const payload = {
+                    content_type: selectedType,
+                    file_name: selectedFile.name,
+                    mime_type: selectedFile.type,
+                    cloud_url: cloudinaryResponse.secure_url,
+                    cloud_public_id: cloudinaryResponse.public_id,
+                    cloud_resource_type: cloudinaryResponse.resource_type,
+                    password,
+                    expiry_hours: expiryHours,
+                    max_views: maxViews,
+                    is_premium: isPremium
+                };
+
+                const res = await fetch(API_BASE_URL + '/api/secrets/from-cloudinary', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.detail || 'Failed to create secret');
                 }
 
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
-                        submitButton.disabled = false;
-                        submitButton.classList.remove('opacity-70', 'cursor-not-allowed');
+                const data = await res.json();
 
-                        if (selectedFile) {
-                            // Mark as processing while waiting for server response
-                            progressBar.style.width = '95%';
-                            progressText.textContent = 'Processing on server...';
-                        }
+                progressBar.style.width = '100%';
+                progressText.textContent = 'Done!';
 
-                        if (xhr.status >= 200 && xhr.status < 300) {
-                            const data = JSON.parse(xhr.responseText);
+                document.getElementById('secretForm').classList.add('hidden');
+                document.getElementById('successMessage').classList.remove('hidden');
+                document.getElementById('secretLink').value = data.url;
 
-                            if (selectedFile) {
-                                progressBar.style.width = '100%';
-                                progressText.textContent = 'Done!';
-                            }
+                if (data.expires_at) {
+                    const expiryDate = new Date(data.expires_at);
+                    const viewText = data.max_views === 1 ? 'first view' : `${data.max_views} views`;
+                    document.getElementById('expiryInfo').textContent =
+                        `⏰ Expires on ${expiryDate.toLocaleString()} or after ${viewText}`;
+                } else {
+                    const viewText = data.max_views === 1 ? 'first view' : `${data.max_views} views`;
+                    document.getElementById('expiryInfo').textContent =
+                        `⚠️ Will be deleted after ${viewText}`;
+                }
 
-                            // Hide form and show success message
-                            document.getElementById('secretForm').classList.add('hidden');
-                            document.getElementById('successMessage').classList.remove('hidden');
-                            document.getElementById('secretLink').value = data.url;
-
-                            if (data.expires_at) {
-                                const expiryDate = new Date(data.expires_at);
-                                const viewText = data.max_views === 1 ? 'first view' : `${data.max_views} views`;
-                                document.getElementById('expiryInfo').textContent =
-                                    `⏰ Expires on ${expiryDate.toLocaleString()} or after ${viewText}`;
-                            } else {
-                                const viewText = data.max_views === 1 ? 'first view' : `${data.max_views} views`;
-                                document.getElementById('expiryInfo').textContent =
-                                    `⚠️ Will be deleted after ${viewText}`;
-                            }
-
-                            // Scroll to success message
-                            document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
-                        } else {
-                            let message = 'Failed to create secret';
-                            try {
-                                const error = JSON.parse(xhr.responseText);
-                                if (error.detail) message = error.detail;
-                            } catch (e) { }
-                            alert(message);
-                            uploadProgress.classList.add('hidden');
-                        }
-                    }
-                };
-
-                xhr.onerror = function () {
-                    submitButton.disabled = false;
-                    submitButton.classList.remove('opacity-70', 'cursor-not-allowed');
-                    if (selectedFile) {
-                        uploadProgress.classList.add('hidden');
-                    }
-                    alert('Network error while creating secret');
-                };
-
-                xhr.send(formData);
+                document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
             } catch (error) {
                 alert(error.message);
+                uploadProgress.classList.add('hidden');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.classList.remove('opacity-70', 'cursor-not-allowed');
             }
         });
 

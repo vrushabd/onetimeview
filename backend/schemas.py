@@ -19,6 +19,20 @@ class SecretCreate(BaseModel):
         return v
 
 
+class CloudinarySecretCreate(BaseModel):
+    """Schema for creating a secret from an already-uploaded Cloudinary file"""
+    content_type: str  # text, image, video, file (we will only use non-text here)
+    file_name: str
+    mime_type: Optional[str] = None
+    cloud_url: str
+    cloud_public_id: str
+    cloud_resource_type: str  # image, video, raw
+    password: Optional[str] = None
+    expiry_hours: Optional[int] = None
+    max_views: Optional[int] = Field(default=1, ge=1, le=10)
+    is_premium: bool = False
+
+
 class SecretResponse(BaseModel):
     """Response after creating a secret"""
     id: str
