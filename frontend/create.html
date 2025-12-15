@@ -246,13 +246,13 @@
                         <p class="font-bold" id="fileName"></p>
                         <p class="text-sm text-text-secondary" id="fileSize"></p>
                     </div>
-                    <div id="uploadProgress" class="hidden mt-4">
-                        <div class="bg-background rounded-full h-3 overflow-hidden">
+                    <div id="uploadProgress" class="hidden mt-3">
+                        <div class="bg-background rounded-full h-2 overflow-hidden">
                             <div id="progressBar"
                                 class="progress-bar bg-gradient-to-r from-primary to-primary-hover h-full"
                                 style="width: 0%"></div>
                         </div>
-                        <p class="text-center text-sm text-text-secondary mt-2" id="progressText">Uploading...</p>
+                        <p class="text-center text-xs sm:text-sm text-text-secondary mt-1" id="progressText">Uploading...</p>
                     </div>
                 </div>
 
@@ -470,59 +470,104 @@
             }
 
             try {
-                // Show progress
-                if (selectedFile) {
-                    document.getElementById('uploadProgress').classList.remove('hidden');
-                    simulateProgress();
+                const submitButton = document.querySelector('#secretForm button[type="submit"]');
+                const uploadProgress = document.getElementById('uploadProgress');
+                const progressBar = document.getElementById('progressBar');
+                const progressText = document.getElementById('progressText');
+
+                // Disable submit to prevent double submits
+                submitButton.disabled = true;
+                submitButton.classList.add('opacity-70', 'cursor-not-allowed');
+
+                // Use XMLHttpRequest to get real upload progress
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', API_BASE_URL + '/api/secrets', true);
+
+                // Upload progress: browser -> API
+                if (xhr.upload && selectedFile) {
+                    // Reset and show progress UI if file upload
+                    uploadProgress.classList.remove('hidden');
+                    progressBar.style.width = '0%';
+                    progressText.textContent = 'Starting upload...';
+                    // Ensure user sees the progress bar (especially on mobile)
+                    uploadProgress.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    xhr.upload.onprogress = function (event) {
+                        if (event.lengthComputable && event.total > 0) {
+                            // Cap at 95% so we leave room for server processing time
+                            const rawPercent = Math.round((event.loaded / event.total) * 100);
+                            const percent = Math.min(rawPercent, 95);
+                            progressBar.style.width = percent + '%';
+                            progressText.textContent = `Uploading... ${percent}%`;
+                        } else {
+                            progressText.textContent = 'Uploading...';
+                        }
+                    };
                 }
 
-                const response = await fetch(API_BASE_URL + '/api/secrets', {
-                    method: 'POST',
-                    body: formData
-                });
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        submitButton.disabled = false;
+                        submitButton.classList.remove('opacity-70', 'cursor-not-allowed');
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.detail || 'Failed to create secret');
-                }
+                        if (selectedFile) {
+                            // Mark as processing while waiting for server response
+                            progressBar.style.width = '95%';
+                            progressText.textContent = 'Processing on server...';
+                        }
 
-                const data = await response.json();
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            const data = JSON.parse(xhr.responseText);
 
-                // Hide form and show success message
-                document.getElementById('secretForm').classList.add('hidden');
-                document.getElementById('successMessage').classList.remove('hidden');
-                document.getElementById('secretLink').value = data.url;
+                            if (selectedFile) {
+                                progressBar.style.width = '100%';
+                                progressText.textContent = 'Done!';
+                            }
 
-                if (data.expires_at) {
-                    const expiryDate = new Date(data.expires_at);
-                    const viewText = data.max_views === 1 ? 'first view' : `${data.max_views} views`;
-                    document.getElementById('expiryInfo').textContent =
-                        `⏰ Expires on ${expiryDate.toLocaleString()} or after ${viewText}`;
-                } else {
-                    const viewText = data.max_views === 1 ? 'first view' : `${data.max_views} views`;
-                    document.getElementById('expiryInfo').textContent =
-                        `⚠️ Will be deleted after ${viewText}`;
-                }
+                            // Hide form and show success message
+                            document.getElementById('secretForm').classList.add('hidden');
+                            document.getElementById('successMessage').classList.remove('hidden');
+                            document.getElementById('secretLink').value = data.url;
 
-                // Scroll to success message
-                document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+                            if (data.expires_at) {
+                                const expiryDate = new Date(data.expires_at);
+                                const viewText = data.max_views === 1 ? 'first view' : `${data.max_views} views`;
+                                document.getElementById('expiryInfo').textContent =
+                                    `⏰ Expires on ${expiryDate.toLocaleString()} or after ${viewText}`;
+                            } else {
+                                const viewText = data.max_views === 1 ? 'first view' : `${data.max_views} views`;
+                                document.getElementById('expiryInfo').textContent =
+                                    `⚠️ Will be deleted after ${viewText}`;
+                            }
 
+                            // Scroll to success message
+                            document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+                        } else {
+                            let message = 'Failed to create secret';
+                            try {
+                                const error = JSON.parse(xhr.responseText);
+                                if (error.detail) message = error.detail;
+                            } catch (e) { }
+                            alert(message);
+                            uploadProgress.classList.add('hidden');
+                        }
+                    }
+                };
+
+                xhr.onerror = function () {
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('opacity-70', 'cursor-not-allowed');
+                    if (selectedFile) {
+                        uploadProgress.classList.add('hidden');
+                    }
+                    alert('Network error while creating secret');
+                };
+
+                xhr.send(formData);
             } catch (error) {
                 alert(error.message);
-                document.getElementById('uploadProgress').classList.add('hidden');
             }
         });
-
-        function simulateProgress() {
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 10;
-                document.getElementById('progressBar').style.width = progress + '%';
-                if (progress >= 100) {
-                    clearInterval(interval);
-                }
-            }, 200);
-        }
 
         function copyLink() {
             const linkInput = document.getElementById('secretLink');
