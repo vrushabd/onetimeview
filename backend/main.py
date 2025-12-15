@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Form, Depends, HTTPException, Request
+from fastapi import FastAPI, UploadFile, File, Form, Depends, HTTPException, Request, BackgroundTasks
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -365,9 +365,18 @@ async def get_secret(
         base_url = str(request.base_url).rstrip('/')
         response.download_url = f"{base_url}/api/download/{secret_id}"
     
-    # Delete secret only if max views reached
+    # Check if we need to clean up
     if secret.view_count >= secret.max_views:
-        delete_secret_immediately(secret_id)
+        if secret.content_type == "text":
+            # For text, we can delete immediately as content is in response
+            delete_secret_immediately(secret_id)
+        else:
+            # For files/images/videos, we MUST defer deletion
+            # The frontend needs to fetch the file URL after this response
+            # We'll set a short expiry (5 mins) as a failsafe
+            # The file serving endpoint will trigger the actual deletion
+            secret.expiry_time = datetime.utcnow() + timedelta(minutes=5)
+            db.commit()
     
     return response
 
@@ -377,6 +386,7 @@ async def get_secret(
 def serve_image(
     request: Request,
     secret_id: str,
+    background: BackgroundTasks,
     password: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
@@ -386,8 +396,14 @@ def serve_image(
     if not secret:
         raise HTTPException(status_code=404, detail="Secret not found")
     
-    if secret.is_expired():
-        raise HTTPException(status_code=404, detail="Secret has expired or already been viewed")
+    # Manual expiry check to allow "last view" access
+    # We allow access if view_count == max_views (since get_secret just incremented it)
+    # But deny if it exceeded
+    if secret.view_count > secret.max_views:
+         raise HTTPException(status_code=404, detail="Secret has expired or already been viewed")
+         
+    if secret.expiry_time and datetime.utcnow() > secret.expiry_time:
+        raise HTTPException(status_code=404, detail="Secret has expired")
     
     if secret.password_hash:
         if not password:
@@ -397,6 +413,10 @@ def serve_image(
     
     if secret.content_type != "image":
         raise HTTPException(status_code=400, detail="This secret is not an image")
+
+    # Schedule deletion if max views reached or exceeded
+    if secret.view_count >= secret.max_views:
+        background.add_task(delete_secret_immediately, secret_id)
     
     # Use Cloudinary URL if available - PROXY IT
     if secret.cloud_url:
@@ -436,6 +456,7 @@ def serve_image(
 async def serve_video(
     request: Request,
     secret_id: str,
+    background: BackgroundTasks,
     password: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
@@ -444,9 +465,13 @@ async def serve_video(
     
     if not secret:
         raise HTTPException(status_code=404, detail="Secret not found")
-    
-    if secret.is_expired():
-        raise HTTPException(status_code=404, detail="Secret has expired or already been viewed")
+        
+    # Manual expiry check to allow "last view" access
+    if secret.view_count > secret.max_views:
+         raise HTTPException(status_code=404, detail="Secret has expired or already been viewed")
+         
+    if secret.expiry_time and datetime.utcnow() > secret.expiry_time:
+        raise HTTPException(status_code=404, detail="Secret has expired")
     
     if secret.password_hash:
         if not password:
@@ -457,6 +482,10 @@ async def serve_video(
     if secret.content_type != "video":
         raise HTTPException(status_code=400, detail="This secret is not a video")
     
+    # Schedule deletion if max views reached or exceeded
+    if secret.view_count >= secret.max_views:
+        background.add_task(delete_secret_immediately, secret_id)
+
     # Use Cloudinary URL if available
     if secret.cloud_url:
         from fastapi.responses import RedirectResponse
@@ -525,6 +554,7 @@ async def serve_video(
 async def serve_file(
     request: Request,
     secret_id: str,
+    background: BackgroundTasks,
     password: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
@@ -534,8 +564,12 @@ async def serve_file(
     if not secret:
         raise HTTPException(status_code=404, detail="Secret not found")
     
-    if secret.is_expired():
-        raise HTTPException(status_code=404, detail="Secret has expired or already been viewed")
+    # Manual expiry check to allow "last view" access
+    if secret.view_count > secret.max_views:
+         raise HTTPException(status_code=404, detail="Secret has expired or already been viewed")
+         
+    if secret.expiry_time and datetime.utcnow() > secret.expiry_time:
+        raise HTTPException(status_code=404, detail="Secret has expired")
     
     if secret.password_hash:
         if not password:
@@ -546,6 +580,10 @@ async def serve_file(
     if secret.content_type != "file":
         raise HTTPException(status_code=400, detail="This secret is not a file")
     
+    # Schedule deletion if max views reached or exceeded
+    if secret.view_count >= secret.max_views:
+        background.add_task(delete_secret_immediately, secret_id)
+
     # Use Cloudinary URL if available
     if secret.cloud_url:
         from fastapi.responses import RedirectResponse
