@@ -52,6 +52,7 @@ app.add_middleware(
 # Configuration
 UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", "./uploads"))
 MAX_FILE_SIZE_FREE = int(os.getenv("MAX_FILE_SIZE_FREE", 104857600))  # 100MB
+MAX_FILE_SIZE_PREMIUM = int(os.getenv("MAX_FILE_SIZE_PREMIUM", 524288000))  # 500MB
 
 # Ensure upload directory exists
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -220,8 +221,8 @@ async def create_secret(
         if not is_valid:
             raise HTTPException(status_code=400, detail="File type not allowed")
         
-        # Check file size - 100MB limit
-        max_size = 104857600  # 100MB
+        # Check file size based on tier
+        max_size = MAX_FILE_SIZE_PREMIUM if is_premium else MAX_FILE_SIZE_FREE
         file.file.seek(0, 2)  # Seek to end
         file_size = file.file.tell()
         file.file.seek(0)  # Reset to beginning
@@ -358,13 +359,18 @@ async def get_secret(
     if secret.cloud_url:
         # For images, we must proxy through backend to get correct Content-Type (since we upload as raw)
         if secret.content_type == "image":
-             base_url = str(request.base_url).rstrip('/')
-             response.download_url = f"{base_url}/api/image/{secret_id}"
+            base_url = str(request.base_url).rstrip('/')
+            response.download_url = f"{base_url}/api/image/{secret_id}"
         else:
-             response.download_url = secret.cloud_url
+            response.download_url = secret.cloud_url
     elif secret.file_path:
         base_url = str(request.base_url).rstrip('/')
-        response.download_url = f"{base_url}/api/download/{secret_id}"
+        if secret.content_type == "image":
+            response.download_url = f"{base_url}/api/image/{secret_id}"
+        elif secret.content_type == "video":
+            response.download_url = f"{base_url}/api/video/{secret_id}"
+        else:
+            response.download_url = f"{base_url}/api/file/{secret_id}"
     
     # Check if we need to clean up
     if secret.view_count >= secret.max_views:
