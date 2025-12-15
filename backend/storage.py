@@ -34,18 +34,42 @@ def upload_file(file_obj, resource_type="auto"):
         logger.info(f"API Secret exists: {bool(os.getenv('CLOUDINARY_API_SECRET'))}")
         logger.info(f"Resource type: {resource_type}")
         
+        size_bytes = None
+
         # If file_obj is bytes, wrap it in BytesIO
         if isinstance(file_obj, bytes):
-            logger.info(f"Converting bytes to BytesIO (size: {len(file_obj)} bytes)")
+            size_bytes = len(file_obj)
+            logger.info(f"Converting bytes to BytesIO (size: {size_bytes} bytes)")
             file_obj = BytesIO(file_obj)
             file_obj.name = "upload.dat" # Cloudinary often needs a name
             file_obj.seek(0)
-        
-        response = cloudinary.uploader.upload(
-            file_obj,
-            resource_type=resource_type,
-            folder="onetimeview_secrets"  # Keep organized
-        )
+        else:
+            try:
+                # Try to detect size if possible
+                pos = file_obj.tell()
+                file_obj.seek(0, 2)
+                size_bytes = file_obj.tell()
+                file_obj.seek(pos)
+            except Exception:
+                pass
+
+        # Cloudinary free tier enforces a 10MB limit on basic uploads.
+        # Use chunked upload for larger files (videos/raw up to our 100MB limit).
+        if size_bytes and size_bytes > 10 * 1024 * 1024 and resource_type in {"raw", "video"}:
+            logger.info(f"Using chunked upload for size {size_bytes} bytes")
+            response = cloudinary.uploader.upload_large(
+                file_obj,
+                resource_type=resource_type,
+                folder="onetimeview_secrets",
+                chunk_size=6 * 1024 * 1024,  # 6MB chunks to stay under 10MB gateway
+                eager_async=True
+            )
+        else:
+            response = cloudinary.uploader.upload(
+                file_obj,
+                resource_type=resource_type,
+                folder="onetimeview_secrets"  # Keep organized
+            )
         
         logger.info(f"Upload successful - Public ID: {response.get('public_id')}")
         
