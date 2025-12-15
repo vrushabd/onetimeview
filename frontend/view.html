@@ -72,19 +72,30 @@
             <div id="contentDisplay" class="hidden">
                 <!-- Text Content -->
                 <div id="textContent" class="hidden bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h3 class="text-2xl font-bold mb-4 text-text-secondary flex items-center justify-center gap-2">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                            <polyline points="10 9 9 9 8 9"></polyline>
+                    <h3 class="text-2xl font-bold mb-4 text-text-secondary flex items-center gap-2">
+                        Your secure message is shown below.
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="text-text-secondary cursor-pointer hover:text-primary transition"
+                            title="This message will be permanently deleted after viewing">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
                         </svg>
-                        Secret Message
                     </h3>
-                    <div class="bg-black/50 rounded-lg p-6 whitespace-pre-wrap break-words text-gray-200" id="textBody">
+                    <div class="bg-black/50 rounded-lg p-6 whitespace-pre-wrap break-words text-gray-200 mb-4"
+                        id="textBody">
                     </div>
+                    <button onclick="copyToClipboard()"
+                        class="bg-cta hover:bg-cta-hover text-white font-bold py-3 px-6 rounded-lg transition flex items-center gap-2 copy-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span id="copyButtonText">Copy to clipboard</span>
+                    </button>
+                    <p class="text-text-secondary text-sm mt-4 text-center">You can close this window when done.</p>
                 </div>
 
                 <!-- Image Content -->
@@ -487,6 +498,27 @@
 
         // Auto-load on page load
         init();
+
+        // Copy to clipboard function
+        async function copyToClipboard() {
+            const textBody = document.getElementById('textBody');
+            const copyButtonText = document.getElementById('copyButtonText');
+
+            try {
+                await navigator.clipboard.writeText(textBody.textContent);
+
+                // Visual feedback
+                const originalText = copyButtonText.textContent;
+                copyButtonText.textContent = 'Copied!';
+
+                setTimeout(() => {
+                    copyButtonText.textContent = originalText;
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                alert('Failed to copy to clipboard');
+            }
+        }
 
         // Allow Enter key to submit password
         document.getElementById('passwordInput')?.addEventListener('keypress', (e) => {
