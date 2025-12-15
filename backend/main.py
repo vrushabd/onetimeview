@@ -400,21 +400,39 @@ async def verify_password_endpoint(
     data: PasswordVerify,
     db: Session = Depends(get_db)
 ):
-    """Verify password for a secret (does not check view count, only time expiry)"""
+    """Verify password for a secret and return basic metadata (without consuming a view)."""
     secret = db.query(Secret).filter(Secret.id == secret_id).first()
     
     if not secret:
         raise HTTPException(status_code=404, detail="Secret not found")
     
-    # Only check time-based expiry here, NOT view count
+    # Check view-based expiry first
+    if secret.view_count >= secret.max_views:
+        # Already fully consumed
+        raise HTTPException(status_code=404, detail="Secret has already been viewed")
+    
+    # Check time-based expiry
     if secret.expiry_time and datetime.utcnow() > secret.expiry_time:
         raise HTTPException(status_code=404, detail="Secret has expired")
     
-    if not secret.password_hash:
-        return {"verified": True}
+    # Compute remaining views without consuming
+    remaining_views = max(secret.max_views - secret.view_count, 0)
     
+    # No password set
+    if not secret.password_hash:
+        return {
+            "verified": True,
+            "remaining_views": remaining_views,
+            "content_type": secret.content_type,
+        }
+    
+    # Verify provided password
     if verify_password(data.password, secret.password_hash):
-        return {"verified": True}
+        return {
+            "verified": True,
+            "remaining_views": remaining_views,
+            "content_type": secret.content_type,
+        }
     
     return {"verified": False}
 
@@ -433,10 +451,14 @@ async def get_secret(
     if not secret:
         raise HTTPException(status_code=404, detail="Secret not found")
     
-    # Check if already viewed or expired
-    if secret.is_expired():
+    # Check if already viewed or expired with explicit reasons
+    if secret.view_count >= secret.max_views:
         delete_secret_immediately(secret_id)
-        raise HTTPException(status_code=404, detail="Secret has expired or already been viewed")
+        raise HTTPException(status_code=404, detail="Secret has already been viewed")
+    
+    if secret.expiry_time and datetime.utcnow() > secret.expiry_time:
+        delete_secret_immediately(secret_id)
+        raise HTTPException(status_code=404, detail="Secret has expired")
     
     # Verify password if required
     if secret.password_hash:

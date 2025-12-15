@@ -341,18 +341,28 @@
                 });
 
                 if (response.status === 404) {
-                    window.location.href = '/expired';
+                    const error = await response.json().catch(() => ({}));
+                    const reason = encodeURIComponent(error.detail || 'unknown');
+                    window.location.href = `/expired?reason=${reason}`;
                     return;
                 }
-
+                
                 if (!response.ok) {
                     console.error('Verify failed:', response.status);
-                    window.location.href = '/expired';
+                    window.location.href = '/expired?reason=Verification failed';
                     return;
                 }
-
+                
                 const data = await response.json();
                 if (data.verified === true) {
+                    // If this is the last remaining view, confirm before consuming it
+                    if (data.remaining_views === 1) {
+                        const confirmLast = confirm('This is the last time this secret can be viewed. After this, it will be permanently deleted. Continue?');
+                        if (!confirmLast) {
+                            window.location.href = '/';
+                            return;
+                        }
+                    }
                     // No password required - auto-load content
                     viewSecret();
                 } else {
@@ -380,8 +390,15 @@
                 });
 
                 const data = await response.json();
-
+                
                 if (data.verified) {
+                    // If this is the last remaining view, confirm before consuming it
+                    if (data.remaining_views === 1) {
+                        const confirmLast = confirm('This is the last time this secret can be viewed. After this, it will be permanently deleted. Continue?');
+                        if (!confirmLast) {
+                            return;
+                        }
+                    }
                     passwordVerified = true;
                     currentPassword = password;
                     document.getElementById('passwordForm').classList.add('hidden');
@@ -411,7 +428,13 @@
                 });
 
                 if (!verifyResponse.ok) {
-                    window.location.href = '/expired';
+                    if (verifyResponse.status === 404) {
+                        const error = await verifyResponse.json().catch(() => ({}));
+                        const reason = encodeURIComponent(error.detail || 'unknown');
+                        window.location.href = `/expired?reason=${reason}`;
+                        return;
+                    }
+                    window.location.href = '/expired?reason=Verification failed';
                     return;
                 }
 
@@ -421,10 +444,12 @@
                     : `${API_BASE_URL}/api/secrets/${secretId}`;
 
                 const response = await fetch(metadataUrl);
-
+                
                 if (!response.ok) {
                     if (response.status === 404) {
-                        window.location.href = '/expired';
+                        const error = await response.json().catch(() => ({}));
+                        const reason = encodeURIComponent(error.detail || 'unknown');
+                        window.location.href = `/expired?reason=${reason}`;
                         return;
                     }
                     throw new Error('Failed to load secret');

@@ -29,8 +29,8 @@
                 </div>
                 <div>
                     <p class="text-sm uppercase tracking-[0.2em] text-primary">One-time link closed</p>
-                    <h1 class="text-3xl sm:text-4xl font-bold text-white mt-2">This secret is unavailable</h1>
-                    <p class="text-base sm:text-lg text-text-secondary mt-3">
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white mt-2" id="expiredTitle">This secret is unavailable</h1>
+                    <p class="text-base sm:text-lg text-text-secondary mt-3" id="expiredReason">
                         It was viewed already, hit its expiry time, or the link was invalid.
                     </p>
                 </div>
@@ -70,7 +70,29 @@
             </div>
         </div>
     </div>
-</body>
+    <script>
+        (function () {
+            const params = new URLSearchParams(window.location.search);
+            const reasonParam = params.get('reason');
+            const titleEl = document.getElementById('expiredTitle');
+            const reasonEl = document.getElementById('expiredReason');
+
+            if (!reasonParam) return;
+
+            const reason = decodeURIComponent(reasonParam);
+
+            if (reason === 'Secret has already been viewed') {
+                titleEl.textContent = 'This secret was already viewed';
+                reasonEl.textContent = 'For security, this one-time link deleted itself right after it was opened.';
+            } else if (reason === 'Secret has expired') {
+                titleEl.textContent = 'This secret has expired';
+                reasonEl.textContent = 'The secret hit its scheduled expiry time and was permanently removed.';
+            } else if (reason === 'Secret not found') {
+                titleEl.textContent = 'Secret not found';
+                reasonEl.textContent = 'The link may be incorrect, or the secret never existed.';
+            }
+        })();
+    </script>
 </body>
 
 </html>

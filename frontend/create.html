@@ -239,7 +239,9 @@
                             </svg>
                         </div>
                         <p class="text-lg font-bold mb-2">Drop file here or click to browse</p>
-                        <p class="text-sm text-text-secondary">Max size: <span id="maxSize">100MB</span></p>
+                        <p class="text-sm text-text-secondary">
+                            Up to <span id="maxSize">100MB</span> &middot; best under 25MB for slow networks
+                        </p>
                     </div>
                     <input type="file" id="fileInput" class="hidden" onchange="handleFileSelect(event)">
                     <div id="fileInfo" class="hidden mt-4 bg-background rounded-lg p-4">
@@ -348,6 +350,7 @@
     <script>
         let selectedType = 'text';
         let selectedFile = null;
+        const MAX_FILE_SIZE_MB = 100;
 
         // Initialize view limit helper text on page load
         document.addEventListener('DOMContentLoaded', function () {
@@ -435,9 +438,19 @@
 
         function handleFile(file) {
             selectedFile = file;
+            const sizeMb = file.size / 1024 / 1024;
+
+            if (sizeMb > MAX_FILE_SIZE_MB) {
+                selectedFile = null;
+                document.getElementById('fileInfo').classList.add('hidden');
+                document.getElementById('fileInput').value = '';
+                alert(`This file is ${sizeMb.toFixed(2)} MB. The maximum allowed size is ${MAX_FILE_SIZE_MB} MB. Please choose a smaller file.`);
+                return;
+            }
+
             document.getElementById('fileInfo').classList.remove('hidden');
             document.getElementById('fileName').textContent = file.name;
-            document.getElementById('fileSize').textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
+            document.getElementById('fileSize').textContent = `${sizeMb.toFixed(2)} MB`;
         }
 
         async function getCloudinarySignature(resourceType) {
@@ -660,7 +673,7 @@
                     // Fallback: try legacy backend upload if direct upload path fails (e.g. endpoint not deployed yet)
                     console.error('Direct cloud upload failed, falling back to backend upload:', cloudErr);
                     progressBar.style.width = '0%';
-                    progressText.textContent = 'Uploading via server...';
+                    progressText.textContent = 'Network seems slow, trying via server...';
 
                     const backendResult = await uploadFileViaBackend(
                         selectedFile,
@@ -700,7 +713,13 @@
 
                 document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
             } catch (error) {
-                alert(error.message);
+                let message = error.message || 'Upload failed. Please try again.';
+                if (message.includes('Network')) {
+                    message = 'Upload failed due to network issues. Please check your connection or try a smaller file.';
+                } else if (message.toLowerCase().includes('failed')) {
+                    message = 'Upload failed. Please try again with a smaller file or more stable connection.';
+                }
+                alert(message);
                 uploadProgress.classList.add('hidden');
             } finally {
                 submitButton.disabled = false;
