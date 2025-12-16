@@ -3,7 +3,7 @@
   
   <!-- Homepage - Highest Priority -->
   <url>
-    <loc>https://onetimeview.com/</loc>
+    <loc>https://onetimeview.app/</loc>
     <lastmod>2025-12-14</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -11,7 +11,7 @@
   
   <!-- Create Secret Page - High Priority -->
   <url>
-    <loc>https://onetimeview.com/create</loc>
+    <loc>https://onetimeview.app/create</loc>
     <lastmod>2025-12-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -19,7 +19,7 @@
   
   <!-- Use Cases Page - High Priority for SEO -->
   <url>
-    <loc>https://onetimeview.com/use-cases</loc>
+    <loc>https://onetimeview.app/use-cases</loc>
     <lastmod>2025-12-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -27,7 +27,7 @@
   
   <!-- Blog/Resources Page - High Priority for SEO -->
   <url>
-    <loc>https://onetimeview.com/blog</loc>
+    <loc>https://onetimeview.app/blog</loc>
     <lastmod>2025-12-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -35,7 +35,7 @@
   
   <!-- Privacy Policy -->
   <url>
-    <loc>https://onetimeview.com/privacy</loc>
+    <loc>https://onetimeview.app/privacy</loc>
     <lastmod>2025-12-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -43,7 +43,7 @@
   
   <!-- Terms of Service -->
   <url>
-    <loc>https://onetimeview.com/terms</loc>
+    <loc>https://onetimeview.app/terms</loc>
     <lastmod>2025-12-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

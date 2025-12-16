@@ -315,7 +315,7 @@ async def create_secret(
     db.refresh(secret)
     
     # Build response with frontend URL (Vercel)
-    frontend_url = os.getenv("FRONTEND_URL", "https://onetimeview-sooty.vercel.app")
+    frontend_url = os.getenv("FRONTEND_URL", "https://onetimeview.app")
     return SecretResponse(
         id=secret.id,
         url=f"{frontend_url}/view/{secret.id}",
@@ -381,7 +381,7 @@ async def create_secret_from_cloudinary(
     db.commit()
     db.refresh(secret)
 
-    frontend_url = os.getenv("FRONTEND_URL", "https://onetimeview-sooty.vercel.app")
+    frontend_url = os.getenv("FRONTEND_URL", "https://onetimeview.app")
     return SecretResponse(
         id=secret.id,
         url=f"{frontend_url}/view/{secret.id}",

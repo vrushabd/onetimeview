@@ -10,7 +10,7 @@
     <meta name="description"
         content="View a one-time secret message or file. This content will be permanently deleted after viewing.">
     <meta name="robots" content="noindex, nofollow">
-    <link rel="canonical" href="https://onetimeview.com/view">
+    <link rel="canonical" href="https://onetimeview.app/view">
 
     <!-- Mobile & Theme -->
     <meta name="theme-color" content="#8B5CF6">
@@ -41,7 +41,8 @@
                     <text x="16" y="20" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="white"
                         text-anchor="middle">1</text>
                 </svg>
-                <span class="text-xl font-semibold text-primary group-hover:text-white transition-colors">OneTimeView</span>
+                <span
+                    class="text-xl font-semibold text-primary group-hover:text-white transition-colors">OneTimeView</span>
             </a>
         </div>
     </nav>
@@ -74,7 +75,8 @@
             </div>
 
             <!-- Content Display -->
-            <div id="contentDisplay" class="hidden bg-card rounded-2xl p-6 sm:p-8 border border-card-border shadow-soft space-y-6">
+            <div id="contentDisplay"
+                class="hidden bg-card rounded-2xl p-6 sm:p-8 border border-card-border shadow-soft space-y-6">
                 <div class="text-center">
                     <p class="text-sm uppercase tracking-[0.2em] text-primary mb-2">Secret Viewer</p>
                     <h2 class="text-2xl font-bold text-white" id="viewerTitle">Your secret</h2>
@@ -346,13 +348,13 @@
                     window.location.href = `/expired?reason=${reason}`;
                     return;
                 }
-                
+
                 if (!response.ok) {
                     console.error('Verify failed:', response.status);
                     window.location.href = '/expired?reason=Verification failed';
                     return;
                 }
-                
+
                 const data = await response.json();
                 if (data.verified === true) {
                     // If this is the last remaining view, confirm before consuming it
@@ -390,7 +392,7 @@
                 });
 
                 const data = await response.json();
-                
+
                 if (data.verified) {
                     // If this is the last remaining view, confirm before consuming it
                     if (data.remaining_views === 1) {
@@ -444,7 +446,7 @@
                     : `${API_BASE_URL}/api/secrets/${secretId}`;
 
                 const response = await fetch(metadataUrl);
-                
+
                 if (!response.ok) {
                     if (response.status === 404) {
                         const error = await response.json().catch(() => ({}));

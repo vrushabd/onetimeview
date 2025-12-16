@@ -13,7 +13,7 @@
         content="one time link, self destruct message, burn after reading, secure file sharing, one time file link, secret link, private message, temporary file sharing">
     <meta name="author" content="OneTimeView">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-    <link rel="canonical" href="https://onetimeview.com/">
+    <link rel="canonical" href="https://onetimeview.app/">
 
     <!-- Mobile & Theme -->
     <meta name="theme-color" content="#0F0F1A">
@@ -23,11 +23,11 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://onetimeview.com/">
+    <meta property="og:url" content="https://onetimeview.app/">
     <meta property="og:title" content="OneTimeView | One-Time Secret Links">
     <meta property="og:description"
         content="Send confidential messages and files with auto-delete after first view. Free, secure, and fast.">
-    <meta property="og:image" content="https://onetimeview.com/static/og-image.jpg">
+    <meta property="og:image" content="https://onetimeview.app/static/og-image.jpg">
     <meta property="og:site_name" content="OneTimeView">
 
     <!-- Twitter Card -->
@@ -35,7 +35,7 @@
     <meta name="twitter:title" content="OneTimeView | One-Time Secret Links">
     <meta name="twitter:description"
         content="Send confidential messages and files that self-destruct after opening. No account needed.">
-    <meta name="twitter:image" content="https://onetimeview.com/static/og-image.jpg">
+    <meta name="twitter:image" content="https://onetimeview.app/static/og-image.jpg">
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
@@ -153,13 +153,14 @@
             <a href="/" class="flex items-center gap-2 group flex-shrink-0">
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"
                     class="transition-transform group-hover:scale-110">
-                    <path d="M16 8C10 8 5 12 3 16C5 20 10 24 16 24C22 24 27 20 29 16C27 12 22 8 16 8Z"
-                        stroke="#6D5DF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                    <path d="M16 8C10 8 5 12 3 16C5 20 10 24 16 24C22 24 27 20 29 16C27 12 22 8 16 8Z" stroke="#6D5DF6"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
                     <circle cx="16" cy="16" r="5" fill="#6D5DF6" />
                     <text x="16" y="20" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="white"
                         text-anchor="middle">1</text>
                 </svg>
-                <span class="text-xl font-semibold text-primary group-hover:text-white transition-colors">OneTimeView</span>
+                <span
+                    class="text-xl font-semibold text-primary group-hover:text-white transition-colors">OneTimeView</span>
             </a>
             <div class="flex gap-6 md:gap-10 text-sm md:text-base flex-wrap md:flex-nowrap">
                 <a href="/create" class="text-text-muted hover:text-white transition-colors">Create</a>
@@ -182,9 +183,15 @@
                     Optional password protection and custom expiry for extra safety.
                 </p>
                 <div class="flex flex-wrap gap-3 mb-6">
-                    <span class="text-sm bg-primary/10 border border-primary/30 text-primary-light px-3 py-2 rounded-full">No account needed</span>
-                    <span class="text-sm bg-primary/10 border border-primary/30 text-primary-light px-3 py-2 rounded-full">Password optional</span>
-                    <span class="text-sm bg-primary/10 border border-primary/30 text-primary-light px-3 py-2 rounded-full">Auto-delete after view</span>
+                    <span
+                        class="text-sm bg-primary/10 border border-primary/30 text-primary-light px-3 py-2 rounded-full">No
+                        account needed</span>
+                    <span
+                        class="text-sm bg-primary/10 border border-primary/30 text-primary-light px-3 py-2 rounded-full">Password
+                        optional</span>
+                    <span
+                        class="text-sm bg-primary/10 border border-primary/30 text-primary-light px-3 py-2 rounded-full">Auto-delete
+                        after view</span>
                 </div>
                 <div class="flex flex-wrap gap-3">
                     <a href="#quick-create" class="btn-primary">Create a secret</a>
@@ -192,18 +199,21 @@
                 </div>
             </div>
 
-            <div class="card p-6 md:p-8 shadow-2xl shadow-black/20 border border-card-border/80 order-1 lg:order-2" id="quick-create">
+            <div class="card p-6 md:p-8 shadow-2xl shadow-black/20 border border-card-border/80 order-1 lg:order-2"
+                id="quick-create">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <p class="text-sm text-text-muted mb-1">Quick create</p>
                         <h2 class="text-2xl font-semibold text-white">One-time text link</h2>
                     </div>
-                    <span class="text-xs px-3 py-1 rounded-full bg-green-500/10 text-green-300 border border-green-400/40">Free</span>
+                    <span
+                        class="text-xs px-3 py-1 rounded-full bg-green-500/10 text-green-300 border border-green-400/40">Free</span>
                 </div>
                 <form id="quickSecretForm" class="space-y-4">
                     <label class="block">
                         <span class="text-sm text-text-primary">Message</span>
-                        <textarea id="quickText" rows="4" placeholder="Paste or write your secret here..." required class="pt-4 pb-4 pr-4 pl-4"></textarea>
+                        <textarea id="quickText" rows="4" placeholder="Paste or write your secret here..." required
+                            class="pt-4 pb-4 pr-4 pl-4"></textarea>
                     </label>
                     <div class="grid md:grid-cols-2 gap-4">
                         <label class="block">
@@ -232,8 +242,11 @@
                         </div>
                     </div>
                     <button type="submit" class="btn-primary w-full">Create secret link</button>
-                    <a href="/create" class="block w-full text-center bg-card hover:bg-card/80 border border-card-border text-white font-semibold py-3 px-4 rounded-lg transition">Advanced options</a>
-                    <p class="text-xs text-text-muted text-center">Need files, images, or passwords? Use the advanced creator.</p>
+                    <a href="/create"
+                        class="block w-full text-center bg-card hover:bg-card/80 border border-card-border text-white font-semibold py-3 px-4 rounded-lg transition">Advanced
+                        options</a>
+                    <p class="text-xs text-text-muted text-center">Need files, images, or passwords? Use the advanced
+                        creator.</p>
                 </form>
             </div>
         </div>
@@ -247,19 +260,28 @@
         </div>
         <div class="grid md:grid-cols-3 gap-8">
             <div class="card p-6">
-                <div class="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center mb-3 font-semibold">1</div>
+                <div
+                    class="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center mb-3 font-semibold">
+                    1</div>
                 <h3 class="text-lg font-semibold text-white mb-2">Write or upload</h3>
-                <p class="text-text-secondary text-sm">Add your message or upload a file. Keep sensitive info off email and chat.</p>
+                <p class="text-text-secondary text-sm">Add your message or upload a file. Keep sensitive info off email
+                    and chat.</p>
             </div>
             <div class="card p-6">
-                <div class="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center mb-3 font-semibold">2</div>
+                <div
+                    class="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center mb-3 font-semibold">
+                    2</div>
                 <h3 class="text-lg font-semibold text-white mb-2">Share the one-time link</h3>
-                <p class="text-text-secondary text-sm">Send the generated URL. Add an optional password for extra security.</p>
+                <p class="text-text-secondary text-sm">Send the generated URL. Add an optional password for extra
+                    security.</p>
             </div>
             <div class="card p-6">
-                <div class="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center mb-3 font-semibold">3</div>
+                <div
+                    class="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center mb-3 font-semibold">
+                    3</div>
                 <h3 class="text-lg font-semibold text-white mb-2">Auto-delete after view</h3>
-                <p class="text-text-secondary text-sm">Content self-destructs after the set views or expiry time—no leftovers.</p>
+                <p class="text-text-secondary text-sm">Content self-destructs after the set views or expiry time—no
+                    leftovers.</p>
             </div>
         </div>
     </section>
@@ -269,7 +291,8 @@
         <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-6">
             <div class="card p-6">
                 <h3 class="text-xl font-semibold text-white mb-2">Secure by default</h3>
-                <p class="text-text-secondary text-sm mb-3">Links are short-lived and never indexed. Password hashing, sanitization, and rate limits protect against abuse.</p>
+                <p class="text-text-secondary text-sm mb-3">Links are short-lived and never indexed. Password hashing,
+                    sanitization, and rate limits protect against abuse.</p>
                 <ul class="text-text-secondary text-sm space-y-2 list-disc list-inside">
                     <li>Auto-delete on first view or after expiry</li>
                     <li>Password protection available</li>
@@ -278,7 +301,8 @@
             </div>
             <div class="card p-6">
                 <h3 class="text-xl font-semibold text-white mb-2">Built for quick sharing</h3>
-                <p class="text-text-secondary text-sm mb-3">No accounts, no friction. Perfect for credentials, handoff notes, and sensitive attachments.</p>
+                <p class="text-text-secondary text-sm mb-3">No accounts, no friction. Perfect for credentials, handoff
+                    notes, and sensitive attachments.</p>
                 <ul class="text-text-secondary text-sm space-y-2 list-disc list-inside">
                     <li>Share via email, chat, or ticketing tools</li>
                     <li>Images, videos, and documents supported</li>
@@ -301,16 +325,20 @@
                     <p class="text-text-secondary text-sm mt-2">No. Create and share a secret link instantly.</p>
                 </details>
                 <details class="card p-4">
-                    <summary class="text-white font-semibold cursor-pointer">How many times can a link be viewed?</summary>
-                    <p class="text-text-secondary text-sm mt-2">You choose 1–10 views in the creator. Quick create defaults to 1–3 views.</p>
+                    <summary class="text-white font-semibold cursor-pointer">How many times can a link be viewed?
+                    </summary>
+                    <p class="text-text-secondary text-sm mt-2">You choose 1–10 views in the creator. Quick create
+                        defaults to 1–3 views.</p>
                 </details>
                 <details class="card p-4">
                     <summary class="text-white font-semibold cursor-pointer">Are files supported?</summary>
-                    <p class="text-text-secondary text-sm mt-2">Yes. Images, videos, and documents up to 100MB free or 500MB on premium.</p>
+                    <p class="text-text-secondary text-sm mt-2">Yes. Images, videos, and documents up to 100MB free or
+                        500MB on premium.</p>
                 </details>
                 <details class="card p-4">
                     <summary class="text-white font-semibold cursor-pointer">Can I add a password?</summary>
-                    <p class="text-text-secondary text-sm mt-2">Absolutely. Use the advanced creator to add a password for viewing.</p>
+                    <p class="text-text-secondary text-sm mt-2">Absolutely. Use the advanced creator to add a password
+                        for viewing.</p>
                 </details>
             </div>
         </div>
@@ -318,7 +346,8 @@
 
     <!-- Footer -->
     <footer class="border-t border-card-border mt-12">
-        <div class="container mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center text-sm text-text-muted gap-3">
+        <div
+            class="container mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center text-sm text-text-muted gap-3">
             <div>© 2024 OneTimeView — one-time secrets, made simple.</div>
             <div class="flex gap-6">
                 <a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a>

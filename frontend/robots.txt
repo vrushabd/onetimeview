@@ -18,7 +18,7 @@ Disallow: /expired
 Disallow: /api/
 
 # Sitemap location
-Sitemap: https://onetimeview.com/sitemap.xml
+Sitemap: https://onetimeview.app/sitemap.xml
 
 # Crawl-delay for politeness (optional)
 Crawl-delay: 1

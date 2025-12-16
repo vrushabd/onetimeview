@@ -282,7 +282,7 @@ This project is provided as-is for educational and commercial use.
 ## 🤝 Support
 
 For questions or issues:
-- Email: support@onetimeview.com
+- Email: support@onetimeview.app
 - Documentation: See this README
 
 ## 🔄 Future Enhancements
