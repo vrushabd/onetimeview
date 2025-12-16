@@ -130,6 +130,24 @@ async def serve_terms():
     return {"error": "Page not found"}
 
 
+@app.get("/robots.txt")
+async def serve_robots():
+    """Serve robots.txt"""
+    robots_path = FRONTEND_DIR / "robots.txt"
+    if robots_path.exists():
+        return FileResponse(robots_path)
+    return {"error": "File not found"}
+
+
+@app.get("/sitemap.xml")
+async def serve_sitemap():
+    """Serve sitemap"""
+    sitemap_path = FRONTEND_DIR / "sitemap.xml"
+    if sitemap_path.exists():
+        return FileResponse(sitemap_path)
+    return {"error": "File not found"}
+
+
 
 
 @app.get("/health")
