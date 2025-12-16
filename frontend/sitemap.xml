@@ -17,21 +17,7 @@
     <priority>0.9</priority>
   </url>
   
-  <!-- Use Cases Page - High Priority for SEO -->
-  <url>
-    <loc>https://onetimeview.app/use-cases</loc>
-    <lastmod>2025-12-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <!-- Blog/Resources Page - High Priority for SEO -->
-  <url>
-    <loc>https://onetimeview.app/blog</loc>
-    <lastmod>2025-12-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
+
   
   <!-- Privacy Policy -->
   <url>

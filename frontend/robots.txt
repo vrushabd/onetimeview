@@ -8,8 +8,7 @@ Allow: /
 Allow: /create
 Allow: /privacy
 Allow: /terms
-Allow: /use-cases
-Allow: /blog
+
 Allow: /static/
 
 # Disallow indexing of sensitive/private pages
