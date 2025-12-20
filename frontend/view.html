@@ -361,7 +361,11 @@
         }
 
         // Auto-load secret on page load
+        let initCalled = false;
         async function init() {
+            if (initCalled) return;
+            initCalled = true;
+
             try {
                 // Check if password is required
                 const response = await fetch(`${API_BASE_URL}/api/secrets/${secretId}/verify`, {
