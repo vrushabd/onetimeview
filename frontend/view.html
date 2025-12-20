@@ -360,7 +360,7 @@
             }
         }
 
-        // Auto-load secret metadata on page load (but don't consume the view yet)
+        // Auto-load secret on page load
         async function init() {
             try {
                 // Check if password is required
@@ -387,9 +387,8 @@
 
                 const data = await response.json();
                 if (data.verified === true) {
-                    // No password required - show reveal button
-                    hideLoading();
-                    showRevealButton(data.remaining_views, data.content_type);
+                    // No password required - auto-reveal the secret
+                    await viewSecret();
                 } else {
                     // Password is required - show password form
                     hideLoading();
@@ -405,10 +404,10 @@
         function showRevealButton(remainingViews, contentType) {
             const revealSection = document.getElementById('revealSection');
             const revealInfo = document.getElementById('revealInfo');
-            
+
             let contentTypeLabel = contentType;
             if (contentType === 'text') contentTypeLabel = 'message';
-            
+
             revealInfo.textContent = `This ${contentTypeLabel} has ${remainingViews} view${remainingViews !== 1 ? 's' : ''} remaining`;
             revealSection.classList.remove('hidden');
         }
@@ -432,8 +431,9 @@
                     currentPassword = password;
                     document.getElementById('passwordForm').classList.add('hidden');
                     document.getElementById('passwordError').classList.add('hidden');
-                    // Show reveal button instead of auto-loading
-                    showRevealButton(data.remaining_views, data.content_type);
+                    // Auto-reveal the secret after password verification
+                    showLoading();
+                    await viewSecret();
                 } else {
                     document.getElementById('passwordError').classList.remove('hidden');
                 }
@@ -445,8 +445,8 @@
 
         async function revealSecret() {
             // Hide reveal button and show loading
-     lementById('revealSection').classList.add('hidden');
-            showLoa                     
+            lementById('revealSection').classList.add('hidden');
+            showLoa
             // Fetch the secret (this will consume a view)
             await viewSecret();
         }
