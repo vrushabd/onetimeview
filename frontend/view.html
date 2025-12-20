@@ -391,8 +391,9 @@
 
                 const data = await response.json();
                 if (data.verified === true) {
-                    // No password required - auto-reveal the secret
-                    await viewSecret();
+                    // No password required
+                    hideLoading();
+                    showRevealButton(data.remaining_views, data.content_type);
                 } else {
                     // Password is required - show password form
                     hideLoading();
@@ -412,7 +413,13 @@
             let contentTypeLabel = contentType;
             if (contentType === 'text') contentTypeLabel = 'message';
 
-            revealInfo.textContent = `This ${contentTypeLabel} has ${remainingViews} view${remainingViews !== 1 ? 's' : ''} remaining`;
+            // Customize warning based on remaining views
+            if (remainingViews <= 1) {
+                revealInfo.innerHTML = `⚠️ <strong class="text-red-400">Warning:</strong> This secret can be viewed <strong>only one time</strong>.<br>It will be permanently deleted immediately after you click reveal.`;
+            } else {
+                revealInfo.innerHTML = `This ${contentTypeLabel} has ${remainingViews} view${remainingViews !== 1 ? 's' : ''} remaining.`;
+            }
+
             revealSection.classList.remove('hidden');
         }
 
@@ -435,9 +442,8 @@
                     currentPassword = password;
                     document.getElementById('passwordForm').classList.add('hidden');
                     document.getElementById('passwordError').classList.add('hidden');
-                    // Auto-reveal the secret after password verification
-                    showLoading();
-                    await viewSecret();
+                    // Show reveal warning instead of auto-reveal
+                    showRevealButton(data.remaining_views, data.content_type);
                 } else {
                     document.getElementById('passwordError').classList.remove('hidden');
                 }
