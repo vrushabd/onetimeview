@@ -11,14 +11,22 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+from sqlalchemy import or_
+
 async def cleanup_expired_secrets():
     """Background task to clean up expired secrets and their files"""
     while True:
         try:
             db = SessionLocal()
             
-            # Find all expired secrets
-            secrets = db.query(Secret).all()
+            # Find all expired secrets optimally
+            # Query for: (view_count >= max_views) OR (expiry_time < now)
+            secrets = db.query(Secret).filter(
+                or_(
+                    Secret.view_count >= Secret.max_views,
+                    Secret.expiry_time < datetime.utcnow()
+                )
+            ).all()
             deleted_count = 0
             
             for secret in secrets:

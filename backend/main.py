@@ -486,8 +486,25 @@ async def get_secret(
             raise HTTPException(status_code=401, detail="Invalid password")
     
     # Increment view count
-    secret.increment_view()
+    # Atomic update: Increment view_count only if it's less than max_views
+    # This prevents race conditions where multiple concurrent requests could bypass the limit
+    rows_affected = db.query(Secret).filter(
+        Secret.id == secret_id,
+        Secret.view_count < Secret.max_views
+    ).update(
+        {Secret.view_count: Secret.view_count + 1},
+        synchronize_session=False
+    )
+    
     db.commit()
+    
+    # If no rows were affected, it means the limit was reached between our initial check and now
+    if rows_affected == 0:
+        delete_secret_immediately(secret_id)
+        raise HTTPException(status_code=404, detail="Secret has already been viewed")
+    
+    # Refresh to get the new view_count
+    db.refresh(secret)
     
     # Calculate remaining views
     remaining_views = secret.max_views - secret.view_count

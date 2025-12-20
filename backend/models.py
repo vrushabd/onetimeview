@@ -42,6 +42,4 @@ class Secret(Base):
             return True
         return False
     
-    def increment_view(self):
-        """Increment view count"""
-        self.view_count += 1
+
