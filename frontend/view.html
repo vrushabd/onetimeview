@@ -391,9 +391,11 @@
 
                 const data = await response.json();
                 if (data.verified === true) {
-                    // No password required
-                    hideLoading();
-                    showRevealButton(data.remaining_views, data.content_type);
+                    // No password required - auto-reveal
+                    if (data.remaining_views <= 1) {
+                        console.warn('⚠️ Warning: This secret can be viewed only one time. It will be deleted immediately after this view.');
+                    }
+                    await viewSecret();
                 } else {
                     // Password is required - show password form
                     hideLoading();
@@ -442,8 +444,14 @@
                     currentPassword = password;
                     document.getElementById('passwordForm').classList.add('hidden');
                     document.getElementById('passwordError').classList.add('hidden');
-                    // Show reveal warning instead of auto-reveal
-                    showRevealButton(data.remaining_views, data.content_type);
+
+                    if (data.remaining_views <= 1) {
+                        console.warn('⚠️ Warning: This secret can be viewed only one time. It will be deleted immediately after this view.');
+                    }
+
+                    // Auto-reveal the secret after password verification
+                    showLoading();
+                    await viewSecret();
                 } else {
                     document.getElementById('passwordError').classList.remove('hidden');
                 }
