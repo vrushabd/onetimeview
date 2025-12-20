@@ -446,7 +446,7 @@
                     document.getElementById('passwordError').classList.add('hidden');
 
                     if (data.remaining_views <= 1) {
-                        console.warn('⚠️ Warning: This secret can be viewed only one time. It will be deleted immediately after this view.');
+                        alert('⚠️ Warning: This secret can be viewed only one time. It will be deleted immediately after this view.');
                     }
 
                     // Auto-reveal the secret after password verification
