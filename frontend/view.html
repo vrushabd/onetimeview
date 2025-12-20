@@ -393,7 +393,7 @@
                 if (data.verified === true) {
                     // No password required - auto-reveal
                     if (data.remaining_views <= 1) {
-                        console.warn('⚠️ Warning: This secret can be viewed only one time. It will be deleted immediately after this view.');
+                        alert('⚠️ Warning: This secret can be viewed only one time. It will be deleted immediately after this view.');
                     }
                     await viewSecret();
                 } else {
