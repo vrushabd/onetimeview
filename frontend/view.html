@@ -85,6 +85,25 @@
                 <p id="passwordError" class="text-red-400 text-sm mt-2 hidden">Incorrect password. Please try again.</p>
             </div>
 
+            <!-- Reveal Button Section -->
+            <div id="revealSection"
+                class="hidden bg-card rounded-2xl p-8 sm:p-10 mb-6 border border-card-border shadow-soft text-center">
+                <div class="mb-6">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-primary mb-4">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <h3 class="text-3xl font-bold mb-3 text-white">Secret Ready to View</h3>
+                    <p class="text-text-secondary text-lg" id="revealInfo">Click below to reveal the secret</p>
+                </div>
+                <button onclick="revealSecret()"
+                    class="bg-cta hover:bg-cta-hover text-white font-bold py-4 px-8 rounded-lg transition text-lg shadow-lg hover:shadow-xl transform hover:scale-105">
+                    🔓 Click to Reveal Secret
+                </button>
+                <p class="text-text-secondary text-sm mt-6">⚠️ Once revealed, the view count will be consumed</p>
+            </div>
+
             <!-- Content Display -->
             <div id="contentDisplay"
                 class="hidden bg-card rounded-2xl p-6 sm:p-8 border border-card-border shadow-soft space-y-6">
@@ -341,7 +360,7 @@
             }
         }
 
-        // Auto-load secret on page load
+        // Auto-load secret metadata on page load (but don't consume the view yet)
         async function init() {
             try {
                 // Check if password is required
@@ -368,16 +387,9 @@
 
                 const data = await response.json();
                 if (data.verified === true) {
-                    // If this is the last remaining view, confirm before consuming it
-                    if (data.remaining_views === 1) {
-                        const confirmLast = confirm('This is the last time this secret can be viewed. After this, it will be permanently deleted. Continue?');
-                        if (!confirmLast) {
-                            window.location.href = '/';
-                            return;
-                        }
-                    }
-                    // No password required - auto-load content
-                    viewSecret();
+                    // No password required - show reveal button
+                    hideLoading();
+                    showRevealButton(data.remaining_views, data.content_type);
                 } else {
                     // Password is required - show password form
                     hideLoading();
@@ -388,6 +400,17 @@
                 console.error('Error checking password:', error);
                 window.location.href = '/expired';
             }
+        }
+
+        function showRevealButton(remainingViews, contentType) {
+            const revealSection = document.getElementById('revealSection');
+            const revealInfo = document.getElementById('revealInfo');
+            
+            let contentTypeLabel = contentType;
+            if (contentType === 'text') contentTypeLabel = 'message';
+            
+            revealInfo.textContent = `This ${contentTypeLabel} has ${remainingViews} view${remainingViews !== 1 ? 's' : ''} remaining`;
+            revealSection.classList.remove('hidden');
         }
 
         async function verifyPassword() {
@@ -405,19 +428,12 @@
                 const data = await response.json();
 
                 if (data.verified) {
-                    // If this is the last remaining view, confirm before consuming it
-                    if (data.remaining_views === 1) {
-                        const confirmLast = confirm('This is the last time this secret can be viewed. After this, it will be permanently deleted. Continue?');
-                        if (!confirmLast) {
-                            return;
-                        }
-                    }
                     passwordVerified = true;
                     currentPassword = password;
                     document.getElementById('passwordForm').classList.add('hidden');
                     document.getElementById('passwordError').classList.add('hidden');
-                    showLoading();
-                    viewSecret();
+                    // Show reveal button instead of auto-loading
+                    showRevealButton(data.remaining_views, data.content_type);
                 } else {
                     document.getElementById('passwordError').classList.remove('hidden');
                 }
@@ -425,6 +441,14 @@
             } catch (error) {
                 alert('Error verifying password: ' + error.message);
             }
+        }
+
+        async function revealSecret() {
+            // Hide reveal button and show loading
+     lementById('revealSection').classList.add('hidden');
+            showLoa                     
+            // Fetch the secret (this will consume a view)
+            await viewSecret();
         }
 
         async function viewSecret() {

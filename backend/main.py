@@ -258,8 +258,8 @@ async def create_secret(
     # Validate and set max_views
     if max_views is None or max_views < 1:
         max_views = 1
-    if max_views > 10:
-        max_views = 10
+    if max_views > 100:
+        max_views = 100
     
     # Create secret object
     secret = Secret(
@@ -363,8 +363,8 @@ async def create_secret_from_cloudinary(
     max_views = body.max_views or 1
     if max_views < 1:
         max_views = 1
-    if max_views > 10:
-        max_views = 10
+    if max_views > 100:
+        max_views = 100
 
     secret = Secret(
         content_type=body.content_type,

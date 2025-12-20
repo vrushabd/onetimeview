@@ -9,7 +9,7 @@ class SecretCreate(BaseModel):
     content: Optional[str] = None
     password: Optional[str] = None
     expiry_hours: Optional[int] = None  # Hours until expiration
-    max_views: Optional[int] = Field(default=1, ge=1, le=10)  # Number of times secret can be viewed
+    max_views: Optional[int] = Field(default=1, ge=1, le=100)  # Number of times secret can be viewed
     is_premium: bool = False
     
     @field_validator('content')
@@ -29,7 +29,7 @@ class CloudinarySecretCreate(BaseModel):
     cloud_resource_type: str  # image, video, raw
     password: Optional[str] = None
     expiry_hours: Optional[int] = None
-    max_views: Optional[int] = Field(default=1, ge=1, le=10)
+    max_views: Optional[int] = Field(default=1, ge=1, le=100)
     is_premium: bool = False
 
 
