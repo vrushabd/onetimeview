@@ -292,9 +292,9 @@ async def create_secret(
             )
         
         # Determine resource type for Cloudinary
-        # Force RAW for everything to avoid "Failed to ping image" errors
-        # We will proxy images through our backend to fix headers
-        resource_type = "raw"
+        # Use "video" for videos to ensure playback ability
+        # Force "raw" for others to avoid transformation errors
+        resource_type = "video" if content_type == "video" else "raw"
         
         # Upload to Cloudinary
         file_content = await file.read()
@@ -484,6 +484,8 @@ async def get_secret(
             raise HTTPException(status_code=401, detail="Password required")
         if not verify_password(password, secret.password_hash):
             raise HTTPException(status_code=401, detail="Invalid password")
+            
+
     
     # Increment view count
     # Atomic update: Increment view_count only if it's less than max_views
