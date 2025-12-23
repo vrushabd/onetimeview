@@ -8,7 +8,8 @@ class SecretCreate(BaseModel):
     content_type: str = Field(..., pattern="^(text|image|video|file)$")
     content: Optional[str] = None
     password: Optional[str] = None
-    expiry_hours: Optional[int] = None  # Hours until expiration
+    expiry_hours: Optional[int] = None  # Deprecated, prefer expiry_minutes
+    expiry_minutes: Optional[int] = None # Minutes until expiration
     max_views: Optional[int] = Field(default=1, ge=1, le=100)  # Number of times secret can be viewed
     is_premium: bool = False
     
@@ -29,6 +30,7 @@ class CloudinarySecretCreate(BaseModel):
     cloud_resource_type: str  # image, video, raw
     password: Optional[str] = None
     expiry_hours: Optional[int] = None
+    expiry_minutes: Optional[int] = None
     max_views: Optional[int] = Field(default=1, ge=1, le=100)
     is_premium: bool = False
 

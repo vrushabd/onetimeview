@@ -233,6 +233,7 @@ async def create_secret(
     content: Optional[str] = Form(None),
     password: Optional[str] = Form(None),
     expiry_hours: Optional[int] = Form(None),
+    expiry_minutes: Optional[int] = Form(None),
     max_views: Optional[int] = Form(1),
     is_premium: bool = Form(False),
     file: Optional[UploadFile] = File(None),
@@ -314,13 +315,14 @@ async def create_secret(
         secret.password_hash = hash_password(password)
     
     # Handle expiry
-    if expiry_hours is not None:
+    # Handle expiry
+    if expiry_minutes is not None:
+        if expiry_minutes == 0:
+            secret.expiry_time = None
+        else:
+            secret.expiry_time = datetime.utcnow() + timedelta(minutes=expiry_minutes)
+    elif expiry_hours is not None:
         if expiry_hours == 0:
-            if not is_premium:
-                raise HTTPException(
-                    status_code=403, 
-                    detail="No Expiry option requires premium subscription"
-                )
             secret.expiry_time = None
         else:
             secret.expiry_time = datetime.utcnow() + timedelta(hours=expiry_hours)
@@ -382,13 +384,14 @@ async def create_secret_from_cloudinary(
         secret.password_hash = hash_password(body.password)
 
     # Handle expiry (same rules as create_secret)
-    if body.expiry_hours is not None:
+    # Handle expiry (same rules as create_secret)
+    if body.expiry_minutes is not None:
+        if body.expiry_minutes == 0:
+            secret.expiry_time = None
+        else:
+            secret.expiry_time = datetime.utcnow() + timedelta(minutes=body.expiry_minutes)
+    elif body.expiry_hours is not None:
         if body.expiry_hours == 0:
-            if not body.is_premium:
-                raise HTTPException(
-                    status_code=403,
-                    detail="No Expiry option requires premium subscription"
-                )
             secret.expiry_time = None
         else:
             secret.expiry_time = datetime.utcnow() + timedelta(hours=body.expiry_hours)

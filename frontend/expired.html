@@ -27,10 +27,13 @@
         window.si = window.si || function () { (window.si.q = window.si.q || []).push(arguments); };
     </script>
     <script defer src="/_vercel/speed-insights/script.js"></script>
+    <script src="/static/cookie-consent.js" defer></script>
 </head>
 
-<body class="bg-background min-h-screen text-text-primary flex items-center justify-center px-4">
-    <div class="container mx-auto">
+<body
+    class="bg-background min-h-screen text-text-primary bg-grid-pattern relative overflow-x-hidden flex items-center justify-center px-4">
+    <div class="bg-noise"></div>
+    <div class="container mx-auto z-10 relative">
         <div class="max-w-2xl mx-auto text-center space-y-6">
             <div class="flex flex-col items-center gap-4 animate-fade-in">
                 <div

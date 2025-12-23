@@ -36,6 +36,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/static/tailwind-config.js"></script>
+    <script src="/static/cookie-consent.js" defer></script>
     <link rel="stylesheet" href="/static/styles.css">
 
     <!-- JSON-LD Structured Data -->
@@ -45,8 +46,8 @@
       "@type": "Article",
       "headline": "Privacy Policy - OneTimeView",
       "description": "Privacy policy explaining how OneTimeView handles and protects user data",
-      "datePublished": "2024-12-14",
-      "dateModified": "2024-12-14",
+      "datePublished": "2025-01-01",
+      "dateModified": "2025-01-01",
       "author": {
         "@type": "Organization",
         "name": "OneTimeView"
@@ -86,51 +87,47 @@
     <script defer src="/_vercel/speed-insights/script.js"></script>
 </head>
 
-<body class="bg-background min-h-screen text-text-primary">
+<body class="bg-background min-h-screen text-text-primary bg-grid-pattern relative overflow-x-hidden">
+    <div class="bg-noise"></div>
+
     <!-- Navigation -->
-    <nav class="container mx-auto px-6 py-4">
-        <div class="flex justify-between items-center">
-            <a href="/" class="flex items-center gap-2 group">
-                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"
-                    class="transition-transform group-hover:scale-110">
-                    <path d="M16 8C10 8 5 12 3 16C5 20 10 24 16 24C22 24 27 20 29 16C27 12 22 8 16 8Z" stroke="#6D5DF6"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                    <circle cx="16" cy="16" r="5" fill="#6D5DF6" />
-                    <text x="16" y="20" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="white"
-                        text-anchor="middle">1</text>
-                    <circle cx="8" cy="6" r="1" fill="#6D5DF6" opacity="0.6" />
-                    <circle cx="11" cy="4" r="0.8" fill="#6D5DF6" opacity="0.4" />
-                    <circle cx="14" cy="3" r="0.6" fill="#6D5DF6" opacity="0.3" />
-                    <circle cx="18" cy="3" r="0.6" fill="#6D5DF6" opacity="0.3" />
-                    <circle cx="21" cy="4" r="0.8" fill="#6D5DF6" opacity="0.4" />
-                    <circle cx="24" cy="6" r="1" fill="#6D5DF6" opacity="0.6" />
-                </svg>
+    <nav class="border-b border-white/5 backdrop-blur-md sticky top-0 z-40 bg-background/80">
+        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 group flex-shrink-0">
+                <div
+                    class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-card border border-primary/30 shadow-glow-sm group-hover:shadow-glow transition-all duration-300">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </div>
                 <span
-                    class="text-xl font-semibold text-primary group-hover:text-white transition-colors">OneTimeView</span>
+                    class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-primary-light to-primary group-hover:to-white transition-all">OneTimeView</span>
             </a>
-            <div class="space-x-6">
-                <a href="/" class="hover:text-primary-light transition">Home</a>
-                <a href="/create" class="hover:text-primary-light transition">Create Secret</a>
+            <div class="flex gap-6 md:gap-8 text-sm md:text-base font-medium">
+                <a href="/" class="text-text-secondary hover:text-primary transition-colors hover:glow-text">Home</a>
+                <a href="/create"
+                    class="text-text-secondary hover:text-primary transition-colors hover:glow-text">Create Secret</a>
             </div>
         </div>
     </nav>
 
-    <div class="container mx-auto px-6 py-12">
+    <div class="container mx-auto px-6 py-12 relative z-10">
         <div class="max-w-4xl mx-auto">
-            <h1 class="text-5xl font-bold mb-8">Privacy Policy</h1>
-            <p class="text-gray-400 mb-8">Last updated: December 14, 2024</p>
+            <h1 class="text-5xl font-bold mb-8 text-white">Privacy Policy</h1>
+            <p class="text-text-secondary mb-8 font-mono text-sm">Last updated: January 1, 2025</p>
 
-            <div class="prose prose-invert max-w-none space-y-8">
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">1. Introduction</h2>
+            <div class="space-y-8">
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">1. Introduction</h2>
                     <p class="text-text-secondary leading-relaxed">
                         OneTimeView ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy
                         explains how we handle information when you use our one-time message and file sharing service.
                     </p>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">2. Information We Collect</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">2. Information We Collect</h2>
                     <h3 class="text-xl font-bold mb-3 text-primary-light">2.1 Content You Share</h3>
                     <p class="text-text-secondary leading-relaxed mb-4">
                         When you create a secret, we temporarily store:
@@ -154,8 +151,8 @@
                     </p>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">3. How We Use Information</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">3. How We Use Information</h2>
                     <p class="text-text-secondary leading-relaxed mb-4">We use the information we collect solely to:</p>
                     <ul class="list-disc list-inside text-text-secondary space-y-2 ml-4">
                         <li>Provide the one-time secret sharing service</li>
@@ -169,8 +166,8 @@
                     </p>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">4. Data Retention and Deletion</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">4. Data Retention and Deletion</h2>
                     <p class="text-text-secondary leading-relaxed mb-4">
                         <strong>Automatic Deletion:</strong> Your secrets are automatically deleted:
                     </p>
@@ -184,8 +181,8 @@
                     </p>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">5. Data Security</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">5. Data Security</h2>
                     <p class="text-text-secondary leading-relaxed">
                         We implement industry-standard security measures including:
                     </p>
@@ -198,8 +195,8 @@
                     </ul>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">6. Third-Party Services</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">6. Third-Party Services</h2>
                     <p class="text-text-secondary leading-relaxed">
                         OneTimeView does not share your content with third parties. We may use third-party services for:
                     </p>
@@ -210,8 +207,8 @@
                     </ul>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">7. Your Rights (GDPR Compliance)</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">7. Your Rights (GDPR Compliance)</h2>
                     <p class="text-text-secondary leading-relaxed mb-4">
                         If you are in the European Union, you have the right to:
                     </p>
@@ -226,24 +223,24 @@
                     </p>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">8. Children's Privacy</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">8. Children's Privacy</h2>
                     <p class="text-text-secondary leading-relaxed">
                         OneTimeView is not intended for users under 13 years of age. We do not knowingly collect
                         information from children under 13.
                     </p>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">9. Changes to This Policy</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">9. Changes to This Policy</h2>
                     <p class="text-text-secondary leading-relaxed">
                         We may update this Privacy Policy from time to time. Changes will be posted on this page with
                         an updated "Last updated" date.
                     </p>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">10. Contact Us</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">10. Contact Us</h2>
                     <p class="text-text-secondary leading-relaxed">
                         If you have questions about this Privacy Policy, please contact us at:
                     </p>
@@ -256,14 +253,13 @@
     </div>
 
     <!-- Footer -->
-    <footer class="container mx-auto px-6 py-8 mt-12 border-t border-card-border">
-        <div class="flex flex-col md:flex-row justify-between items-center">
-            <p class="text-gray-400 mb-4 md:mb-0">
-                © 2024 OneTimeView. All rights reserved.
-            </p>
-            <div class="space-x-6">
-                <a href="/privacy" class="text-text-secondary hover:text-white transition">Privacy Policy</a>
-                <a href="/terms" class="text-text-secondary hover:text-white transition">Terms of Service</a>
+    <footer class="border-t border-card-border mt-12 backdrop-blur-sm bg-background/50">
+        <div
+            class="container mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center text-sm text-text-muted gap-3">
+            <div>© 2025 OneTimeView. All rights reserved.</div>
+            <div class="flex gap-6">
+                <a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a>
+                <a href="/terms" class="hover:text-white transition-colors">Terms of Service</a>
             </div>
         </div>
     </footer>

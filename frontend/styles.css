@@ -25,7 +25,7 @@ html {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #6D5DF6;
+    background: #22d3ee;
 }
 
 /* Enhanced textarea and input */
@@ -50,19 +50,19 @@ input:focus {
 }
 
 .upload-area:hover {
-    border-color: #6D5DF6;
+    border-color: #22d3ee;
     background-color: rgba(109, 93, 246, 0.05);
 }
 
 .upload-area.dragging {
-    border-color: #6D5DF6;
+    border-color: #22d3ee;
     background-color: rgba(109, 93, 246, 0.1);
 }
 
 /* Progress bar */
 .progress-bar {
     transition: width 0.3s ease;
-    background-color: #6D5DF6;
+    background-color: #22d3ee;
 }
 
 /* Button states */
@@ -106,7 +106,7 @@ button:active,
 input:focus,
 textarea:focus,
 button:focus {
-    outline: 2px solid #6D5DF6;
+    outline: 2px solid #22d3ee;
     outline-offset: 2px;
 }
 

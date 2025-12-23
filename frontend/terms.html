@@ -34,6 +34,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/static/tailwind-config.js"></script>
+    <script src="/static/cookie-consent.js" defer></script>
     <link rel="stylesheet" href="/static/styles.css">
 
     <!-- JSON-LD Structured Data -->
@@ -43,8 +44,8 @@
       "@type": "Article",
       "headline": "Terms of Service - OneTimeView",
       "description": "Terms of service for using the OneTimeView platform",
-      "datePublished": "2024-12-14",
-      "dateModified": "2024-12-14",
+      "datePublished": "2025-01-01",
+      "dateModified": "2025-01-01",
       "author": {
         "@type": "Organization",
         "name": "OneTimeView"
@@ -84,51 +85,47 @@
     <script defer src="/_vercel/speed-insights/script.js"></script>
 </head>
 
-<body class="bg-background min-h-screen text-text-primary">
+<body class="bg-background min-h-screen text-text-primary bg-grid-pattern relative overflow-x-hidden">
+    <div class="bg-noise"></div>
+
     <!-- Navigation -->
-    <nav class="container mx-auto px-6 py-4">
-        <div class="flex justify-between items-center">
-            <a href="/" class="flex items-center gap-2 group">
-                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"
-                    class="transition-transform group-hover:scale-110">
-                    <path d="M16 8C10 8 5 12 3 16C5 20 10 24 16 24C22 24 27 20 29 16C27 12 22 8 16 8Z" stroke="#6D5DF6"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                    <circle cx="16" cy="16" r="5" fill="#6D5DF6" />
-                    <text x="16" y="20" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="white"
-                        text-anchor="middle">1</text>
-                    <circle cx="8" cy="6" r="1" fill="#6D5DF6" opacity="0.6" />
-                    <circle cx="11" cy="4" r="0.8" fill="#6D5DF6" opacity="0.4" />
-                    <circle cx="14" cy="3" r="0.6" fill="#6D5DF6" opacity="0.3" />
-                    <circle cx="18" cy="3" r="0.6" fill="#6D5DF6" opacity="0.3" />
-                    <circle cx="21" cy="4" r="0.8" fill="#6D5DF6" opacity="0.4" />
-                    <circle cx="24" cy="6" r="1" fill="#6D5DF6" opacity="0.6" />
-                </svg>
+    <nav class="border-b border-white/5 backdrop-blur-md sticky top-0 z-40 bg-background/80">
+        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 group flex-shrink-0">
+                <div
+                    class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-card border border-primary/30 shadow-glow-sm group-hover:shadow-glow transition-all duration-300">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </div>
                 <span
-                    class="text-xl font-semibold text-primary group-hover:text-white transition-colors">OneTimeView</span>
+                    class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-primary-light to-primary group-hover:to-white transition-all">OneTimeView</span>
             </a>
-            <div class="space-x-6">
-                <a href="/" class="hover:text-primary-light transition">Home</a>
-                <a href="/create" class="hover:text-primary-light transition">Create Secret</a>
+            <div class="flex gap-6 md:gap-8 text-sm md:text-base font-medium">
+                <a href="/" class="text-text-secondary hover:text-primary transition-colors hover:glow-text">Home</a>
+                <a href="/create"
+                    class="text-text-secondary hover:text-primary transition-colors hover:glow-text">Create Secret</a>
             </div>
         </div>
     </nav>
 
-    <div class="container mx-auto px-6 py-12">
+    <div class="container mx-auto px-6 py-12 relative z-10">
         <div class="max-w-4xl mx-auto">
-            <h1 class="text-5xl font-bold mb-8">Terms of Service</h1>
-            <p class="text-text-secondary mb-8">Last updated: December 14, 2024</p>
+            <h1 class="text-5xl font-bold mb-8 text-white">Terms of Service</h1>
+            <p class="text-text-secondary mb-8 font-mono text-sm">Last updated: January 1, 2025</p>
 
-            <div class="prose prose-invert max-w-none space-y-8">
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">1. Acceptance of Terms</h2>
+            <div class="space-y-8">
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">1. Acceptance of Terms</h2>
                     <p class="text-text-secondary leading-relaxed">
                         By accessing and using OneTimeView ("the Service"), you accept and agree to be bound by these
                         Terms of Service. If you do not agree to these terms, please do not use the Service.
                     </p>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">2. Description of Service</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">2. Description of Service</h2>
                     <p class="text-text-secondary leading-relaxed">
                         OneTimeView provides a platform for sharing messages and files that are automatically deleted
                         after being viewed once or after a specified expiration time. The Service is designed for
@@ -136,8 +133,8 @@
                     </p>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">3. User Responsibilities</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">3. User Responsibilities</h2>
                     <p class="text-text-secondary leading-relaxed mb-4">You agree to:</p>
                     <ul class="list-disc list-inside text-text-secondary space-y-2 ml-4">
                         <li>Use the Service only for lawful purposes</li>
@@ -149,8 +146,8 @@
                     </ul>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">4. Acceptable Use Policy</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">4. Acceptable Use Policy</h2>
                     <p class="text-text-secondary leading-relaxed mb-4">
                         <strong>Prohibited Content:</strong> You may not use OneTimeView to share:
                     </p>
@@ -165,8 +162,8 @@
                     </ul>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">5. Content Deletion and Data Loss</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">5. Content Deletion and Data Loss</h2>
                     <p class="text-text-secondary leading-relaxed mb-4">
                         <strong>Important Notice:</strong> OneTimeView automatically deletes content after one view or
                         expiration. You acknowledge that:
@@ -179,8 +176,8 @@
                     </ul>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">6. Service Limitations</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">6. Service Limitations</h2>
                     <h3 class="text-xl font-bold mb-3 text-primary-light">6.1 Free Tier</h3>
                     <ul class="list-disc list-inside text-text-secondary space-y-2 ml-4 mb-4">
                         <li>Text secrets only</li>
@@ -198,8 +195,8 @@
                     </ul>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">7. Intellectual Property</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">7. Intellectual Property</h2>
                     <p class="text-text-secondary leading-relaxed">
                         You retain all rights to content you upload. By using the Service, you grant OneTimeView a
                         limited license to store and deliver your content solely for the purpose of providing the
@@ -208,8 +205,8 @@
                     </p>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">8. Disclaimer of Warranties</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">8. Disclaimer of Warranties</h2>
                     <p class="text-text-secondary leading-relaxed">
                         THE SERVICE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. We do not guarantee:
                     </p>
@@ -221,8 +218,8 @@
                     </ul>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">9. Limitation of Liability</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">9. Limitation of Liability</h2>
                     <p class="text-text-secondary leading-relaxed">
                         OneTimeView shall not be liable for any indirect, incidental, special, consequential, or
                         punitive
@@ -237,8 +234,8 @@
                     </ul>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">10. Account Termination</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">10. Account Termination</h2>
                     <p class="text-text-secondary leading-relaxed">
                         We reserve the right to suspend or terminate your access to the Service at any time for:
                     </p>
@@ -250,8 +247,8 @@
                     </ul>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">11. Premium Subscription</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">11. Premium Subscription</h2>
                     <p class="text-text-secondary leading-relaxed">
                         Premium subscriptions are billed monthly. You may cancel at any time. Refunds are handled on a
                         case-by-case basis. Cancellation does not entitle you to a refund for the current billing
@@ -259,24 +256,24 @@
                     </p>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">12. Changes to Terms</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">12. Changes to Terms</h2>
                     <p class="text-text-secondary leading-relaxed">
                         We may modify these Terms at any time. Continued use of the Service after changes constitutes
                         acceptance of the new Terms. We will notify users of significant changes.
                     </p>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">13. Governing Law</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">13. Governing Law</h2>
                     <p class="text-text-secondary leading-relaxed">
                         These Terms shall be governed by and construed in accordance with applicable laws. Any disputes
                         shall be resolved in the appropriate courts.
                     </p>
                 </section>
 
-                <section class="bg-card backdrop-blur-lg rounded-2xl p-8 border border-card-border">
-                    <h2 class="text-3xl font-bold mb-4">14. Contact Information</h2>
+                <section class="glass rounded-2xl p-8 border border-white/5 shadow-soft">
+                    <h2 class="text-3xl font-bold mb-4 text-white">14. Contact Information</h2>
                     <p class="text-text-secondary leading-relaxed">
                         For questions about these Terms, please contact:
                     </p>
@@ -289,14 +286,13 @@
     </div>
 
     <!-- Footer -->
-    <footer class="container mx-auto px-6 py-8 mt-12 border-t border-card-border">
-        <div class="flex flex-col md:flex-row justify-between items-center">
-            <p class="text-gray-400 mb-4 md:mb-0">
-                © 2024 OneTimeView. All rights reserved.
-            </p>
-            <div class="space-x-6">
-                <a href="/privacy" class="text-text-secondary hover:text-white transition">Privacy Policy</a>
-                <a href="/terms" class="text-text-secondary hover:text-white transition">Terms of Service</a>
+    <footer class="border-t border-card-border mt-12 backdrop-blur-sm bg-background/50">
+        <div
+            class="container mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center text-sm text-text-muted gap-3">
+            <div>© 2025 OneTimeView. All rights reserved.</div>
+            <div class="flex gap-6">
+                <a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a>
+                <a href="/terms" class="hover:text-white transition-colors">Terms of Service</a>
             </div>
         </div>
     </footer>

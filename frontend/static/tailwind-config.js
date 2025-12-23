@@ -2,28 +2,38 @@
 tailwind.config = {
     theme: {
         extend: {
+            fontFamily: {
+                sans: ['Inter', 'sans-serif'],
+                mono: ['JetBrains Mono', 'monospace'],
+            },
             colors: {
-                background: '#0F0B1E',
+                background: 'hsl(220, 20%, 6%)', // Deep navy
+                surface: 'hsl(222, 18%, 10%)', // Slightly lighter background
                 primary: {
-                    DEFAULT: '#6D28D9',
-                    hover: '#9333EA', // Using the end of the gradient as hover/lighter shade for now
-                    light: '#A855F7', // Secondary accent
+                    DEFAULT: 'hsl(190, 95%, 50%)', // Electric Cyan
+                    hover: 'hsl(190, 85%, 60%)',
+                    dim: 'rgba(6, 182, 212, 0.1)',
                 },
-                secondary: {
-                    DEFAULT: '#A855F7',
+                accent: {
+                    DEFAULT: 'hsl(280, 100%, 65%)', // Bright Purple
+                    hover: 'hsl(280, 90%, 75%)',
                 },
+                destructive: 'hsl(0, 84%, 60%)', // Bright Red
                 text: {
                     primary: '#FFFFFF',
-                    secondary: '#C4B5FD',
+                    secondary: 'hsl(215, 20%, 65%)', // Muted Gray
+                    muted: 'hsl(215, 20%, 45%)'
                 },
                 card: {
-                    DEFAULT: '#1E1B3A',
-                    border: '#1E1B3A',
+                    DEFAULT: 'rgba(30, 35, 60, 0.6)', // Glass-like base
+                    border: 'rgba(6, 182, 212, 0.2)', // Cyan border hint
                 },
-                cta: {
-                    DEFAULT: '#7C3AED',
-                    hover: '#6D28D9',
-                }
+                success: 'hsl(150, 90%, 45%)' // Neon Green
+            },
+            boxShadow: {
+                'glow': '0 0 20px rgba(6, 182, 212, 0.35)',
+                'glow-sm': '0 0 10px rgba(6, 182, 212, 0.25)',
+                'glow-accent': '0 0 20px rgba(192, 132, 252, 0.35)',
             }
         }
     }
