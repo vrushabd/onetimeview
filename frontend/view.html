@@ -435,7 +435,11 @@
 
                 if (!response.ok) {
                     console.error('Verify failed:', response.status);
-                    window.location.href = '/expired?reason=Verification failed';
+                    // Don't redirect for server errors, show retry
+                    document.getElementById('loadingSpinner').innerHTML = `
+                        <div class="text-destructive font-bold mb-4">Connection Failed</div>
+                        <button onclick="window.location.reload()" class="bg-primary px-4 py-2 rounded text-background font-bold">Retry</button>
+                    `;
                     return;
                 }
 
@@ -454,7 +458,13 @@
 
             } catch (error) {
                 console.error('Error checking password:', error);
-                window.location.href = '/expired';
+                // Don't redirect for network errors
+                document.getElementById('loadingSpinner').classList.remove('hidden');
+                document.getElementById('loadingSpinner').innerHTML = `
+                    <div class="text-destructive font-bold mb-4">Network Error</div>
+                    <p class="text-text-secondary text-sm mb-4">Please check your connection and try again.</p>
+                    <button onclick="window.location.reload()" class="bg-primary px-4 py-2 rounded text-background font-bold">Retry</button>
+                `;
             }
         }
 
