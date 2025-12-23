@@ -521,8 +521,8 @@
 
         async function revealSecret() {
             // Hide reveal button and show loading
-            lementById('revealSection').classList.add('hidden');
-            showLoa
+            document.getElementById('revealSection').classList.add('hidden');
+            showLoading();
             // Fetch the secret (this will consume a view)
             await viewSecret();
         }
