@@ -35,4 +35,12 @@
     <priority>0.5</priority>
   </url>
   
+  <!-- FAQ - High Text Content for AdSense -->
+  <url>
+    <loc>https://onetimeview.app/faq</loc>
+    <lastmod>2026-01-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
 </urlset>
