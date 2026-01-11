@@ -76,6 +76,16 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 @app.on_event("startup")
 async def startup_event():
     """Initialize database and start cleanup task"""
+    # Debug: Print DB URL to logs (Masking password)
+    from backend.database import DATABASE_URL
+    safe_url = DATABASE_URL
+    if "@" in safe_url:
+        # Mask password
+        parts = safe_url.split("@")
+        safe_url = "redacted@" + parts[1]
+    
+    print(f"🚀 STARTUP: Connecting to database -> {safe_url}")
+    
     init_db()
     asyncio.create_task(cleanup_expired_secrets())
 # ============================================================================
