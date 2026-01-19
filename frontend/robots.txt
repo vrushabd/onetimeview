@@ -8,6 +8,8 @@ Allow: /
 Allow: /create
 Allow: /privacy
 Allow: /terms
+Allow: /faq
+Allow: /guides/
 
 Allow: /static/
 
