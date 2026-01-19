@@ -23,6 +23,54 @@
         {
             "source": "/view/(.*)",
             "destination": "/view.html"
+        },
+        {
+            "source": "/faq",
+            "destination": "/faq.html"
+        },
+        {
+            "source": "/guides",
+            "destination": "/guides/index.html"
+        },
+        {
+            "source": "/guides/",
+            "destination": "/guides/index.html"
+        },
+        {
+            "source": "/guides/whatsapp",
+            "destination": "/guides/whatsapp.html"
+        },
+        {
+            "source": "/guides/instagram",
+            "destination": "/guides/instagram.html"
+        },
+        {
+            "source": "/guides/telegram",
+            "destination": "/guides/telegram.html"
+        },
+        {
+            "source": "/guides/messenger",
+            "destination": "/guides/messenger.html"
+        },
+        {
+            "source": "/guides/snapchat",
+            "destination": "/guides/snapchat.html"
+        },
+        {
+            "source": "/guides/discord",
+            "destination": "/guides/discord.html"
+        },
+        {
+            "source": "/guides/alternatives",
+            "destination": "/guides/alternatives.html"
+        },
+        {
+            "source": "/guides/how-to-screenshot",
+            "destination": "/guides/how-to-screenshot.html"
+        },
+        {
+            "source": "/guides/save-download",
+            "destination": "/guides/save-download.html"
         }
     ]
 }
