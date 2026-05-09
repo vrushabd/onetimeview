@@ -7,11 +7,11 @@
     <meta name="google-adsense-account" content="ca-pub-8327032298153859">
 
     <!-- Primary SEO Meta Tags -->
-    <title>Create Secure Self-Destructing Link - OneTimeView</title>
+    <title>Create Secret - One Time View Link Generator</title>
     <meta name="description"
-        content="Create a secure, encrypted one-time link for messages and files. Password protect your secret and set it to self-destruct after viewing. Free and anonymous.">
+        content="Free one time view link generator. Create secure, self-destructing links for passwords, notes, and files that auto-delete after viewing. No sign-up required.">
     <meta name="keywords"
-        content="create secret link, secure message generator, self destruct file upload, password protected link, encrypted note, temporary url, share secret">
+        content="one time view link generator, one time view, onetimeview, self destruct message, share password securely, one time link, ephemeral file sharing">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://onetimeview.app/create">
 
@@ -46,8 +46,8 @@
     <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/static/tailwind-config.js"></script>
-    <script src="/static/config.js"></script>
+    <script src="/static/tailwind-config.js?v=2"></script>
+    <script src="/static/config.js?v=2"></script>
     <script src="/static/cookie-consent.js" defer></script>
     <link rel="stylesheet" href="/static/styles.css">
 
@@ -371,6 +371,10 @@
                             </svg>
                             Generate Secret Link
                         </button>
+                        
+                        <p class="text-center text-xs text-text-secondary mt-6">
+                            By creating a secret, you agree to our <a href="/terms" class="text-primary-light hover:underline">Terms of Service</a>
+                        </p>
                     </div>
             </form>
         </div>
@@ -422,12 +426,46 @@
         }
 
     </script>
-    <p class="text-center text-sm text-text-secondary mt-4">
-        By creating a secret, you agree to our <a href="/terms" class="text-primary-light hover:underline">Terms of
-            Service</a>
-    </p>
-    </form>
-    </div>
+            </form>
+
+            <!-- Secret Overview Section -->
+            <div id="secretOverviewContainer" class="hidden mt-8 glass rounded-2xl border-white/10 shadow-2xl relative overflow-hidden group animate-fade-in-up">
+                <!-- Top accent line -->
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-accent"></div>
+                
+                <div class="p-8 md:p-10">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Your Recent Links
+                        </h2>
+                        <button onclick="clearAllHistory()" class="text-sm text-text-muted hover:text-red-400 transition-colors flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            Clear History
+                        </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-text-secondary bg-white/5 rounded-t-xl">
+                                <tr>
+                                    <th class="px-4 py-3 font-medium rounded-tl-xl"><span class="flex items-center gap-2"><svg class="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> Date</span></th>
+                                    <th class="px-4 py-3 font-medium"><span class="flex items-center gap-2"><svg class="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg> Secure Link</span></th>
+                                    <th class="px-4 py-3 font-medium"><span class="flex items-center gap-2"><svg class="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg> Status</span></th>
+                                    <th class="px-4 py-3 font-medium"><span class="flex items-center gap-2"><svg class="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Actions</span></th>
+                                    <th class="px-4 py-3 bg-white/5 rounded-tr-xl"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="secretHistoryList" class="divide-y divide-white/5">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -688,6 +726,8 @@
                             `⚠️ Will be deleted after ${viewText}`;
                     }
 
+                    saveSecretToHistory(data.url, !!password, password);
+
                     document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
                     return;
                 }
@@ -794,6 +834,8 @@
                         `⚠️ Will be deleted after ${viewText}`;
                 }
 
+                saveSecretToHistory(finalSecretData.url, !!password, password);
+
                 document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
             } catch (error) {
                 let message = error.message || 'Upload failed. Please try again.';
@@ -865,6 +907,10 @@
             // Set default expiry info for quick creation
             document.getElementById('expiryInfo').textContent =
                 '⚠️ Will be deleted after first view or in 24 hours';
+                
+            // Check if it's already in history (it might have been saved by index.html)
+            const hasPassword = urlParams.get('pwd') === 'true';
+            saveSecretToHistory(secretUrl, hasPassword);
 
             // Scroll to success message
             document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
@@ -872,6 +918,85 @@
             // Clean up URL
             window.history.replaceState({}, document.title, '/create');
         }
+
+        // --- History Rendering Logic ---
+        function loadSecretHistory() {
+            const history = JSON.parse(localStorage.getItem('secretHistory') || '[]');
+            const container = document.getElementById('secretOverviewContainer');
+            const list = document.getElementById('secretHistoryList');
+            
+            if (history.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+            
+            container.classList.remove('hidden');
+            list.innerHTML = '';
+            
+            history.forEach((secret, index) => {
+                // Update status if it's not the first one
+                if (index > 0 && secret.status === 'Newest') {
+                    secret.status = 'Active'; // simple fallback
+                }
+                
+                const dateObj = new Date(secret.date);
+                const dateStr = `${dateObj.toLocaleDateString('en-GB').replace(/\//g, '.')} ${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
+                
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-white/5 transition-colors group';
+                tr.innerHTML = `
+                    <td class="px-4 py-4 text-text-muted whitespace-nowrap">${dateStr}</td>
+                    <td class="px-4 py-4 text-white font-mono truncate max-w-[200px]" title="${secret.url}">
+                        <a href="${secret.url}" target="_blank" class="hover:text-primary transition-colors">${secret.url}</a>
+                    </td>
+                    <td class="px-4 py-4">
+                        <span class="bg-white/10 text-white text-xs px-2 py-1 rounded-md">${secret.status || 'Active'}</span>
+                    </td>
+                    <td class="px-4 py-4">
+                        <div class="flex items-center gap-2">
+                            ${secret.hasPassword ? `
+                            <button onclick="showPassword('${secret.id}')" class="bg-white/5 hover:bg-white/10 text-white/90 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors border border-white/10" title="View Password">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                View Password
+                            </button>
+                            ` : `
+                            <button class="bg-white/5 hover:bg-white/10 text-white/50 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors border border-white/10 opacity-50 cursor-not-allowed" title="No Password">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
+                                Password
+                            </button>
+                            `}
+                            <button onclick="copyHistoryLink('${secret.url}')" class="bg-white/5 hover:bg-white/10 text-white text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors border border-white/10 whitespace-nowrap">
+                                <svg class="w-3.5 h-3.5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                Copy Link
+                            </button>
+                            <a href="mailto:?subject=Secure Secret Message&body=Here is a secure message for you: ${secret.url}" class="bg-white/5 hover:bg-white/10 text-white text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors border border-white/10 whitespace-nowrap">
+                                <svg class="w-3.5 h-3.5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                Email
+                            </a>
+                            <button onclick="removeHistoryItem('${secret.id}')" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors border border-red-500/20 whitespace-nowrap ml-2">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                Delete
+                            </button>
+                        </div>
+                    </td>
+                    <td class="px-4 py-4 text-right">
+                        <button onclick="removeHistoryItem('${secret.id}')" class="text-red-500/50 hover:text-red-500 hover:bg-red-500/10 p-1.5 rounded-md transition-colors border border-red-500/0 hover:border-red-500/30" title="Remove from list">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </td>
+                `;
+                list.appendChild(tr);
+            });
+            
+            // Save updated statuses back to localStorage
+            localStorage.setItem('secretHistory', JSON.stringify(history));
+        }
+        
+        window.loadSecretHistory = loadSecretHistory;
+
+
+        // Initial load
+        loadSecretHistory();
     </script>
 </body>
 
