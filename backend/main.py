@@ -1,5 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, Form, Depends, HTTPException, Request, BackgroundTasks
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, Response, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
@@ -8,25 +8,23 @@ from pathlib import Path
 import os
 import asyncio
 import httpx
-import time
-import hashlib
 from typing import Optional
 
 from backend.database import get_db, init_db
 from backend.models import Secret
-from backend.schemas import SecretCreate, SecretResponse, SecretView, PasswordVerify, CloudinarySecretCreate
+from backend.schemas import SecretCreate, SecretResponse, SecretView, PasswordVerify, FileSecretCreate
 from backend.security import (
     hash_password, verify_password, sanitize_text, 
-    sanitize_filename, get_mime_type, validate_file_type
+    get_mime_type, validate_file_type
 )
 from backend.cleanup import cleanup_expired_secrets, delete_secret_immediately
-from backend.storage import upload_file as cloudinary_upload, delete_file as cloudinary_delete
+from backend.storage import upload_file as b2_upload, delete_file as b2_delete, generate_presigned_url
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-from dotenv import load_dotenv
+from dotenv import find_dotenv, load_dotenv
 
-load_dotenv()
+load_dotenv(find_dotenv(usecwd=True))
 
 # Helper to determine public API base URL (avoids localhost in shared links)
 def get_public_base_url(request: Request) -> str:
@@ -34,6 +32,14 @@ def get_public_base_url(request: Request) -> str:
     if env_base:
         return env_base.rstrip("/")
     return str(request.base_url).rstrip("/")
+
+
+def get_frontend_base_url(request: Request) -> str:
+    request_base = str(request.base_url).rstrip("/")
+    hostname = request.url.hostname or ""
+    if hostname in {"localhost", "127.0.0.1"}:
+        return request_base
+    return os.getenv("FRONTEND_URL", request_base).rstrip("/")
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -146,6 +152,38 @@ async def serve_terms():
     return {"error": "Page not found"}
 
 
+@app.get("/faq")
+async def serve_faq():
+    """Serve FAQ page"""
+    faq_path = FRONTEND_DIR / "faq.html"
+    if faq_path.exists():
+        return FileResponse(faq_path)
+    return {"error": "Page not found"}
+
+
+@app.get("/guides")
+@app.get("/guides/")
+async def serve_guides_index():
+    """Serve guides index page"""
+    guides_path = FRONTEND_DIR / "guides" / "index.html"
+    if guides_path.exists():
+        return FileResponse(guides_path)
+    return {"error": "Page not found"}
+
+
+@app.get("/guides/{guide_path:path}")
+async def serve_guide(guide_path: str):
+    """Serve individual guide pages from the frontend/guides directory."""
+    if ".." in guide_path or guide_path.startswith("/"):
+        raise HTTPException(status_code=404, detail="Page not found")
+
+    guide_name = guide_path if guide_path.endswith(".html") else f"{guide_path}.html"
+    guide_file = FRONTEND_DIR / "guides" / guide_name
+    if guide_file.exists() and guide_file.is_file():
+        return FileResponse(guide_file)
+    raise HTTPException(status_code=404, detail="Page not found")
+
+
 @app.get("/robots.txt")
 async def serve_robots():
     """Serve robots.txt"""
@@ -164,6 +202,13 @@ async def serve_sitemap():
     return {"error": "File not found"}
 
 
+@app.get("/_vercel/insights/script.js")
+@app.get("/_vercel/speed-insights/script.js")
+async def serve_vercel_analytics_stub():
+    """Avoid local 404 noise for Vercel analytics scripts when serving via FastAPI."""
+    return Response(content="", media_type="application/javascript")
+
+
 
 
 @app.get("/health")
@@ -172,73 +217,46 @@ async def health_check():
     return {"status": "healthy"}
 
 
-@app.post("/api/uploads/sign")
-async def sign_cloudinary_upload(body: dict):
-    """
-    Return signed parameters for direct browser-to-Cloudinary upload.
-    Expects JSON body with optional 'resource_type' (image, video, raw).
-    """
-    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME")
-    api_key = os.getenv("CLOUDINARY_API_KEY")
-    api_secret = os.getenv("CLOUDINARY_API_SECRET")
-
-    if not all([cloud_name, api_key, api_secret]):
-        raise HTTPException(status_code=500, detail="Cloud storage is not configured")
-
-    resource_type = body.get("resource_type") or "raw"
-    folder = "onetimeview_secrets"
-    timestamp = int(time.time())
-
-    # Only sign actual upload parameters (not resource_type, which lives in the URL path)
-    to_sign = f"folder={folder}&timestamp={timestamp}{api_secret}"
-    signature = hashlib.sha1(to_sign.encode("utf-8")).hexdigest()
-
-    return {
-        "cloud_name": cloud_name,
-        "api_key": api_key,
-        "timestamp": timestamp,
-        "signature": signature,
-        "folder": folder,
-        "resource_type": resource_type,
-    }
-
-
-@app.get("/api/test-cloudinary")
-async def test_cloudinary():
-    """Test Cloudinary configuration"""
-    import cloudinary
-    
+@app.get("/api/test-b2")
+async def test_b2():
+    """Test Backblaze B2 by uploading, presigning, fetching, and deleting a small file."""
+    import os
     config_info = {
-        "cloud_name": os.getenv("CLOUDINARY_CLOUD_NAME"),
-        "api_key_exists": bool(os.getenv("CLOUDINARY_API_KEY")),
-        "api_secret_exists": bool(os.getenv("CLOUDINARY_API_SECRET")),
-        "cloudinary_configured": bool(cloudinary.config().cloud_name)
+        "key_id_exists": bool(os.getenv("B2_KEY_ID")),
+        "app_key_exists": bool(os.getenv("B2_APP_KEY")),
+        "bucket_name": os.getenv("B2_BUCKET_NAME"),
+        "endpoint_url": os.getenv("B2_ENDPOINT_URL"),
     }
-    
-    # Try a simple test upload
+    uploaded_key = None
     try:
-        from io import BytesIO
-        test_data = BytesIO(b"test")
-        result = cloudinary.uploader.upload(
-            test_data,
+        expected = b"backblaze-b2-smoke-test"
+        result = await asyncio.to_thread(
+            b2_upload,
+            expected,
             resource_type="raw",
-            folder="onetimeview_test"
+            original_filename="b2-smoke-test.txt",
         )
-        
-        # Delete the test file
-        cloudinary.uploader.destroy(result['public_id'], resource_type='raw')
-        
+        uploaded_key = result["public_id"]
+        presigned_url = generate_presigned_url(uploaded_key, expiry_seconds=60)
+        async with httpx.AsyncClient(timeout=15) as client:
+            response = await client.get(presigned_url)
+            response.raise_for_status()
+            if response.content != expected:
+                raise RuntimeError("Uploaded test object content did not match fetched content")
+        deleted = await asyncio.to_thread(b2_delete, uploaded_key)
+        uploaded_key = None
         return {
             "status": "success",
             "config": config_info,
-            "test_upload": "successful"
+            "test_upload": "successful",
+            "test_presigned_fetch": "successful",
+            "test_delete": "successful" if deleted else "failed",
         }
     except Exception as e:
-        return {
-            "status": "error",
-            "config": config_info,
-            "error": str(e)
-        }
+        return {"status": "error", "config": config_info, "error": str(e)}
+    finally:
+        if uploaded_key:
+            await asyncio.to_thread(b2_delete, uploaded_key)
 
 
 @app.post("/api/secrets", response_model=SecretResponse)
@@ -289,7 +307,7 @@ async def create_secret(
     if content_type == "text":
         secret.content = content
     
-    # Handle file upload - Use Cloudinary
+    # Handle file upload through Backblaze B2
     if file:
         # Validate file type
         is_valid, detected_type = validate_file_type(file.filename)
@@ -308,15 +326,18 @@ async def create_secret(
                 detail=f"File size exceeds limit ({max_size / 1024 / 1024}MB)"
             )
         
-        # Determine resource type for Cloudinary
-        # Use "video" for videos to ensure playback ability
-        # Force "raw" for others to avoid transformation errors
+        # Keep this value for legacy DB/API compatibility.
         resource_type = "video" if content_type == "video" else "raw"
         
-        # Upload to Cloudinary
+        # Upload to Backblaze B2
         file_content = await file.read()
         try:
-            upload_result = cloudinary_upload(file_content, resource_type=resource_type)
+            upload_result = await asyncio.to_thread(
+                b2_upload,
+                file_content,
+                resource_type=resource_type,
+                original_filename=file.filename
+            )
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
         
@@ -330,7 +351,6 @@ async def create_secret(
     if password:
         secret.password_hash = hash_password(password)
     
-    # Handle expiry
     # Handle expiry
     if expiry_minutes is not None:
         if expiry_minutes == 0:
@@ -350,8 +370,7 @@ async def create_secret(
     db.commit()
     db.refresh(secret)
     
-    # Build response with frontend URL (Vercel)
-    frontend_url = os.getenv("FRONTEND_URL", "https://onetimeview.app")
+    frontend_url = get_frontend_base_url(request)
     return SecretResponse(
         id=secret.id,
         url=f"{frontend_url}/view/{secret.id}",
@@ -362,20 +381,20 @@ async def create_secret(
     )
 
 
+@app.post("/api/secrets/from-storage", response_model=SecretResponse)
 @app.post("/api/secrets/from-cloudinary", response_model=SecretResponse)
 @limiter.limit("10/minute")
-async def create_secret_from_cloudinary(
+async def create_secret_from_storage(
     request: Request,
-    body: CloudinarySecretCreate,
+    body: FileSecretCreate,
     db: Session = Depends(get_db)
 ):
     """
-    Create a secret for a file that has already been uploaded to Cloudinary
-    directly from the client.
+    Create a secret for a file that has already been uploaded to object storage.
     """
     # Validate content type
     if body.content_type not in ["image", "video", "file"]:
-        raise HTTPException(status_code=400, detail="Invalid content type for Cloudinary secret")
+        raise HTTPException(status_code=400, detail="Invalid content type for file secret")
 
     # Validate and normalize max_views
     max_views = body.max_views or 1
@@ -400,7 +419,6 @@ async def create_secret_from_cloudinary(
         secret.password_hash = hash_password(body.password)
 
     # Handle expiry (same rules as create_secret)
-    # Handle expiry (same rules as create_secret)
     if body.expiry_minutes is not None:
         if body.expiry_minutes == 0:
             secret.expiry_time = None
@@ -418,7 +436,7 @@ async def create_secret_from_cloudinary(
     db.commit()
     db.refresh(secret)
 
-    frontend_url = os.getenv("FRONTEND_URL", "https://onetimeview.app")
+    frontend_url = get_frontend_base_url(request)
     return SecretResponse(
         id=secret.id,
         url=f"{frontend_url}/view/{secret.id}",
@@ -539,20 +557,44 @@ async def get_secret(
         remaining_views=remaining_views
     )
     
-    # For files, provide Cloudinary URL or fallback to download URL
-    if secret.cloud_url:
-        # For images, we must proxy through backend to get correct Content-Type (since we upload as raw)
-        if secret.content_type == "image":
-            base_url = get_public_base_url(request)
-            response.download_url = f"{base_url}/api/image/{secret_id}"
-        else:
+    # For files, provide a presigned B2 URL for secure access.
+    if secret.cloud_public_id:
+        try:
+            if secret.content_type == "image":
+                # Proxy images through backend to serve with correct Content-Type
+                base_url = get_public_base_url(request)
+                response.view_url = f"{base_url}/api/image/{secret_id}"
+                response.download_url = response.view_url
+            elif secret.content_type == "video":
+                response.view_url = generate_presigned_url(
+                    secret.cloud_public_id,
+                    expiry_seconds=300,
+                    filename=secret.file_name,
+                    as_attachment=False,
+                )
+            else:
+                response.view_url = generate_presigned_url(
+                    secret.cloud_public_id,
+                    expiry_seconds=300,
+                    filename=secret.file_name,
+                    as_attachment=False,
+                )
+                response.download_url = generate_presigned_url(
+                    secret.cloud_public_id,
+                    expiry_seconds=300,
+                    filename=secret.file_name,
+                    as_attachment=True,
+                )
+        except Exception as e:
+            # Fallback to the stored URL if presigning fails
             response.download_url = secret.cloud_url
     elif secret.file_path:
         base_url = get_public_base_url(request)
         if secret.content_type == "image":
-            response.download_url = f"{base_url}/api/image/{secret_id}"
+            response.view_url = f"{base_url}/api/image/{secret_id}"
+            response.download_url = response.view_url
         elif secret.content_type == "video":
-            response.download_url = f"{base_url}/api/video/{secret_id}"
+            response.view_url = f"{base_url}/api/video/{secret_id}"
         else:
             response.download_url = f"{base_url}/api/file/{secret_id}"
     
@@ -565,7 +607,7 @@ async def get_secret(
             # For files/images/videos, we MUST defer deletion
             # The frontend needs to fetch the file URL after this response
             # We'll set a short expiry (5 mins) as a failsafe
-            # The file serving endpoint will trigger the actual deletion
+            # Image serving can trigger deletion; B2 video/file redirects are cleaned by the background task.
             secret.expiry_time = datetime.utcnow() + timedelta(minutes=5)
             db.commit()
     
@@ -581,7 +623,7 @@ async def serve_image(
     password: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
-    """Serve image file (proxy from Cloudinary if needed)"""
+    """Serve image file, proxying from B2 when needed."""
     secret = db.query(Secret).filter(Secret.id == secret_id).first()
     
     if not secret:
@@ -609,20 +651,19 @@ async def serve_image(
     if secret.view_count >= secret.max_views:
         background.add_task(delete_secret_immediately, secret_id)
     
-    # Use Cloudinary URL if available - PROXY IT
-    if secret.cloud_url:
-        # Proxy the raw file from Cloudinary but serve with correct mime type
+    # Use B2 presigned URL and proxy for images
+    if secret.cloud_public_id:
         try:
+            presigned_url = generate_presigned_url(secret.cloud_public_id, expiry_seconds=300)
             async def iterfile():
                 async with httpx.AsyncClient() as client:
-                    async with client.stream("GET", secret.cloud_url) as response:
-                        response.raise_for_status()
-                        async for chunk in response.aiter_bytes():
+                    async with client.stream("GET", presigned_url) as r:
+                        r.raise_for_status()
+                        async for chunk in r.aiter_bytes():
                             yield chunk
-
             return StreamingResponse(iterfile(), media_type=secret.mime_type or "image/jpeg")
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to fetch image: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Failed to fetch image from B2: {str(e)}")
     
     # Fallback to local file
     if not secret.file_path:
@@ -645,6 +686,7 @@ async def serve_video(
     secret_id: str,
     background: BackgroundTasks,
     password: Optional[str] = None,
+    download: bool = False,
     db: Session = Depends(get_db)
 ):
     """Serve video file with range request support (view count already handled by /api/secrets endpoint)"""
@@ -669,14 +711,24 @@ async def serve_video(
     if secret.content_type != "video":
         raise HTTPException(status_code=400, detail="This secret is not a video")
     
-    # Schedule deletion if max views reached or exceeded
+    # Use B2 presigned URL for video — redirect directly for streaming
+    if secret.cloud_public_id:
+        try:
+            presigned_url = generate_presigned_url(
+                secret.cloud_public_id,
+                expiry_seconds=300,
+                filename=secret.file_name,
+                as_attachment=download,
+            )
+            from fastapi.responses import RedirectResponse
+            return RedirectResponse(url=presigned_url)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to generate B2 URL: {str(e)}")
+
+    # Schedule deletion for legacy local files after the response is sent. B2 files
+    # use the short expiry set by /api/secrets so redirects can complete first.
     if secret.view_count >= secret.max_views:
         background.add_task(delete_secret_immediately, secret_id)
-
-    # Use Cloudinary URL if available
-    if secret.cloud_url:
-        from fastapi.responses import RedirectResponse
-        return RedirectResponse(url=secret.cloud_url)
     
     # Fallback to local file
     if not secret.file_path:
@@ -720,6 +772,8 @@ async def serve_video(
             "Content-Length": str(chunk_size),
             "Content-Type": secret.mime_type or "video/mp4",
         }
+        if download and secret.file_name:
+            headers["Content-Disposition"] = f'attachment; filename="{secret.file_name.replace(chr(34), "")}"'
         
         return StreamingResponse(
             file_iterator(),
@@ -729,10 +783,13 @@ async def serve_video(
         )
     else:
         # No range header - return full file
+        headers = {"Accept-Ranges": "bytes"}
+        if download and secret.file_name:
+            headers["Content-Disposition"] = f'attachment; filename="{secret.file_name.replace(chr(34), "")}"'
         return FileResponse(
             path=file_path,
             media_type=secret.mime_type or "video/mp4",
-            headers={"Accept-Ranges": "bytes"}
+            headers=headers
         )
 
 
@@ -767,14 +824,24 @@ async def serve_file(
     if secret.content_type != "file":
         raise HTTPException(status_code=400, detail="This secret is not a file")
     
-    # Schedule deletion if max views reached or exceeded
+    # Use B2 presigned URL for file download — redirect directly
+    if secret.cloud_public_id:
+        try:
+            presigned_url = generate_presigned_url(
+                secret.cloud_public_id,
+                expiry_seconds=300,
+                filename=secret.file_name,
+                as_attachment=True,
+            )
+            from fastapi.responses import RedirectResponse
+            return RedirectResponse(url=presigned_url)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to generate B2 URL: {str(e)}")
+
+    # Schedule deletion for legacy local files after the response is sent. B2 files
+    # use the short expiry set by /api/secrets so redirects can complete first.
     if secret.view_count >= secret.max_views:
         background.add_task(delete_secret_immediately, secret_id)
-
-    # Use Cloudinary URL if available
-    if secret.cloud_url:
-        from fastapi.responses import RedirectResponse
-        return RedirectResponse(url=secret.cloud_url)
     
     # Fallback to local file
     if not secret.file_path:

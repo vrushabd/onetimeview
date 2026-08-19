@@ -20,19 +20,22 @@ class SecretCreate(BaseModel):
         return v
 
 
-class CloudinarySecretCreate(BaseModel):
-    """Schema for creating a secret from an already-uploaded Cloudinary file"""
-    content_type: str  # text, image, video, file (we will only use non-text here)
+class FileSecretCreate(BaseModel):
+    """Schema for creating a secret from an already-uploaded file (storage-agnostic)"""
+    content_type: str  # image, video, file (non-text only)
     file_name: str
     mime_type: Optional[str] = None
     cloud_url: str
     cloud_public_id: str
-    cloud_resource_type: str  # image, video, raw
+    cloud_resource_type: Optional[str] = None  # kept for DB compat, not required
     password: Optional[str] = None
     expiry_hours: Optional[int] = None
     expiry_minutes: Optional[int] = None
     max_views: Optional[int] = Field(default=1, ge=1, le=100)
     is_premium: bool = False
+
+# Keep old name as an alias for backward compatibility with older imports/routes.
+CloudinarySecretCreate = FileSecretCreate
 
 
 class SecretResponse(BaseModel):
@@ -55,6 +58,7 @@ class SecretView(BaseModel):
     file_name: Optional[str] = None
     mime_type: Optional[str] = None
     download_url: Optional[str] = None
+    view_url: Optional[str] = None
     remaining_views: Optional[int] = None
     
     class Config:

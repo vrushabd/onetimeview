@@ -74,7 +74,7 @@ onetime/
 │   ├── privacy.html      # Privacy policy
 │   ├── terms.html        # Terms of service
 │   └── styles.css        # Custom CSS
-├── uploads/              # File storage directory
+├── uploads/              # Legacy local fallback storage directory
 ├── requirements.txt      # Python dependencies
 ├── .env.example          # Environment variables template
 └── README.md            # This file
@@ -88,7 +88,11 @@ Edit the `.env` file to configure:
 - `SECRET_KEY`: Secret key for security features
 - `MAX_FILE_SIZE_FREE`: Max file size for free users (bytes)
 - `MAX_FILE_SIZE_PREMIUM`: Max file size for premium users (bytes)
-- `UPLOAD_DIR`: Directory for file uploads
+- `UPLOAD_DIR`: Directory for legacy local fallback uploads
+- `B2_ENDPOINT_URL`: Backblaze B2 S3-compatible endpoint URL
+- `B2_KEY_ID`: Backblaze B2 application key ID
+- `B2_APP_KEY`: Backblaze B2 application key
+- `B2_BUCKET_NAME`: Backblaze B2 bucket name
 - `RATE_LIMIT_PER_MINUTE`: Rate limit per IP address
 - `ALLOWED_ORIGINS`: CORS allowed origins
 
@@ -289,7 +293,7 @@ For questions or issues:
 
 Potential improvements:
 - Payment integration (Stripe)
-- Cloud storage (AWS S3, Google Cloud Storage)
+- Additional storage providers (AWS S3, Google Cloud Storage)
 - Analytics dashboard
 - API keys for programmatic access
 - Self-destruct countdown timer

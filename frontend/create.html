@@ -8,318 +8,159 @@
 
     <!-- Primary SEO Meta Tags -->
     <title>Create Secret - One Time View Link Generator</title>
-    <meta name="description"
-        content="Free one time view link generator. Create secure, self-destructing links for passwords, notes, and files that auto-delete after viewing. No sign-up required.">
-    <meta name="keywords"
-        content="one time view link generator, one time view, onetimeview, self destruct message, share password securely, one time link, ephemeral file sharing">
+    <meta name="description" content="Free one time view link generator. Create secure, self-destructing links for passwords, notes, and files that auto-delete after viewing. No sign-up required.">
+    <meta name="keywords" content="one time view link generator, one time view, onetimeview, self destruct message, share password securely, one time link, ephemeral file sharing">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://onetimeview.app/create">
 
     <!-- Mobile & Theme -->
-    <meta name="theme-color" content="#22d3ee">
+    <meta name="theme-color" content="#0a0a0a">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://onetimeview.app/create">
-    <meta property="og:title" content="Create Secure One-Time Link">
-    <meta property="og:description"
-        content="Generate a secure link that automatically deletes itself after being viewed. Protect your sensitive data.">
-    <meta property="og:image" content="https://onetimeview.com/static/og-image.jpg">
-    <meta property="og:site_name" content="OneTimeView">
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://onetimeview.app/create">
-    <meta name="twitter:title" content="Create Secure One-Time Link">
-    <meta name="twitter:description"
-        content="Generate a secure link that automatically deletes itself after being viewed. Protect your sensitive data.">
-    <meta name="twitter:image" content="https://onetimeview.com/static/og-image.jpg">
-
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
 
-    <!-- Performance Optimization -->
-    <link rel="preconnect" href="https://cdn.tailwindcss.com">
-    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
-
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/static/tailwind-config.js?v=2"></script>
-    <script src="/static/config.js?v=2"></script>
+    <script src="/static/config.js?v=3"></script>
     <script src="/static/cookie-consent.js" defer></script>
-    <link rel="stylesheet" href="/static/styles.css">
 
-    <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": "Create Secret Link",
-      "description": "Create secure self-destructing links for confidential messages and files",
-      "url": "https://onetimeview.app/create",
-      "potentialAction": {
-        "@type": "CreateAction",
-        "name": "Create Secret",
-        "target": "https://onetimeview.app/create"
-      }
-    }
-    </script>
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://onetimeview.app/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Create Secret",
-          "item": "https://onetimeview.app/create"
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #0a0a0a;
+            color: #ededed;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
-      ]
-    }
-    </script>
-    <!-- Vercel Web Analytics -->
-    <script>
-        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-    </script>
-    <script defer src="/_vercel/insights/script.js"></script>
-    <!-- Vercel Speed Insights -->
-    <script>
-        window.si = window.si || function () { (window.si.q = window.si.q || []).push(arguments); };
-    </script>
-    <script defer src="/_vercel/speed-insights/script.js"></script>
+        .container { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+        textarea, input, select {
+            background-color: #111111;
+            border: 1px solid #3f3f46;
+            color: #ededed;
+            border-radius: 8px;
+            padding: 16px 20px !important;
+            font-size: 14px;
+            transition: border-color 0.15s ease;
+            width: 100%;
+        }
+        textarea:focus, input:focus, select:focus {
+            outline: none; border-color: #71717a;
+        }
+        ::placeholder { color: #71717a; }
+        .type-btn.active {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        /* Fix for the secret link input right padding to avoid text under button */
+        #secretLink {
+            padding-right: 100px !important;
+        }
+    </style>
 </head>
 
-<body class="bg-background min-h-screen text-text-primary bg-grid-pattern relative overflow-x-hidden">
-    <div class="bg-noise"></div>
-
+<body class="bg-background min-h-screen text-text-primary">
     <!-- Navigation -->
-    <nav class="border-b border-white/5 backdrop-blur-md sticky top-0 z-40 bg-background/80">
+    <nav class="border-b border-card-border sticky top-0 z-40 bg-background/95 backdrop-blur-sm">
         <div class="container mx-auto px-6 py-4 flex items-center gap-4 flex-wrap md:flex-nowrap justify-between">
-            <a href="/" class="flex items-center gap-2 group flex-shrink-0">
-                <div
-                    class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-card border border-primary/30 shadow-glow-sm group-hover:shadow-glow transition-all duration-300">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" class="text-primary">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                    </svg>
-                </div>
-                <span
-                    class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-primary-light to-primary group-hover:to-white transition-all">OneTimeView</span>
+            <a href="/" class="flex items-center gap-3 font-semibold text-white tracking-tight text-lg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                OneTimeView
             </a>
-            <div class="flex gap-6 md:gap-8 text-sm md:text-base font-medium">
-                <a href="/" class="text-text-secondary hover:text-primary transition-colors hover:glow-text">Home</a>
-                <a href="/privacy"
-                    class="text-text-secondary hover:text-primary transition-colors hover:glow-text">Privacy</a>
+            <div class="flex gap-6 md:gap-8 text-sm font-medium">
+                <a href="/" class="text-text-secondary hover:text-white transition-colors">Home</a>
+                <a href="/privacy" class="text-text-secondary hover:text-white transition-colors">Privacy</a>
             </div>
         </div>
     </nav>
 
-    <div class="container mx-auto px-6 py-12 relative z-10">
+    <div class="container mx-auto px-6 py-12">
         <div class="max-w-2xl mx-auto">
 
-            <div id="successMessage"
-                class="hidden glass rounded-2xl p-8 mb-8 border-primary/30 shadow-glow animate-fade-in-up">
-                <div class="flex items-center gap-4 mb-6">
-                    <div
-                        class="w-12 h-12 rounded-full bg-success/20 flex items-center justify-center text-success border border-success/30 shadow-glow-sm">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
-                            </path>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-bold text-white">Secret Created!</h3>
-                        <p class="text-text-secondary">Your secure link is ready to share.</p>
-                    </div>
+            <!-- Success Message -->
+            <div id="successMessage" class="hidden bg-surface border border-card-border rounded-xl p-8 mb-8">
+                <div class="mb-6">
+                    <h3 class="text-2xl font-medium text-white">Secret Created</h3>
+                    <p class="text-text-secondary mt-1">Your secure link is ready to share.</p>
                 </div>
 
                 <div class="relative mb-6">
-                    <input type="text" id="secretLink" readonly
-                        class="w-full bg-background/50 border border-primary/30 rounded-xl px-5 py-4 text-white font-mono text-sm pr-32 focus:outline-none focus:border-primary focus:shadow-glow-sm transition-all">
-                    <button onclick="copyLink()"
-                        class="absolute right-2 top-2 bottom-2 bg-primary hover:bg-primary-hover text-background font-bold px-6 rounded-lg transition-all shadow-glow-sm hover:shadow-glow flex items-center gap-2">
+                    <input type="text" id="secretLink" readonly class="w-full font-mono">
+                    <button onclick="copyLink()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white text-black font-medium px-4 py-2 rounded-md hover:bg-gray-100 transition-colors">
                         Copy
                     </button>
                 </div>
 
-                <div class="flex items-start gap-3 bg-white/5 rounded-lg p-4 mb-6 border border-white/5">
-                    <span class="text-xl">⚠️</span>
-                    <p class="text-sm text-text-secondary" id="expiryInfo"></p>
-                </div>
+                <div class="text-sm text-text-secondary mb-6" id="expiryInfo"></div>
 
-                <div class="text-center">
-                    <a href="/create"
-                        class="inline-flex items-center gap-2 text-primary hover:text-white transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                        </svg>
-                        Create another secret
-                    </a>
-                </div>
+                <a href="/create" class="text-sm text-text-secondary hover:text-white transition-colors">
+                    ← Create another secret
+                </a>
             </div>
 
-            <form id="secretForm" class="glass rounded-2xl border-white/10 shadow-2xl relative overflow-hidden group">
-                <!-- Top accent line -->
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-accent"></div>
-
-                <div class="p-8 md:p-10 space-y-8">
-                    <div class="text-center mb-8">
-                        <div
-                            class="mx-auto w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 text-primary shadow-glow-sm">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-                                </path>
-                            </svg>
-                        </div>
-                        <h1 class="text-3xl font-bold text-white mb-2">Create a Secret</h1>
-                        <p class="text-text-secondary">Your message will self-destruct after being read once.</p>
+            <!-- Form -->
+            <form id="secretForm" class="bg-surface border border-card-border rounded-xl">
+                <div class="p-8 space-y-8">
+                    <div>
+                        <h1 class="text-2xl font-medium text-white mb-2">Create a Secret</h1>
+                        <p class="text-text-secondary text-sm">Your message will self-destruct after being read once.</p>
                     </div>
 
-                    <!-- Content Type Selection (Compact) -->
-                    <div class="grid grid-cols-4 gap-2 p-1 bg-background/50 rounded-xl border border-white/5">
-                        <button type="button" onclick="selectType('text')" id="btn-text"
-                            class="type-btn rounded-lg py-2 text-sm font-medium transition-all flex flex-col items-center gap-1 hover:bg-white/5">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                </path>
-                            </svg>
-                            Text
-                        </button>
-                        <button type="button" onclick="selectType('image')" id="btn-image"
-                            class="type-btn rounded-lg py-2 text-sm font-medium transition-all flex flex-col items-center gap-1 hover:bg-white/5">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                </path>
-                            </svg>
-                            Image
-                        </button>
-                        <button type="button" onclick="selectType('video')" id="btn-video"
-                            class="type-btn rounded-lg py-2 text-sm font-medium transition-all flex flex-col items-center gap-1 hover:bg-white/5">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
-                                </path>
-                            </svg>
-                            Video
-                        </button>
-                        <button type="button" onclick="selectType('file')" id="btn-file"
-                            class="type-btn rounded-lg py-2 text-sm font-medium transition-all flex flex-col items-center gap-1 hover:bg-white/5">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                </path>
-                            </svg>
-                            File
-                        </button>
+                    <!-- Content Type -->
+                    <div class="grid grid-cols-4 gap-2">
+                        <button type="button" onclick="selectType('text')" id="btn-text" class="type-btn active rounded-md py-2 text-sm font-medium transition-colors bg-background border border-card-border hover:bg-white/5">Text</button>
+                        <button type="button" onclick="selectType('image')" id="btn-image" class="type-btn rounded-md py-2 text-sm font-medium transition-colors bg-background border border-card-border hover:bg-white/5">Image</button>
+                        <button type="button" onclick="selectType('video')" id="btn-video" class="type-btn rounded-md py-2 text-sm font-medium transition-colors bg-background border border-card-border hover:bg-white/5">Video</button>
+                        <button type="button" onclick="selectType('file')" id="btn-file" class="type-btn rounded-md py-2 text-sm font-medium transition-colors bg-background border border-card-border hover:bg-white/5">File</button>
                     </div>
 
                     <!-- Text Content -->
                     <div id="textContent">
-                        <label class="block text-sm font-bold mb-2 ml-1">Your Secret</label>
-                        <textarea id="contentField" rows="6"
-                            class="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-text-muted focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all resize-none font-mono text-sm"
-                            placeholder="Enter your secret message, password, or sensitive data..."></textarea>
+                        <label class="block text-sm font-medium mb-2 text-white">Your Secret</label>
+                        <textarea id="contentField" rows="6" class="font-mono text-sm" placeholder="Enter your secret message, password, or sensitive data..."></textarea>
                     </div>
 
                     <!-- File Upload -->
                     <div id="fileContent" class="hidden">
-                        <label class="block text-sm font-bold mb-2 ml-1">Upload File</label>
-                        <div class="upload-area border-2 border-dashed border-white/20 hover:border-primary/50 bg-background/30 rounded-xl p-8 text-center cursor-pointer transition-all"
-                            id="uploadArea" ondrop="handleDrop(event)" ondragover="handleDragOver(event)"
-                            ondragleave="handleDragLeave(event)" onclick="document.getElementById('fileInput').click()">
+                        <label class="block text-sm font-medium mb-2 text-white">Upload File</label>
+                        <div class="border border-dashed border-card-border hover:border-text-muted bg-background rounded-xl p-8 text-center cursor-pointer transition-colors"
+                            id="uploadArea" onclick="document.getElementById('fileInput').click()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
                             <input type="file" id="fileInput" class="hidden" onchange="handleFileSelect(event)">
-                            <div class="flex justify-center mb-3">
-                                <div class="p-3 rounded-full bg-primary/10 text-primary">
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                        </path>
-                                    </svg>
-                                </div>
-                            </div>
-                            <p class="font-bold text-white mb-1">Click to upload or drag and drop</p>
+                            <p class="font-medium text-white mb-1">Click to upload or drag and drop</p>
                             <p class="text-xs text-text-muted">Maximum file size 100MB</p>
 
-                            <div id="fileInfo"
-                                class="hidden mt-4 bg-primary/10 border border-primary/20 rounded-lg p-3 flex items-center gap-3">
-                                <svg class="w-5 h-5 text-primary flex-shrink-0" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                    </path>
-                                </svg>
-                                <div class="text-left overflow-hidden">
-                                    <p class="text-sm font-bold text-white truncate" id="fileName"></p>
-                                    <p class="text-xs text-text-secondary" id="fileSize"></p>
-                                </div>
+                            <div id="fileInfo" class="hidden mt-4 text-left border border-card-border p-3 rounded-md">
+                                <p class="text-sm font-medium text-white truncate" id="fileName"></p>
+                                <p class="text-xs text-text-secondary mt-1" id="fileSize"></p>
                             </div>
 
-                            <div id="uploadProgress" class="hidden mt-4">
-                                <div class="w-full bg-background rounded-full h-1.5 overflow-hidden">
-                                    <div id="progressBar" class="bg-primary h-full transition-all duration-300"
-                                        style="width: 0%"></div>
+                            <div id="uploadProgress" class="hidden mt-4 text-left">
+                                <div class="w-full bg-card-border rounded-full h-1 mb-2">
+                                    <div id="progressBar" class="bg-white h-full transition-all duration-300" style="width: 0%"></div>
                                 </div>
-                                <p class="text-xs text-primary mt-2 animate-pulse" id="progressText">Uploading...</p>
+                                <p class="text-xs text-text-secondary" id="progressText">Uploading...</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="space-y-4">
-                        <!-- Password Toggle -->
-                        <div
-                            class="flex items-center justify-between bg-background/30 p-4 rounded-xl border border-white/5">
-                            <div class="flex items-center gap-3">
-                                <svg class="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-                                    </path>
-                                </svg>
-                                <span class="text-sm font-medium">Password Protection</span>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="passwordToggle" class="sr-only peer"
-                                    onchange="togglePasswordSection()">
-                                <div
-                                    class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
-                                </div>
-                            </label>
+                    <div class="space-y-5 border-t border-card-border pt-6">
+                        <!-- Password -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-white">Password Protection (Optional)</label>
+                            <input type="password" id="passwordField" class="text-sm" placeholder="Require a password to view">
                         </div>
 
-                        <div id="passwordSection" class="hidden animate-fade-in">
-                            <input type="password" id="passwordField"
-                                class="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-text-muted focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all text-sm"
-                                placeholder="Enter a password (optional)">
-                        </div>
-
-                        <!-- Full width expiration and view limits -->
-                        <div class="space-y-4">
-                            <!-- Expiration Section -->
-                            <div class="bg-background/30 p-4 rounded-xl border border-white/5">
-                                <label class="block text-lg font-bold mb-3 flex items-center gap-2">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <polyline points="12 6 12 12 16 14"></polyline>
-                                    </svg>
-                                    <span>Expiration</span>
-                                </label>
-                                <select id="expiryField"
-                                    class="w-full bg-background border border-card-border rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none">
+                        <!-- Settings -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2 text-white">Expiration</label>
+                                <select id="expiryField" class="text-sm">
                                     <option value="0">Never expires</option>
                                     <option value="5">5 minutes</option>
                                     <option value="15">15 minutes</option>
@@ -327,138 +168,42 @@
                                     <option value="1440" selected>24 hours</option>
                                     <option value="10080">7 days</option>
                                 </select>
-                                <p class="text-sm text-text-secondary mt-2">Content will also be deleted after reaching
-                                    the view limit below.</p>
                             </div>
-
-                            <!-- View Limit Section -->
-                            <div class="bg-background/30 p-4 rounded-xl border border-white/5 space-y-2">
-                                <div class="flex items-center justify-between">
-                                    <label
-                                        class="text-xs font-mono text-text-secondary uppercase flex items-center gap-2">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                            </path>
-                                        </svg>
-                                        View Limit
-                                    </label>
-                                    <div id="viewLimitHelperText"
-                                        class="text-xs text-primary-light/80 italic animate-fade-in pl-1">
-                                    </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-sm font-medium text-white">View Limit</label>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <input type="number" id="maxViewsField" min="1" max="100" value="1"
-                                        class="bg-transparent text-white focus:outline-none text-sm w-full font-mono text-lg"
-                                        onchange="updateViewLimitHelperText()">
-                                    <span class="text-xs text-text-muted whitespace-nowrap">views</span>
-                                </div>
+                                <input type="number" id="maxViewsField" min="1" max="100" value="1" class="text-sm w-full font-mono">
                             </div>
                         </div>
 
-                        <!-- Hidden Premium Toggle -->
                         <input type="checkbox" id="isPremium" class="hidden">
 
-                        <button type="submit"
-                            class="w-full bg-primary hover:bg-primary-hover text-background font-bold py-4 rounded-xl px-6 text-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-glow flex items-center justify-center gap-2 group/btn">
-                            <svg class="w-5 h-5 group-hover/btn:rotate-12 transition-transform" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-                                </path>
-                            </svg>
-                            Generate Secret Link
-                        </button>
-                        
-                        <p class="text-center text-xs text-text-secondary mt-6">
-                            By creating a secret, you agree to our <a href="/terms" class="text-primary-light hover:underline">Terms of Service</a>
-                        </p>
-                    </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script>
-        // Update type selection styling
-        function selectType(type) {
-            selectedType = type;
-
-            // Reset all buttons
-            document.querySelectorAll('.type-btn').forEach(btn => {
-                btn.classList.remove('bg-primary', 'text-background', 'shadow-glow-sm');
-                btn.classList.add('hover:bg-white/5');
-            });
-
-            // Activate selected
-            const activeBtn = document.getElementById(`btn-${type}`);
-            activeBtn.classList.add('bg-primary', 'text-background', 'shadow-glow-sm');
-            activeBtn.classList.remove('hover:bg-white/5');
-
-            // Update file input accept attribute
-            const fileInput = document.getElementById('fileInput');
-            if (type === 'image') fileInput.setAttribute('accept', 'image/*');
-            else if (type === 'video') fileInput.setAttribute('accept', 'video/*');
-            else fileInput.setAttribute('accept', '*/*');
-
-            // Toggle content areas
-            if (type === 'text') {
-                document.getElementById('textContent').classList.remove('hidden');
-                document.getElementById('fileContent').classList.add('hidden');
-            } else {
-                document.getElementById('textContent').classList.add('hidden');
-                document.getElementById('fileContent').classList.remove('hidden');
-            }
-        }
-
-        function togglePasswordSection() {
-            const section = document.getElementById('passwordSection');
-            const toggle = document.getElementById('passwordToggle');
-            if (toggle.checked) {
-                section.classList.remove('hidden');
-                document.getElementById('passwordField').focus();
-            } else {
-                section.classList.add('hidden');
-                document.getElementById('passwordField').value = '';
-            }
-        }
-
-    </script>
-            </form>
-
-            <!-- Secret Overview Section -->
-            <div id="secretOverviewContainer" class="hidden mt-8 glass rounded-2xl border-white/10 shadow-2xl relative overflow-hidden group animate-fade-in-up">
-                <!-- Top accent line -->
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-accent"></div>
-                
-                <div class="p-8 md:p-10">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-2xl font-bold text-white flex items-center gap-2">
-                            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            Your Recent Links
-                        </h2>
-                        <button onclick="clearAllHistory()" class="text-sm text-text-muted hover:text-red-400 transition-colors flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            Clear History
+                        <button type="submit" class="w-full bg-white text-black font-medium py-3 rounded-md hover:bg-gray-100 transition-colors mt-4">
+                            Generate Link
                         </button>
                     </div>
-                    
+                </div>
+            </form>
+
+            <!-- History -->
+            <div id="secretOverviewContainer" class="hidden mt-8 bg-surface border border-card-border rounded-xl">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-medium text-white">Recent Links</h2>
+                        <button onclick="clearAllHistory()" class="text-sm text-text-muted hover:text-white transition-colors">Clear History</button>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left">
-                            <thead class="text-text-secondary bg-white/5 rounded-t-xl">
+                            <thead class="text-text-secondary border-b border-card-border">
                                 <tr>
-                                    <th class="px-4 py-3 font-medium rounded-tl-xl"><span class="flex items-center gap-2"><svg class="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> Date</span></th>
-                                    <th class="px-4 py-3 font-medium"><span class="flex items-center gap-2"><svg class="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg> Secure Link</span></th>
-                                    <th class="px-4 py-3 font-medium"><span class="flex items-center gap-2"><svg class="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg> Status</span></th>
-                                    <th class="px-4 py-3 font-medium"><span class="flex items-center gap-2"><svg class="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Actions</span></th>
-                                    <th class="px-4 py-3 bg-white/5 rounded-tr-xl"></th>
+                                    <th class="px-4 py-2 font-normal">Date</th>
+                                    <th class="px-4 py-2 font-normal">Link</th>
+                                    <th class="px-4 py-2 font-normal">Status</th>
+                                    <th class="px-4 py-2 font-normal">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="secretHistoryList" class="divide-y divide-white/5">
+                            <tbody id="secretHistoryList" class="divide-y divide-card-border">
                                 <!-- Dynamic rows -->
                             </tbody>
                         </table>
@@ -472,53 +217,28 @@
         let selectedType = 'text';
         let selectedFile = null;
         const MAX_FILE_SIZE_MB = 100;
+        const typeButtons = {};
 
-        // Initialize view limit helper text on page load
-        document.addEventListener('DOMContentLoaded', function () {
-            updateViewLimitHelperText();
+        document.querySelectorAll('.type-btn').forEach(btn => {
+            typeButtons[btn.id.replace('btn-', '')] = btn;
         });
-
-        function updateViewLimitHelperText() {
-            const maxViews = parseInt(document.getElementById('maxViewsField').value);
-            const helperDiv = document.getElementById('viewLimitHelperText');
-
-            if (maxViews === 1) {
-                helperDiv.innerHTML = `
-                    <div class="flex items-start space-x-2 bg-primary/10 border border-primary/30 rounded-lg p-3">
-                        <span class="text-primary-light">✓</span>
-                        <span class="text-primary-light font-medium">This is a one-time view link.</span>
-                    </div>
-                `;
-            } else {
-                helperDiv.innerHTML = `
-                    <div class="flex items-start space-x-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
-                        <span class="text-yellow-400">⚠</span>
-                        <span class="text-yellow-400">Anyone with this link can open it until the view limit is reached.</span>
-                    </div>
-                `;
-            }
-        }
 
         function selectType(type) {
             selectedType = type;
 
-            // Update button states
-            document.querySelectorAll('.type-btn').forEach(btn => {
-                btn.classList.remove('border-primary', 'bg-primary/20');
+            Object.values(typeButtons).forEach(btn => {
+                btn.classList.remove('active', 'bg-white', 'text-black');
+                btn.classList.add('bg-background', 'text-text-primary');
             });
-            document.getElementById(`btn-${type}`).classList.add('border-primary', 'bg-primary/20');
+            const activeBtn = typeButtons[type];
+            activeBtn.classList.remove('bg-background', 'text-text-primary');
+            activeBtn.classList.add('active', 'bg-white', 'text-black');
 
-            // Update file input accept attribute based on content type
             const fileInput = document.getElementById('fileInput');
-            if (type === 'image') {
-                fileInput.setAttribute('accept', 'image/*');
-            } else if (type === 'video') {
-                fileInput.setAttribute('accept', 'video/*');
-            } else if (type === 'file') {
-                fileInput.setAttribute('accept', '*/*');
-            }
+            if (type === 'image') fileInput.setAttribute('accept', 'image/*');
+            else if (type === 'video') fileInput.setAttribute('accept', 'video/*');
+            else fileInput.setAttribute('accept', '*/*');
 
-            // Show/hide content areas
             if (type === 'text') {
                 document.getElementById('textContent').classList.remove('hidden');
                 document.getElementById('fileContent').classList.add('hidden');
@@ -528,33 +248,15 @@
             }
         }
 
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            document.getElementById('uploadArea').classList.add('dragging');
-        }
-
-        function handleDragLeave(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            document.getElementById('uploadArea').classList.remove('dragging');
-        }
-
+        function handleDragOver(e) { e.preventDefault(); e.stopPropagation(); }
+        function handleDragLeave(e) { e.preventDefault(); e.stopPropagation(); }
         function handleDrop(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            document.getElementById('uploadArea').classList.remove('dragging');
-
+            e.preventDefault(); e.stopPropagation();
             const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleFile(files[0]);
-            }
+            if (files.length > 0) handleFile(files[0]);
         }
-
         function handleFileSelect(e) {
-            if (e.target.files.length > 0) {
-                handleFile(e.target.files[0]);
-            }
+            if (e.target.files.length > 0) handleFile(e.target.files[0]);
         }
 
         function handleFile(file) {
@@ -565,104 +267,41 @@
                 selectedFile = null;
                 document.getElementById('fileInfo').classList.add('hidden');
                 document.getElementById('fileInput').value = '';
-                alert(`This file is ${sizeMb.toFixed(2)} MB. The maximum allowed size is ${MAX_FILE_SIZE_MB} MB. Please choose a smaller file.`);
+                alert(`Maximum allowed size is ${MAX_FILE_SIZE_MB} MB.`);
                 return;
             }
-
             document.getElementById('fileInfo').classList.remove('hidden');
             document.getElementById('fileName').textContent = file.name;
             document.getElementById('fileSize').textContent = `${sizeMb.toFixed(2)} MB`;
         }
 
-        async function getCloudinarySignature(resourceType) {
-            const res = await fetch(API_BASE_URL + '/api/uploads/sign', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ resource_type: resourceType })
-            });
-            if (!res.ok) {
-                const err = await res.json().catch(() => ({}));
-                throw new Error(err.detail || 'Failed to prepare upload');
-            }
-            return res.json();
-        }
-
-        function uploadFileToCloudinary(file, contentType, onProgress) {
-            const resourceType = contentType === 'video' ? 'video' : 'raw';
-            return getCloudinarySignature(resourceType).then(sign => {
-                const url = `https://api.cloudinary.com/v1_1/${sign.cloud_name}/${sign.resource_type}/upload`;
-                const fd = new FormData();
-                fd.append('file', file);
-                fd.append('api_key', sign.api_key);
-                fd.append('timestamp', sign.timestamp);
-                fd.append('signature', sign.signature);
-                fd.append('folder', sign.folder);
-
-                return new Promise((resolve, reject) => {
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('POST', url, true);
-
-                    if (xhr.upload && onProgress) {
-                        xhr.upload.onprogress = onProgress;
-                    }
-
-                    xhr.onreadystatechange = function () {
-                        if (xhr.readyState === XMLHttpRequest.DONE) {
-                            if (xhr.status >= 200 && xhr.status < 300) {
-                                try {
-                                    const data = JSON.parse(xhr.responseText);
-                                    resolve(data);
-                                } catch (e) {
-                                    reject(new Error('Upload response parse error'));
-                                }
-                            } else {
-                                reject(new Error('Cloud storage upload failed'));
-                            }
-                        }
-                    };
-
-                    xhr.onerror = function () {
-                        reject(new Error('Network error during file upload'));
-                    };
-
-                    xhr.send(fd);
-                });
-            });
-        }
-
-        // Fallback: upload file through our API (old behavior)
-        function uploadFileViaBackend(file, contentType, onProgress) {
+        // Upload file through the backend (which uploads to Backblaze B2)
+        function uploadFileViaBackend(file, contentType, password, expiryMinutes, maxViews, isPremium, onProgress) {
             return new Promise((resolve, reject) => {
                 const formData = new FormData();
                 formData.append('content_type', contentType);
                 formData.append('file', file);
-
+                if (password) formData.append('password', password);
+                formData.append('expiry_minutes', expiryMinutes);
+                formData.append('max_views', maxViews);
+                formData.append('is_premium', isPremium);
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', API_BASE_URL + '/api/secrets', true);
-
-                if (xhr.upload && onProgress) {
-                    xhr.upload.onprogress = onProgress;
-                }
-
+                if (xhr.upload && onProgress) xhr.upload.onprogress = onProgress;
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === XMLHttpRequest.DONE) {
-                        if (xhr.status >= 200 && xhr.status < 300) {
+                        if (xhr.status >= 200 && xhr.status < 300) resolve(JSON.parse(xhr.responseText));
+                        else {
+                            let detail = xhr.responseText || xhr.statusText || 'Unknown error';
                             try {
-                                const data = JSON.parse(xhr.responseText);
-                                resolve({ backend_secret: data });
-                            } catch (e) {
-                                reject(new Error('Upload response parse error'));
-                            }
-                        } else {
-                            reject(new Error('Backend upload failed'));
+                                const parsed = JSON.parse(xhr.responseText);
+                                detail = parsed.detail || parsed.error || xhr.responseText;
+                            } catch (e) { }
+                            reject(new Error(`Upload failed: ${xhr.status} (${API_BASE_URL}) ${detail}`));
                         }
                     }
                 };
-
-                xhr.onerror = function () {
-                    reject(new Error('Network error during file upload'));
-                };
-
+                xhr.onerror = () => reject(new Error('Network error'));
                 xhr.send(formData);
             });
         }
@@ -670,10 +309,10 @@
         document.getElementById('secretForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const submitButton = document.querySelector('#secretForm button[type="submit"]');
-            const uploadProgress = document.getElementById('uploadProgress');
-            const progressBar = document.getElementById('progressBar');
-            const progressText = document.getElementById('progressText');
+                const submitButton = document.querySelector('#secretForm button[type="submit"]');
+                const uploadProgress = document.getElementById('uploadProgress');
+                const progressBar = document.getElementById('progressBar');
+                const progressText = document.getElementById('progressText');
 
             const isPremium = document.getElementById('isPremium').checked;
             const expiryMinutes = parseInt(document.getElementById('expiryField').value);
@@ -682,12 +321,12 @@
 
             try {
                 submitButton.disabled = true;
-                submitButton.classList.add('opacity-70', 'cursor-not-allowed');
+                submitButton.classList.add('opacity-50');
 
                 if (selectedType === 'text') {
                     const content = document.getElementById('contentField').value;
                     if (!content.trim()) {
-                        alert('Please enter a message');
+                        showToast('Please enter a message');
                         return;
                     }
 
@@ -697,307 +336,125 @@
                     formData.append('is_premium', isPremium);
                     formData.append('expiry_minutes', expiryMinutes);
                     formData.append('max_views', maxViews);
-                    if (password) {
-                        formData.append('password', password);
-                    }
+                    if (password) formData.append('password', password);
 
-                    const res = await fetch(API_BASE_URL + '/api/secrets', {
-                        method: 'POST',
-                        body: formData
-                    });
+                    const res = await fetch(API_BASE_URL + '/api/secrets', { method: 'POST', body: formData });
                     if (!res.ok) {
-                        const err = await res.json().catch(() => ({}));
-                        throw new Error(err.detail || 'Failed to create secret');
+                        let detail = await res.text();
+                        try {
+                            const parsed = JSON.parse(detail);
+                            detail = parsed.detail || parsed.error || detail;
+                        } catch (e) { }
+                        throw new Error(`Failed to create secret: ${res.status} (${API_BASE_URL}) ${detail}`);
                     }
                     const data = await res.json();
 
-                    document.getElementById('secretForm').classList.add('hidden');
-                    document.getElementById('successMessage').classList.remove('hidden');
-                    document.getElementById('secretLink').value = data.url;
-
-                    if (data.expires_at) {
-                        const expiryDate = new Date(data.expires_at);
-                        const viewText = data.max_views === 1 ? 'first view' : `${data.max_views} views`;
-                        document.getElementById('expiryInfo').textContent =
-                            `⏰ Expires on ${expiryDate.toLocaleString()} or after ${viewText}`;
-                    } else {
-                        const viewText = data.max_views === 1 ? 'first view' : `${data.max_views} views`;
-                        document.getElementById('expiryInfo').textContent =
-                            `⚠️ Will be deleted after ${viewText}`;
-                    }
-
-                    saveSecretToHistory(data.url, !!password, password);
-
-                    document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+                    showSuccess(data, password);
                     return;
                 }
 
-                // File / image / video flow: direct to Cloudinary, then create secret
                 if (!selectedFile) {
-                    alert('Please select a file');
+                    showToast('Please select a file');
                     return;
                 }
 
-                // Reset and show progress UI
                 uploadProgress.classList.remove('hidden');
                 progressBar.style.width = '0%';
                 progressText.textContent = 'Starting upload...';
-                uploadProgress.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-                let finalSecretData = null;
-
-                try {
-                    // Preferred path: direct to Cloudinary
-                    const cloudinaryResponse = await uploadFileToCloudinary(
-                        selectedFile,
-                        selectedType,
-                        function (event) {
-                            if (event.lengthComputable && event.total > 0) {
-                                const rawPercent = Math.round((event.loaded / event.total) * 100);
-                                const percent = Math.min(rawPercent, 95);
-                                progressBar.style.width = percent + '%';
-                                progressText.textContent = `Uploading... ${percent}%`;
-                            } else {
-                                progressText.textContent = 'Uploading...';
-                            }
+                const result = await uploadFileViaBackend(
+                    selectedFile, selectedType, password,
+                    expiryMinutes, maxViews, isPremium,
+                    (e) => {
+                        if (e.lengthComputable && e.total > 0) {
+                            const percent = Math.min(Math.round((e.loaded / e.total) * 100), 99);
+                            progressBar.style.width = percent + '%';
+                            progressText.textContent = percent >= 99 ? 'Securing file...' : `Uploading... ${percent}%`;
                         }
-                    );
-
-                    // Small finalization step with your API
-                    progressBar.style.width = '95%';
-                    progressText.textContent = 'Finalizing...';
-
-                    const payload = {
-                        content_type: selectedType,
-                        file_name: selectedFile.name,
-                        mime_type: selectedFile.type,
-                        cloud_url: cloudinaryResponse.secure_url,
-                        cloud_public_id: cloudinaryResponse.public_id,
-                        cloud_resource_type: cloudinaryResponse.resource_type,
-                        password,
-                        expiry_minutes: expiryMinutes,
-                        max_views: maxViews,
-                        is_premium: isPremium
-                    };
-
-                    const res = await fetch(API_BASE_URL + '/api/secrets/from-cloudinary', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!res.ok) {
-                        const err = await res.json().catch(() => ({}));
-                        throw new Error(err.detail || 'Failed to create secret');
                     }
-
-                    finalSecretData = await res.json();
-                } catch (cloudErr) {
-                    // Fallback: try legacy backend upload if direct upload path fails (e.g. endpoint not deployed yet)
-                    console.error('Direct cloud upload failed, falling back to backend upload:', cloudErr);
-                    progressBar.style.width = '0%';
-                    progressText.textContent = 'Network seems slow, trying via server...';
-
-                    const backendResult = await uploadFileViaBackend(
-                        selectedFile,
-                        selectedType,
-                        function (event) {
-                            if (event.lengthComputable && event.total > 0) {
-                                const rawPercent = Math.round((event.loaded / event.total) * 100);
-                                const percent = Math.min(rawPercent, 95);
-                                progressBar.style.width = percent + '%';
-                                progressText.textContent = `Uploading... ${percent}%`;
-                            } else {
-                                progressText.textContent = 'Uploading...';
-                            }
-                        }
-                    );
-
-                    finalSecretData = backendResult.backend_secret;
-                }
+                );
 
                 progressBar.style.width = '100%';
-                progressText.textContent = 'Done!';
-
-                document.getElementById('secretForm').classList.add('hidden');
-                document.getElementById('successMessage').classList.remove('hidden');
-                document.getElementById('secretLink').value = finalSecretData.url;
-
-                if (finalSecretData.expires_at) {
-                    const expiryDate = new Date(finalSecretData.expires_at);
-                    const viewText = finalSecretData.max_views === 1 ? 'first view' : `${finalSecretData.max_views} views`;
-                    document.getElementById('expiryInfo').textContent =
-                        `⏰ Expires on ${expiryDate.toLocaleString()} or after ${viewText}`;
-                } else {
-                    const viewText = finalSecretData.max_views === 1 ? 'first view' : `${finalSecretData.max_views} views`;
-                    document.getElementById('expiryInfo').textContent =
-                        `⚠️ Will be deleted after ${viewText}`;
-                }
-
-                saveSecretToHistory(finalSecretData.url, !!password, password);
-
-                document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+                progressText.textContent = 'Done';
+                showSuccess(result, password);
             } catch (error) {
-                let message = error.message || 'Upload failed. Please try again.';
-                if (message.includes('Network')) {
-                    message = 'Upload failed due to network issues. Please check your connection or try a smaller file.';
-                } else if (message.toLowerCase().includes('failed')) {
-                    message = 'Upload failed. Please try again with a smaller file or more stable connection.';
-                }
-                alert(message);
+                alert(error.message || 'Upload failed.');
                 uploadProgress.classList.add('hidden');
             } finally {
                 submitButton.disabled = false;
-                submitButton.classList.remove('opacity-70', 'cursor-not-allowed');
+                submitButton.classList.remove('opacity-50');
             }
         });
 
-        function copyLink() {
-            const linkInput = document.getElementById('secretLink');
-            linkInput.select();
-            document.execCommand('copy');
+        function showSuccess(data, password) {
+            document.getElementById('secretForm').classList.add('hidden');
+            document.getElementById('successMessage').classList.remove('hidden');
+            document.getElementById('secretLink').value = data.url;
 
-            // Show toast notification
+            let viewText = data.max_views === 1 ? 'first view' : `${data.max_views} views`;
+            if (data.expires_at) {
+                document.getElementById('expiryInfo').textContent = `Expires on ${new Date(data.expires_at).toLocaleString()} or after ${viewText}`;
+            } else {
+                document.getElementById('expiryInfo').textContent = `Will be deleted after ${viewText}`;
+            }
+            saveSecretToHistory(data.url, !!password, password);
+            document.getElementById('successMessage').scrollIntoView();
+        }
+
+        function copyLink() {
+            document.getElementById('secretLink').select();
+            document.execCommand('copy');
             showToast('Link copied to clipboard!');
         }
 
         function showToast(message) {
             const toast = document.createElement('div');
-            toast.className = 'toast fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
-
-            // Create SVG checkmark icon
-            const svgIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svgIcon.setAttribute('width', '20');
-            svgIcon.setAttribute('height', '20');
-            svgIcon.setAttribute('viewBox', '0 0 24 24');
-            svgIcon.setAttribute('fill', 'none');
-            svgIcon.setAttribute('stroke', 'currentColor');
-            svgIcon.setAttribute('stroke-width', '3');
-            svgIcon.setAttribute('stroke-linecap', 'round');
-            svgIcon.setAttribute('stroke-linejoin', 'round');
-            svgIcon.style.flexShrink = '0';
-
-            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            path.setAttribute('d', 'M20 6L9 17L4 12');
-
-            svgIcon.appendChild(path);
-
-            toast.appendChild(svgIcon);
-            toast.appendChild(document.createTextNode(message));
+            toast.className = 'fixed top-4 right-4 bg-white text-black px-4 py-2 rounded shadow-md z-50 text-sm font-medium';
+            toast.innerText = message;
             document.body.appendChild(toast);
-
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
+            setTimeout(() => toast.remove(), 3000);
         }
 
-        // Initialize
-        selectType('text');
-
-        // Check if redirected from homepage with success
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('success') === 'true' && urlParams.get('url')) {
             const secretUrl = decodeURIComponent(urlParams.get('url'));
-
-            // Hide the form and show success message
             document.getElementById('secretForm').classList.add('hidden');
             document.getElementById('successMessage').classList.remove('hidden');
             document.getElementById('secretLink').value = secretUrl;
-
-            // Set default expiry info for quick creation
-            document.getElementById('expiryInfo').textContent =
-                '⚠️ Will be deleted after first view or in 24 hours';
-                
-            // Check if it's already in history (it might have been saved by index.html)
-            const hasPassword = urlParams.get('pwd') === 'true';
-            saveSecretToHistory(secretUrl, hasPassword);
-
-            // Scroll to success message
-            document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
-
-            // Clean up URL
+            document.getElementById('expiryInfo').textContent = 'Will be deleted after first view or in 24 hours';
+            saveSecretToHistory(secretUrl, urlParams.get('pwd') === 'true');
             window.history.replaceState({}, document.title, '/create');
         }
 
-        // --- History Rendering Logic ---
         function loadSecretHistory() {
             const history = JSON.parse(localStorage.getItem('secretHistory') || '[]');
             const container = document.getElementById('secretOverviewContainer');
             const list = document.getElementById('secretHistoryList');
-            
-            if (history.length === 0) {
-                container.classList.add('hidden');
-                return;
-            }
-            
+            if (history.length === 0) return container.classList.add('hidden');
             container.classList.remove('hidden');
             list.innerHTML = '';
-            
-            history.forEach((secret, index) => {
-                // Update status if it's not the first one
-                if (index > 0 && secret.status === 'Newest') {
-                    secret.status = 'Active'; // simple fallback
-                }
-                
+
+            history.forEach((secret, i) => {
                 const dateObj = new Date(secret.date);
-                const dateStr = `${dateObj.toLocaleDateString('en-GB').replace(/\//g, '.')} ${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
-                
+                const dateStr = `${dateObj.toLocaleDateString('en-GB')} ${dateObj.getHours()}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-white/5 transition-colors group';
                 tr.innerHTML = `
-                    <td class="px-4 py-4 text-text-muted whitespace-nowrap">${dateStr}</td>
-                    <td class="px-4 py-4 text-white font-mono truncate max-w-[200px]" title="${secret.url}">
-                        <a href="${secret.url}" target="_blank" class="hover:text-primary transition-colors">${secret.url}</a>
-                    </td>
-                    <td class="px-4 py-4">
-                        <span class="bg-white/10 text-white text-xs px-2 py-1 rounded-md">${secret.status || 'Active'}</span>
-                    </td>
-                    <td class="px-4 py-4">
-                        <div class="flex items-center gap-2">
-                            ${secret.hasPassword ? `
-                            <button onclick="showPassword('${secret.id}')" class="bg-white/5 hover:bg-white/10 text-white/90 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors border border-white/10" title="View Password">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                                View Password
-                            </button>
-                            ` : `
-                            <button class="bg-white/5 hover:bg-white/10 text-white/50 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors border border-white/10 opacity-50 cursor-not-allowed" title="No Password">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
-                                Password
-                            </button>
-                            `}
-                            <button onclick="copyHistoryLink('${secret.url}')" class="bg-white/5 hover:bg-white/10 text-white text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors border border-white/10 whitespace-nowrap">
-                                <svg class="w-3.5 h-3.5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                                Copy Link
-                            </button>
-                            <a href="mailto:?subject=Secure Secret Message&body=Here is a secure message for you: ${secret.url}" class="bg-white/5 hover:bg-white/10 text-white text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors border border-white/10 whitespace-nowrap">
-                                <svg class="w-3.5 h-3.5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                Email
-                            </a>
-                            <button onclick="removeHistoryItem('${secret.id}')" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors border border-red-500/20 whitespace-nowrap ml-2">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                Delete
-                            </button>
+                    <td class="px-4 py-3 text-text-muted whitespace-nowrap">${dateStr}</td>
+                    <td class="px-4 py-3 font-mono truncate max-w-[200px]"><a href="${secret.url}" target="_blank" class="hover:underline">${secret.url}</a></td>
+                    <td class="px-4 py-3 text-text-secondary">${i === 0 ? 'Newest' : (secret.status || 'Active')}</td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center gap-3 text-text-secondary">
+                            ${secret.hasPassword ? `<button onclick="showPassword('${secret.id}')" class="hover:text-white">Password</button>` : ``}
+                            <button onclick="copyHistoryLink('${secret.url}')" class="hover:text-white">Copy</button>
+                            <button onclick="removeHistoryItem('${secret.id}')" class="text-red-400 hover:text-red-300">Delete</button>
                         </div>
-                    </td>
-                    <td class="px-4 py-4 text-right">
-                        <button onclick="removeHistoryItem('${secret.id}')" class="text-red-500/50 hover:text-red-500 hover:bg-red-500/10 p-1.5 rounded-md transition-colors border border-red-500/0 hover:border-red-500/30" title="Remove from list">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                        </button>
                     </td>
                 `;
                 list.appendChild(tr);
             });
-            
-            // Save updated statuses back to localStorage
-            localStorage.setItem('secretHistory', JSON.stringify(history));
         }
-        
         window.loadSecretHistory = loadSecretHistory;
-
-
-        // Initial load
-        loadSecretHistory();
+        document.addEventListener('DOMContentLoaded', loadSecretHistory);
     </script>
 </body>
-
 </html>

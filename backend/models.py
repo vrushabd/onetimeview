@@ -29,9 +29,9 @@ class Secret(Base):
     is_premium = Column(Boolean, default=False)  # Premium feature flag
     created_at = Column(DateTime, default=datetime.utcnow)
     
-    # Cloudinary fields
-    cloud_url = Column(String(500), nullable=True)  # Cloudinary secure URL
-    cloud_public_id = Column(String(255), nullable=True)  # Cloudinary public_id for deletion
+    # Object storage fields. Column names are kept for existing databases.
+    cloud_url = Column(String(500), nullable=True)
+    cloud_public_id = Column(String(255), nullable=True)
     cloud_resource_type = Column(String(20), nullable=True)  # image, video, raw
     
     def is_expired(self):
@@ -42,4 +42,3 @@ class Secret(Base):
             return True
         return False
     
-

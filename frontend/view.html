@@ -8,238 +8,47 @@
 
     <!-- SEO Meta Tags -->
     <title>View Secret - OneTimeView - Secure One-Time Message</title>
-    <meta name="description"
-        content="View a one-time secret message or file. This content will be permanently deleted after viewing.">
+    <meta name="description" content="View a one-time secret message or file. This content will be permanently deleted after viewing.">
     <meta name="robots" content="noindex, nofollow">
     <link rel="canonical" href="https://onetimeview.app/view">
 
     <!-- Mobile & Theme -->
-    <meta name="theme-color" content="#0F0F1A">
+    <meta name="theme-color" content="#0a0a0a">
     <meta name="mobile-web-app-capable" content="yes">
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
 
-    <!-- Performance Optimization -->
-    <link rel="preconnect" href="https://cdn.tailwindcss.com">
-
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/static/tailwind-config.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script src="/static/config.js"></script>
+    <script src="/static/config.js?v=3"></script>
     <script src="/static/cookie-consent.js" defer></script>
-    <link rel="stylesheet" href="/static/styles.css">
-    <!-- Vercel Web Analytics -->
-    <script>
-        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-    </script>
-    <script defer src="/_vercel/insights/script.js"></script>
-    <!-- Vercel Speed Insights -->
-    <script>
-        window.si = window.si || function () { (window.si.q = window.si.q || []).push(arguments); };
-    </script>
-    <script defer src="/_vercel/speed-insights/script.js"></script>
-</head>
-
-<body class="bg-background min-h-screen text-text-primary bg-grid-pattern relative overflow-x-hidden">
-    <div class="bg-noise"></div>
-
-    <!-- Navigation -->
-    <nav class="border-b border-white/5 backdrop-blur-md sticky top-0 z-40 bg-background/80">
-        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2 group">
-                <div
-                    class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-card border border-primary/30 shadow-glow-sm group-hover:shadow-glow transition-all duration-300">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" class="text-primary">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                    </svg>
-                </div>
-                <span
-                    class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-primary-light to-primary group-hover:to-white transition-all">OneTimeView</span>
-            </a>
-        </div>
-    </nav>
-
-    <div class="container mx-auto px-4 sm:px-6 py-10 relative z-10">
-        <div class="max-w-3xl mx-auto">
-            <!-- Password Form -->
-            <div id="passwordForm"
-                class="hidden glass rounded-2xl p-8 mb-6 shadow-2xl animate-fade-in-up border border-white/5">
-                <div class="text-center mb-6">
-                    <div
-                        class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary mb-4">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-2xl font-bold text-white mb-2">Password Protected</h3>
-                    <p class="text-text-secondary">This secret is encrypted. Enter the password to unlock.</p>
-                </div>
-
-                <div class="flex flex-col sm:flex-row gap-3">
-                    <input type="password" id="passwordInput"
-                        class="flex-1 bg-background/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all placeholder-text-muted"
-                        placeholder="Enter password...">
-                    <button onclick="verifyPassword()"
-                        class="bg-primary hover:bg-primary-hover text-background font-bold px-6 py-3 rounded-xl transition shadow-glow-sm hover:shadow-glow">
-                        Unlock
-                    </button>
-                </div>
-                <p id="passwordError"
-                    class="text-destructive text-sm mt-3 hidden flex items-center gap-2 justify-center">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="15" y1="9" x2="9" y2="15"></line>
-                        <line x1="9" y1="9" x2="15" y2="15"></line>
-                    </svg>
-                    Incorrect password
-                </p>
-            </div>
-
-            <!-- Reveal Button Section -->
-            <div id="revealSection"
-                class="hidden glass rounded-2xl p-10 mb-6 shadow-2xl text-center animate-fade-in-up border border-white/5">
-                <div class="mb-8">
-                    <div
-                        class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6 glow-primary">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </div>
-                    <h3 class="text-3xl font-bold text-white mb-3">Secret Ready</h3>
-                    <div class="inline-block px-4 py-1.5 rounded-full bg-surface border border-white/5">
-                        <p class="text-text-secondary" id="revealInfo">One-time view only</p>
-                    </div>
-                </div>
-                <button onclick="revealSecret()"
-                    class="w-full sm:w-auto bg-primary hover:bg-primary-hover text-background font-bold py-4 px-10 rounded-xl transition shadow-glow text-lg transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3 mx-auto">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    Reveal Secret
-                </button>
-                <p class="text-text-muted text-xs mt-6 uppercase tracking-wider">
-                    <span class="text-destructive">*</span> Content deletes forever after viewing
-                </p>
-            </div>
-
-            <!-- Content Display -->
-            <div id="contentDisplay"
-                class="hidden glass rounded-3xl p-1 shadow-2xl animate-fade-in-up border border-white/5">
-
-                <div class="bg-background/80 backdrop-blur-sm rounded-[1.3rem] p-6 sm:p-10">
-                    <div class="text-center mb-8">
-                        <p class="text-xs font-mono text-primary uppercase tracking-[0.2em] mb-3">Secret Viewer</p>
-                        <h2 class="text-3xl font-bold text-white" id="viewerTitle">Your secret</h2>
-                    </div>
-
-                    <!-- Text Content -->
-                    <div id="textContent" class="hidden">
-                        <div class="bg-surface/50 border border-white/5 rounded-xl p-6 whitespace-pre-wrap break-words text-text-primary mb-6 font-mono text-sm leading-relaxed shadow-inner"
-                            id="textBody"></div>
-
-                        <button onclick="copyToClipboard()"
-                            class="w-full bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent-hover text-white font-bold py-4 px-6 rounded-xl transition shadow-glow flex items-center justify-center gap-2 transform active:scale-95 group">
-                            <span id="copyButtonText">Copy to clipboard</span>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="group-hover:rotate-12 transition-transform">
-                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Image Content -->
-                    <div id="imageContent" class="hidden">
-                        <div class="rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/50 mb-6">
-                            <img id="imageBody" class="w-full h-auto no-select mx-auto"
-                                style="max-height: 70vh; object-fit: contain;" draggable="false"
-                                oncontextmenu="return false;">
-                        </div>
-                    </div>
-
-                    <!-- Video Content -->
-                    <div id="videoContent" class="hidden">
-                        <div class="rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/50 mb-6">
-                            <video id="videoBody" controls controlsList="nodownload noremoteplayback"
-                                class="w-full h-auto no-select mx-auto" style="max-height: 70vh;"
-                                oncontextmenu="return false;" disablePictureInPicture>
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                    </div>
-
-                    <!-- File Content -->
-                    <div id="fileContent" class="hidden text-center py-8">
-                        <div
-                            class="w-20 h-20 bg-surface rounded-2xl flex items-center justify-center mx-auto mb-6 border border-white/10">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
-                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                                <polyline points="13 2 13 9 20 9"></polyline>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-2">File Ready for Download</h3>
-                        <p class="text-text-secondary mb-8 font-mono text-sm bg-surface/50 inline-block px-3 py-1 rounded-lg border border-white/5"
-                            id="fileInfo"></p>
-
-                        <a id="downloadBtn" href="#" download
-                            class="w-full bg-primary hover:bg-primary-hover text-background font-bold py-4 px-6 rounded-xl transition shadow-glow flex items-center justify-center gap-2">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                <polyline points="7 10 12 15 17 10"></polyline>
-                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                            </svg>
-                            Download File
-                        </a>
-                    </div>
-
-                    <div class="mt-8 pt-8 border-t border-white/5 text-center">
-                        <p class="text-text-secondary text-sm mb-4">You can close this window when done.</p>
-                        <a href="/create"
-                            class="inline-flex items-center gap-1 text-primary hover:text-primary-hover text-sm font-semibold transition-colors">
-                            Create your own secret
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M5 12h14"></path>
-                                <path d="M12 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Loading Spinner -->
-            <div id="loadingSpinner" class="hidden text-center py-20">
-                <div class="relative w-16 h-16 mx-auto mb-4">
-                    <div class="absolute inset-0 rounded-full border-4 border-primary/20"></div>
-                    <div
-                        class="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin">
-                    </div>
-                </div>
-                <p class="text-text-secondary font-mono text-sm animate-pulse">Decrypting secure content...</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Remaining Views Counter -->
-    <div id="viewsCounter"
-        class="fixed top-24 right-6 bg-card border border-card-border px-4 py-2 rounded-lg shadow-lg hidden">
-        <span class="text-text-secondary">Remaining views - </span>
-        <span id="viewsCountValue" class="font-bold text-primary-light"></span>
-    </div>
 
     <style>
-        /* Disable text selection and drag for security */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #0a0a0a;
+            color: #ededed;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+        input {
+            background-color: #111111;
+            border: 1px solid #3f3f46;
+            color: #ededed;
+            border-radius: 8px;
+            padding: 16px 20px !important;
+            font-size: 14px;
+            transition: border-color 0.15s ease;
+            width: 100%;
+        }
+        input:focus {
+            outline: none; border-color: #52525b;
+        }
+        ::placeholder { color: #71717a; }
         .no-select {
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -248,135 +57,131 @@
             -webkit-touch-callout: none;
         }
     </style>
+</head>
+
+<body class="bg-background min-h-screen text-text-primary">
+
+    <!-- Navigation -->
+    <nav class="border-b border-card-border sticky top-0 z-40 bg-background/95 backdrop-blur-sm">
+        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-3 font-semibold text-white tracking-tight text-lg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                OneTimeView
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 sm:px-6 py-12">
+        <div class="max-w-2xl mx-auto">
+
+            <!-- Password Form -->
+            <div id="passwordForm" class="hidden bg-surface border border-card-border rounded-xl p-8 mb-6 text-center animate-fade-in-up">
+                <h3 class="text-2xl font-medium text-white mb-2">Password Protected</h3>
+                <p class="text-text-secondary text-sm mb-6">This secret is encrypted. Enter the password to unlock.</p>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input type="password" id="passwordInput" placeholder="Enter password...">
+                    <button onclick="verifyPassword()" class="bg-white text-black font-medium px-6 py-3 rounded-md transition-colors hover:bg-gray-100 whitespace-nowrap">
+                        Unlock
+                    </button>
+                </div>
+                <p id="passwordError" class="text-destructive text-sm mt-3 hidden">Incorrect password</p>
+            </div>
+
+            <!-- Reveal Button Section -->
+            <div id="revealSection" class="hidden bg-surface border border-card-border rounded-xl p-10 mb-6 text-center animate-fade-in-up">
+                <h3 class="text-2xl font-medium text-white mb-2">Secret Ready</h3>
+                <p class="text-text-secondary text-sm mb-8" id="revealInfo">One-time view only</p>
+
+                <button onclick="revealSecret()" class="bg-white text-black font-medium py-3 px-8 rounded-md hover:bg-gray-100 transition-colors inline-flex items-center gap-2">
+                    Reveal Secret
+                </button>
+                <p class="text-text-muted text-xs mt-6">Content deletes forever after viewing.</p>
+            </div>
+
+            <!-- Content Display -->
+            <div id="contentDisplay" class="hidden animate-fade-in-up">
+                <div class="bg-surface border border-card-border rounded-xl p-8 sm:p-10">
+
+                    <div class="text-center mb-8">
+                        <p class="text-xs font-mono text-text-secondary uppercase mb-2">Secret Viewer</p>
+                        <h2 class="text-2xl font-medium text-white" id="viewerTitle">Your secret</h2>
+                    </div>
+
+                    <!-- Text Content -->
+                    <div id="textContent" class="hidden">
+                        <div class="bg-background border border-card-border rounded-md p-6 whitespace-pre-wrap break-words text-text-primary mb-6 font-mono text-sm leading-relaxed" id="textBody"></div>
+                        <button onclick="copyToClipboard()" class="w-full bg-white text-black font-medium py-3 rounded-md hover:bg-gray-100 transition-colors flex items-center justify-center gap-2">
+                            <span id="copyButtonText">Copy to clipboard</span>
+                        </button>
+                    </div>
+
+                    <!-- Image Content -->
+                    <div id="imageContent" class="hidden">
+                        <div class="rounded-md overflow-hidden border border-card-border bg-black/50 mb-6 flex justify-center">
+                            <img id="imageBody" class="w-full h-auto no-select" style="max-height: 70vh; object-fit: contain;" draggable="false" oncontextmenu="return false;">
+                        </div>
+                    </div>
+
+                    <!-- Video Content -->
+                    <div id="videoContent" class="hidden">
+                        <div class="rounded-md overflow-hidden border border-card-border bg-black/50 mb-6">
+                            <video id="videoBody" controls controlsList="nodownload noremoteplayback" class="w-full h-auto no-select" style="max-height: 70vh;" oncontextmenu="return false;" disablePictureInPicture>
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    </div>
+
+                    <!-- File Content -->
+                    <div id="fileContent" class="hidden text-center py-8">
+                        <h3 class="text-xl font-medium text-white mb-2">File Ready for Download</h3>
+                        <p class="text-text-secondary text-sm font-mono bg-background border border-card-border inline-block px-3 py-1 rounded-md mb-8" id="fileInfo"></p>
+                        <a id="downloadBtn" href="#" download class="block w-full bg-white text-black font-medium py-3 rounded-md hover:bg-gray-100 transition-colors">
+                            Download File
+                        </a>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-card-border text-center">
+                        <a href="/create" class="text-sm text-text-secondary hover:text-white transition-colors">Create your own secret</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="loadingSpinner" class="hidden text-center py-20">
+                <p class="text-text-secondary font-mono text-sm">Decrypting secure content...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remaining Views Counter -->
+    <div id="viewsCounter" class="fixed bottom-6 right-6 bg-surface border border-card-border px-4 py-2 rounded-md shadow-lg hidden">
+        <span class="text-text-secondary text-sm">Remaining views: </span>
+        <span id="viewsCountValue" class="font-medium text-white"></span>
+    </div>
 
     <script>
-        // ========================================
-        // SECURITY: DevTools & Download Protection
-        // ========================================
-
         (function () {
             'use strict';
-
-            // 1. Disable right-click context menu
-            document.addEventListener('contextmenu', function (e) {
-                e.preventDefault();
-                return false;
-            });
-
-            // 2. Disable keyboard shortcuts
-            document.addEventListener('keydown', function (e) {
-                // F12 - DevTools
-                if (e.keyCode === 123) {
-                    e.preventDefault();
-                    return false;
-                }
-
-                // Ctrl+Shift+I or Cmd+Option+I - Inspector
-                if ((e.ctrlKey && e.shiftKey && e.keyCode === 73) ||
-                    (e.metaKey && e.altKey && e.keyCode === 73)) {
-                    e.preventDefault();
-                    return false;
-                }
-
-                // Ctrl+Shift+J or Cmd+Option+J - Console
-                if ((e.ctrlKey && e.shiftKey && e.keyCode === 74) ||
-                    (e.metaKey && e.altKey && e.keyCode === 74)) {
-                    e.preventDefault();
-                    return false;
-                }
-
-                // Ctrl+U or Cmd+Option+U - View Source
-                if ((e.ctrlKey && e.keyCode === 85) ||
-                    (e.metaKey && e.altKey && e.keyCode === 85)) {
-                    e.preventDefault();
-                    return false;
-                }
-
-                // Ctrl+S or Cmd+S - Save Page
-                if ((e.ctrlKey && e.keyCode === 83) ||
-                    (e.metaKey && e.keyCode === 83)) {
-                    e.preventDefault();
-                    return false;
-                }
-
-                // Ctrl+Shift+C or Cmd+Option+C - Inspect Element
-                if ((e.ctrlKey && e.shiftKey && e.keyCode === 67) ||
-                    (e.metaKey && e.altKey && e.keyCode === 67)) {
-                    e.preventDefault();
-                    return false;
+            document.addEventListener('contextmenu', e => { e.preventDefault(); return false; });
+            document.addEventListener('keydown', e => {
+                if (e.keyCode === 123 ||
+                    ((e.ctrlKey && e.shiftKey || e.metaKey && e.altKey) && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) ||
+                    ((e.ctrlKey || e.metaKey) && (e.keyCode === 85 || e.keyCode === 83))) {
+                    e.preventDefault(); return false;
                 }
             });
-
-            // 3. DevTools detection
-            let devtoolsOpen = false;
-            const threshold = 160;
-
-            const detectDevTools = () => {
-                const widthThreshold = window.outerWidth - window.innerWidth > threshold;
-                const heightThreshold = window.outerHeight - window.innerHeight > threshold;
-
-                if (widthThreshold || heightThreshold) {
-                    if (!devtoolsOpen) {
-                        devtoolsOpen = true;
-                        handleDevToolsOpen();
-                    }
-                } else {
-                    devtoolsOpen = false;
-                }
-            };
-
-            const handleDevToolsOpen = () => {
-                // Redirect to home or show warning
-                alert('⚠️ Developer tools are disabled for security reasons.');
-                window.location.href = '/';
-            };
-
-            // Check for DevTools using debugger
-            setInterval(() => {
-                const start = performance.now();
-                debugger;
-                const end = performance.now();
-
-                if (end - start > 100) {
-                    handleDevToolsOpen();
-                }
-            }, 1000);
-
-            // Check window size changes
-            window.addEventListener('resize', detectDevTools);
-            setInterval(detectDevTools, 500);
-
-            // 4. Disable drag events on images and videos
-            document.addEventListener('dragstart', function (e) {
-                if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') {
-                    e.preventDefault();
-                    return false;
+            document.addEventListener('dragstart', e => {
+                if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') { e.preventDefault(); return false; }
+            });
+            document.addEventListener('selectstart', e => {
+                if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO' || e.target.className.includes('no-select')) {
+                    e.preventDefault(); return false;
                 }
             });
-
-            // 5. Clear console regularly to prevent URL inspection
-            setInterval(() => {
-                if (console.clear) {
-                    console.clear();
-                }
-            }, 2000);
-
-            // 6. Disable text selection on sensitive elements
-            document.addEventListener('selectstart', function (e) {
-                if (e.target.tagName === 'IMG' ||
-                    e.target.tagName === 'VIDEO' ||
-                    e.target.className.includes('no-select')) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
-
-            // 7. Override console methods to prevent inspection
             const noop = () => { };
-            ['log', 'debug', 'info', 'warn', 'error'].forEach(method => {
-                console[method] = noop;
-            });
-
+            ['log', 'debug', 'info', 'warn', 'error'].forEach(method => { console[method] = noop; });
         })();
     </script>
 
@@ -386,16 +191,30 @@
         let currentPassword = null;
         let mediaLoading = false;
 
-        // Helpers
         function addPasswordParam(url, password) {
             if (!password) return url;
             try {
                 const parsed = new URL(url);
+                if (parsed.searchParams.has('X-Amz-Signature')) return url;
                 parsed.searchParams.set('password', password);
                 return parsed.toString();
             } catch (e) {
                 return url;
             }
+        }
+
+        function mediaUrl(contentType, downloadUrl) {
+            const backendUrl = `${API_BASE_URL}/api/${contentType}/${secretId}`;
+            if (currentPassword) return addPasswordParam(backendUrl, currentPassword);
+            return downloadUrl || backendUrl;
+        }
+
+        function downloadMediaUrl(contentType, downloadUrl) {
+            const backendUrl = `${API_BASE_URL}/api/${contentType}/${secretId}`;
+            if (!currentPassword) return downloadUrl || (contentType === 'video' ? `${backendUrl}?download=1` : backendUrl);
+            const separator = backendUrl.includes('?') ? '&' : '?';
+            const url = contentType === 'video' ? `${backendUrl}${separator}download=1` : backendUrl;
+            return addPasswordParam(url, currentPassword);
         }
 
         function showLoading() {
@@ -405,24 +224,18 @@
 
         function hideLoading() {
             const spinner = document.getElementById('loadingSpinner');
-            if (spinner && !mediaLoading) {
-                spinner.classList.add('hidden');
-            }
+            if (spinner && !mediaLoading) spinner.classList.add('hidden');
         }
 
-        // Auto-load secret on page load
         let initCalled = false;
         async function init() {
             if (initCalled) return;
             initCalled = true;
 
             try {
-                // Check if password is required
                 const response = await fetch(`${API_BASE_URL}/api/secrets/${secretId}/verify`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: '' })
                 });
 
@@ -432,38 +245,29 @@
                     window.location.href = `/expired?reason=${reason}`;
                     return;
                 }
-
                 if (!response.ok) {
-                    console.error('Verify failed:', response.status);
-                    // Don't redirect for server errors, show retry
                     document.getElementById('loadingSpinner').innerHTML = `
-                        <div class="text-destructive font-bold mb-4">Connection Failed</div>
-                        <button onclick="window.location.reload()" class="bg-primary px-4 py-2 rounded text-background font-bold">Retry</button>
+                        <div class="text-destructive mb-2">Connection Failed</div>
+                        <button onclick="window.location.reload()" class="bg-white text-black px-4 py-2 rounded-md">Retry</button>
                     `;
                     return;
                 }
 
                 const data = await response.json();
                 if (data.verified === true) {
-                    // No password required - auto-reveal
                     if (data.remaining_views <= 1) {
-                        alert('⚠️ Warning: This secret can be viewed only one time. It will be deleted immediately after this view.');
+                        alert('Warning: This secret can be viewed only one time. It will be deleted immediately after this view.');
                     }
                     await viewSecret();
                 } else {
-                    // Password is required - show password form
                     hideLoading();
                     document.getElementById('passwordForm').classList.remove('hidden');
                 }
-
             } catch (error) {
-                console.error('Error checking password:', error);
-                // Don't redirect for network errors
                 document.getElementById('loadingSpinner').classList.remove('hidden');
                 document.getElementById('loadingSpinner').innerHTML = `
-                    <div class="text-destructive font-bold mb-4">Network Error</div>
-                    <p class="text-text-secondary text-sm mb-4">Please check your connection and try again.</p>
-                    <button onclick="window.location.reload()" class="bg-primary px-4 py-2 rounded text-background font-bold">Retry</button>
+                    <div class="text-destructive mb-2">Network Error</div>
+                    <button onclick="window.location.reload()" class="bg-white text-black px-4 py-2 rounded-md">Retry</button>
                 `;
             }
         }
@@ -471,70 +275,49 @@
         function showRevealButton(remainingViews, contentType) {
             const revealSection = document.getElementById('revealSection');
             const revealInfo = document.getElementById('revealInfo');
+            let contentTypeLabel = contentType === 'text' ? 'message' : contentType;
 
-            let contentTypeLabel = contentType;
-            if (contentType === 'text') contentTypeLabel = 'message';
-
-            // Customize warning based on remaining views
             if (remainingViews <= 1) {
-                revealInfo.innerHTML = `⚠️ <strong class="text-red-400">Warning:</strong> This secret can be viewed <strong>only one time</strong>.<br>It will be permanently deleted immediately after you click reveal.`;
+                revealInfo.innerHTML = `Warning: This secret can be viewed only one time.`;
             } else {
                 revealInfo.innerHTML = `This ${contentTypeLabel} has ${remainingViews} view${remainingViews !== 1 ? 's' : ''} remaining.`;
             }
-
             revealSection.classList.remove('hidden');
         }
 
         async function verifyPassword() {
             const password = document.getElementById('passwordInput').value;
-
             try {
                 const response = await fetch(`${API_BASE_URL}/api/secrets/${secretId}/verify`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password })
                 });
-
                 const data = await response.json();
-
                 if (data.verified) {
                     passwordVerified = true;
                     currentPassword = password;
                     document.getElementById('passwordForm').classList.add('hidden');
                     document.getElementById('passwordError').classList.add('hidden');
-
-                    if (data.remaining_views <= 1) {
-                        alert('⚠️ Warning: This secret can be viewed only one time. It will be deleted immediately after this view.');
-                    }
-
-                    // Auto-reveal the secret after password verification
+                    if (data.remaining_views <= 1) alert('Warning: This secret can be viewed only one time.');
                     showLoading();
                     await viewSecret();
                 } else {
                     document.getElementById('passwordError').classList.remove('hidden');
                 }
-
             } catch (error) {
-                alert('Error verifying password: ' + error.message);
+                alert('Error verifying password.');
             }
         }
 
         async function revealSecret() {
-            // Hide reveal button and show loading
             document.getElementById('revealSection').classList.add('hidden');
             showLoading();
-            // Fetch the secret (this will consume a view)
             await viewSecret();
         }
 
         async function viewSecret() {
             try {
-                // For text secrets, we use the /api/secrets endpoint
-                // For file-based secrets (image/video/file), we directly use the file endpoints
-
-                // First, check the content type by making a metadata request
                 const verifyUrl = `${API_BASE_URL}/api/secrets/${secretId}/verify`;
                 const verifyResponse = await fetch(verifyUrl, {
                     method: 'POST',
@@ -545,167 +328,95 @@
                 if (!verifyResponse.ok) {
                     if (verifyResponse.status === 404) {
                         const error = await verifyResponse.json().catch(() => ({}));
-                        const reason = encodeURIComponent(error.detail || 'unknown');
-                        window.location.href = `/expired?reason=${reason}`;
+                        window.location.href = `/expired?reason=${encodeURIComponent(error.detail || 'unknown')}`;
                         return;
                     }
                     window.location.href = '/expired?reason=Verification failed';
                     return;
                 }
 
-                // Now get the secret metadata to know the content type
                 const metadataUrl = currentPassword
                     ? `${API_BASE_URL}/api/secrets/${secretId}?password=${encodeURIComponent(currentPassword)}`
                     : `${API_BASE_URL}/api/secrets/${secretId}`;
-
                 const response = await fetch(metadataUrl);
 
                 if (!response.ok) {
                     if (response.status === 404) {
                         const error = await response.json().catch(() => ({}));
-                        const reason = encodeURIComponent(error.detail || 'unknown');
-                        window.location.href = `/expired?reason=${reason}`;
+                        window.location.href = `/expired?reason=${encodeURIComponent(error.detail || 'unknown')}`;
                         return;
                     }
                     throw new Error('Failed to load secret');
                 }
 
                 const data = await response.json();
-
-                // Show main container (we may still keep spinner for slow media)
                 document.getElementById('contentDisplay').classList.remove('hidden');
 
-                // Display remaining views in corner
-                const viewsCounter = document.getElementById('viewsCounter');
-                const viewsCountValue = document.getElementById('viewsCountValue');
-
                 if (data.remaining_views > 0) {
-                    viewsCounter.classList.remove('hidden');
-                    viewsCountValue.textContent = `${data.remaining_views}`;
+                    document.getElementById('viewsCounter').classList.remove('hidden');
+                    document.getElementById('viewsCountValue').textContent = data.remaining_views;
                 }
 
-                // Display based on content type
                 if (data.content_type === 'text') {
-                    // Text content is returned directly in the metadata response
                     document.getElementById('textContent').classList.remove('hidden');
                     document.getElementById('textBody').textContent = data.content;
                     mediaLoading = false;
                     hideLoading();
                 } else if (data.content_type === 'image') {
-                    // For images, use the download_url from response (Cloudinary URL)
                     mediaLoading = true;
                     showLoading();
                     document.getElementById('imageContent').classList.remove('hidden');
-                    if (data.download_url) {
-                        document.getElementById('imageBody').src = addPasswordParam(data.download_url, currentPassword);
-                    } else {
-                        // Fallback to API endpoint if no download_url
-                        const imageUrl = currentPassword
-                            ? `${API_BASE_URL}/api/image/${secretId}?password=${encodeURIComponent(currentPassword)}`
-                            : `${API_BASE_URL}/api/image/${secretId}`;
-                        document.getElementById('imageBody').src = imageUrl;
-                    }
+                    document.getElementById('imageBody').src = mediaUrl('image', data.view_url || data.download_url);
                 } else if (data.content_type === 'video') {
-                    // For videos, use the download_url from response (Cloudinary URL)
                     mediaLoading = true;
                     showLoading();
                     document.getElementById('videoContent').classList.remove('hidden');
                     const videoElement = document.getElementById('videoBody');
-                    if (data.download_url) {
-                        videoElement.src = addPasswordParam(data.download_url, currentPassword);
-                    } else {
-                        // Fallback to API endpoint if no download_url
-                        const videoUrl = currentPassword
-                            ? `${API_BASE_URL}/api/video/${secretId}?password=${encodeURIComponent(currentPassword)}`
-                            : `${API_BASE_URL}/api/video/${secretId}`;
-                        videoElement.src = videoUrl;
-                    }
-                    // Force the video element to load the source
+                    videoElement.src = mediaUrl('video', data.view_url || data.download_url);
                     videoElement.load();
                 } else if (data.content_type === 'file') {
-                    // For files, use the download_url from response (Cloudinary URL)
                     document.getElementById('fileContent').classList.remove('hidden');
-                    document.getElementById('fileInfo').textContent = `File: ${data.file_name}`;
-                    if (data.download_url) {
-                        document.getElementById('downloadBtn').href = addPasswordParam(data.download_url, currentPassword);
-                    } else {
-                        // Fallback to API endpoint if no download_url
-                        const fileUrl = currentPassword
-                            ? `${API_BASE_URL}/api/file/${secretId}?password=${encodeURIComponent(currentPassword)}`
-                            : `${API_BASE_URL}/api/file/${secretId}`;
-                        document.getElementById('downloadBtn').href = fileUrl;
-                    }
-                    document.getElementById('downloadBtn').download = data.file_name;
+                    document.getElementById('fileInfo').textContent = `${data.file_name}`;
+                    const dlBtn = document.getElementById('downloadBtn');
+                    dlBtn.href = downloadMediaUrl('file', data.download_url);
+                    dlBtn.download = data.file_name;
                     mediaLoading = false;
                     hideLoading();
                 }
-
             } catch (error) {
-                alert('Error loading secret: ' + error.message);
                 window.location.href = '/expired';
             }
         }
 
-        // Media load handlers to hide spinner when content is ready
         window.addEventListener('load', () => {
             const imageEl = document.getElementById('imageBody');
             const videoEl = document.getElementById('videoBody');
-
             if (imageEl) {
-                imageEl.addEventListener('load', () => {
-                    mediaLoading = false;
-                    hideLoading();
-                });
-                imageEl.addEventListener('error', () => {
-                    mediaLoading = false;
-                    hideLoading();
-                });
+                imageEl.addEventListener('load', () => { mediaLoading = false; hideLoading(); });
+                imageEl.addEventListener('error', () => { mediaLoading = false; hideLoading(); });
             }
-
             if (videoEl) {
-                // loadeddata fires when enough data is available to start playback
-                videoEl.addEventListener('loadeddata', () => {
-                    mediaLoading = false;
-                    hideLoading();
-                });
-                videoEl.addEventListener('error', () => {
-                    mediaLoading = false;
-                    hideLoading();
-                });
+                videoEl.addEventListener('loadeddata', () => { mediaLoading = false; hideLoading(); });
+                videoEl.addEventListener('error', () => { mediaLoading = false; hideLoading(); });
             }
-
-            // Auto-load on page load (after handlers are ready)
             init();
         });
 
-        // Copy to clipboard function
         async function copyToClipboard() {
-            const textBody = document.getElementById('textBody');
-            const copyButtonText = document.getElementById('copyButtonText');
-
+            const copyBtn = document.getElementById('copyButtonText');
             try {
-                await navigator.clipboard.writeText(textBody.textContent);
-
-                // Visual feedback
-                const originalText = copyButtonText.textContent;
-                copyButtonText.textContent = 'Copied!';
-
-                setTimeout(() => {
-                    copyButtonText.textContent = originalText;
-                }, 2000);
+                await navigator.clipboard.writeText(document.getElementById('textBody').textContent);
+                const original = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => copyBtn.textContent = original, 2000);
             } catch (err) {
-                console.error('Failed to copy text: ', err);
-                alert('Failed to copy to clipboard');
+                alert('Failed to copy');
             }
         }
 
-        // Allow Enter key to submit password
         document.getElementById('passwordInput')?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                verifyPassword();
-            }
+            if (e.key === 'Enter') verifyPassword();
         });
     </script>
 </body>
-
 </html>
