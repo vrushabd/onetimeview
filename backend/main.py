@@ -63,7 +63,7 @@ app.add_middleware(
         "http://127.0.0.1:8000",
         "https://onetimeview.app",
         "https://www.onetimeview.app",
-        "https://onetimeview-1.onrender.com"
+        "https://onetimeview-kdzc.onrender.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],
