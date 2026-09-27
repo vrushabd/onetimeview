@@ -3,6 +3,7 @@ import uuid
 import logging
 import traceback
 from io import BytesIO
+from urllib.parse import urlparse
 
 import boto3
 from botocore.exceptions import ClientError
@@ -15,13 +16,32 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+def _get_b2_endpoint_url():
+    endpoint = os.getenv("B2_ENDPOINT_URL")
+    if not endpoint:
+        return endpoint
+
+    endpoint = endpoint.strip()
+    if "://" not in endpoint:
+        endpoint = f"https://{endpoint}"
+
+    parsed = urlparse(endpoint)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        raise RuntimeError(
+            "Invalid B2_ENDPOINT_URL. Use a full Backblaze S3 endpoint, "
+            "for example: https://s3.us-east-005.backblazeb2.com"
+        )
+
+    return endpoint.rstrip("/")
+
+
 def _get_client():
     """Create and return a boto3 S3 client configured for Backblaze B2."""
     load_dotenv(find_dotenv(usecwd=True), override=True)
     _require_b2_config()
     return boto3.client(
         "s3",
-        endpoint_url=os.getenv("B2_ENDPOINT_URL"),
+        endpoint_url=_get_b2_endpoint_url(),
         aws_access_key_id=os.getenv("B2_KEY_ID"),
         aws_secret_access_key=os.getenv("B2_APP_KEY"),
         config=Config(signature_version="s3v4"),
@@ -33,6 +53,7 @@ def _require_b2_config():
     missing = [name for name in required if not os.getenv(name)]
     if missing:
         raise RuntimeError(f"Backblaze B2 is not configured. Missing: {', '.join(missing)}")
+    _get_b2_endpoint_url()
 
 
 def upload_file(file_obj, resource_type="raw", original_filename=None):
@@ -43,7 +64,7 @@ def upload_file(file_obj, resource_type="raw", original_filename=None):
     """
     try:
         _require_b2_config()
-        b2_endpoint = os.getenv("B2_ENDPOINT_URL")
+        b2_endpoint = _get_b2_endpoint_url()
         b2_bucket = os.getenv("B2_BUCKET_NAME")
         logger.info(f"B2 upload — endpoint: {b2_endpoint}, bucket: {b2_bucket}")
 

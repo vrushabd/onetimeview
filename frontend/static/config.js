@@ -1,7 +1,7 @@
 // Configuration - Auto-detect environment
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? `http://${window.location.hostname}:${window.location.port || 8000}`
-    : 'https://onetimeview-kdzc.onrender.com';
+    : 'https://onetimeview-3h3s.onrender.com';
 
 // Helper function to build API URLs
 function apiUrl(path) {
