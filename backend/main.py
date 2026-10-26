@@ -46,14 +46,33 @@ app = FastAPI(
     title="OneTimeView API",
     description="Secure one-time message and file sharing API",
     version="1.0.0",
-    docs_url="/docs",  # Swagger UI
-    redoc_url="/redoc"  # ReDoc
+    docs_url="/docs",
+    redoc_url="/redoc"
 )
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    from fastapi.responses import JSONResponse
+    import logging
+    logging.error(f"Unhandled exception: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An unexpected error occurred. Please try again or contact support."},
+    )
 
 # Rate limiting
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    from fastapi.responses import JSONResponse
+    return JSONResponse(
+        status_code=429,
+        content={"detail": "Too many requests. Please wait a minute before trying again."},
+    )
+
+app.add_exception_handler(RateLimitExceeded, rate_limit_handler)
 
 # CORS configuration - Allow Vercel frontend
 app.add_middleware(
@@ -277,18 +296,18 @@ async def create_secret(
     
     # Validate content type
     if content_type not in ["text", "image", "video", "file"]:
-        raise HTTPException(status_code=400, detail="Invalid content type")
+        raise HTTPException(status_code=400, detail="Invalid content type. Supported types: text, image, video, file.")
     
     # For text secrets, content is required
     if content_type == "text":
         if not content:
-            raise HTTPException(status_code=400, detail="Content is required for text secrets")
+            raise HTTPException(status_code=400, detail="Message content is required for text secrets.")
         content = sanitize_text(content)
     
     # For file-based secrets, file is required
     if content_type in ["image", "video", "file"]:
         if not file:
-            raise HTTPException(status_code=400, detail="File is required")
+            raise HTTPException(status_code=400, detail="A file is required for image, video, or file secrets.")
     
     # Validate and set max_views
     if max_views is None or max_views < 1:
@@ -323,7 +342,7 @@ async def create_secret(
         if file_size > max_size:
             raise HTTPException(
                 status_code=413, 
-                detail=f"File size exceeds limit ({max_size / 1024 / 1024}MB)"
+                detail=f"File is too large. Maximum allowed size is {max_size // 1024 // 1024} MB."
             )
         
         # Keep this value for legacy DB/API compatibility.
@@ -339,7 +358,7 @@ async def create_secret(
                 original_filename=file.filename
             )
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"File upload failed. Please try again. ({str(e)})")
         
         secret.cloud_url = upload_result["secure_url"]
         secret.cloud_public_id = upload_result["public_id"]
@@ -459,16 +478,15 @@ async def verify_password_endpoint(
     secret = db.query(Secret).filter(Secret.id == secret_id).first()
     
     if not secret:
-        raise HTTPException(status_code=404, detail="Secret not found")
+        raise HTTPException(status_code=404, detail="Secret not found or has already been deleted.")
     
     # Check view-based expiry first
     if secret.view_count >= secret.max_views:
-        # Already fully consumed
-        raise HTTPException(status_code=404, detail="Secret has already been viewed")
+        raise HTTPException(status_code=404, detail="This secret has already been viewed and was deleted.")
     
     # Check time-based expiry
     if secret.expiry_time and datetime.utcnow() > secret.expiry_time:
-        raise HTTPException(status_code=404, detail="Secret has expired")
+        raise HTTPException(status_code=404, detail="This secret has expired and was deleted.")
     
     # Compute remaining views without consuming
     remaining_views = max(secret.max_views - secret.view_count, 0)
@@ -518,9 +536,9 @@ async def get_secret(
     # Verify password if required
     if secret.password_hash:
         if not password:
-            raise HTTPException(status_code=401, detail="Password required")
+            raise HTTPException(status_code=401, detail="This secret is password protected. Please provide a password to view it.")
         if not verify_password(password, secret.password_hash):
-            raise HTTPException(status_code=401, detail="Invalid password")
+            raise HTTPException(status_code=401, detail="Incorrect password. Please try again.")
             
 
     

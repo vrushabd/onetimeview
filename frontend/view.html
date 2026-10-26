@@ -56,6 +56,23 @@
             user-select: none;
             -webkit-touch-callout: none;
         }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); }
+        }
+        .countdown-urgent { animation: pulse-ring 2s infinite; }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .spinner {
+            width: 20px; height: 20px;
+            border: 2px solid #3f3f46;
+            border-top-color: #ededed;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
     </style>
 </head>
 
@@ -92,7 +109,8 @@
             <!-- Reveal Button Section -->
             <div id="revealSection" class="hidden bg-surface border border-card-border rounded-xl p-10 mb-6 text-center animate-fade-in-up">
                 <h3 class="text-2xl font-medium text-white mb-2">Secret Ready</h3>
-                <p class="text-text-secondary text-sm mb-8" id="revealInfo">One-time view only</p>
+                <p class="text-text-secondary text-sm mb-2" id="revealInfo">One-time view only</p>
+                <p class="text-xs text-text-muted mb-8" id="expiryCountdown"></p>
 
                 <button onclick="revealSecret()" class="bg-white text-black font-medium py-3 px-8 rounded-md hover:bg-gray-100 transition-colors inline-flex items-center gap-2">
                     Reveal Secret
@@ -150,7 +168,10 @@
 
             <!-- Loading Spinner -->
             <div id="loadingSpinner" class="hidden text-center py-20">
-                <p class="text-text-secondary font-mono text-sm">Decrypting secure content...</p>
+                <div class="flex items-center justify-center gap-3 text-text-secondary font-mono text-sm">
+                    <span class="spinner"></span>
+                    <span>Decrypting secure content...</span>
+                </div>
             </div>
         </div>
     </div>
@@ -256,38 +277,74 @@
                 const data = await response.json();
                 if (data.verified === true) {
                     if (data.remaining_views <= 1) {
-                        alert('Warning: This secret can be viewed only one time. It will be deleted immediately after this view.');
+                        showToast('Warning: This is a one-time link. It will be deleted after this view.', 'info');
                     }
-                    await viewSecret();
+                    showRevealButton(data.remaining_views, data.content_type);
                 } else {
                     hideLoading();
                     document.getElementById('passwordForm').classList.remove('hidden');
+                    document.getElementById('passwordInput').focus();
                 }
             } catch (error) {
                 document.getElementById('loadingSpinner').classList.remove('hidden');
                 document.getElementById('loadingSpinner').innerHTML = `
-                    <div class="text-destructive mb-2">Network Error</div>
-                    <button onclick="window.location.reload()" class="bg-white text-black px-4 py-2 rounded-md">Retry</button>
+                    <div class="flex flex-col items-center gap-4">
+                        <div class="text-destructive font-medium">Network Error</div>
+                        <p class="text-text-secondary text-sm">Could not connect to server. Check your connection.</p>
+                        <button onclick="window.location.reload()" class="bg-white text-black px-5 py-2 rounded-md text-sm font-medium">Retry</button>
+                    </div>
                 `;
             }
         }
 
-        function showRevealButton(remainingViews, contentType) {
+        function showRevealButton(remainingViews, contentType, expiryTime) {
             const revealSection = document.getElementById('revealSection');
             const revealInfo = document.getElementById('revealInfo');
+            const countdown = document.getElementById('expiryCountdown');
             let contentTypeLabel = contentType === 'text' ? 'message' : contentType;
 
             if (remainingViews <= 1) {
-                revealInfo.innerHTML = `Warning: This secret can be viewed only one time.`;
+                revealInfo.innerHTML = `<span style="color:#ef4444">⚠ Warning: This secret can only be viewed <strong>one time</strong>.</span>`;
             } else {
-                revealInfo.innerHTML = `This ${contentTypeLabel} has ${remainingViews} view${remainingViews !== 1 ? 's' : ''} remaining.`;
+                revealInfo.innerHTML = `This ${contentTypeLabel} has <strong style="color:#ededed">${remainingViews} view${remainingViews !== 1 ? 's' : ''}</strong> remaining.`;
             }
+
+            // Start countdown if expiry time known
+            if (expiryTime) {
+                const expiry = new Date(expiryTime);
+                function updateCountdown() {
+                    const now = new Date();
+                    const diff = expiry - now;
+                    if (diff <= 0) { countdown.textContent = 'This secret has expired.'; return; }
+                    const h = Math.floor(diff / 3600000);
+                    const m = Math.floor((diff % 3600000) / 60000);
+                    const s = Math.floor((diff % 60000) / 1000);
+                    const parts = [];
+                    if (h > 0) parts.push(`${h}h`);
+                    if (m > 0 || h > 0) parts.push(`${m}m`);
+                    parts.push(`${s}s`);
+                    countdown.textContent = `Expires in ${parts.join(' ')}`;
+                    if (diff < 60000) countdown.style.color = '#ef4444';
+                }
+                updateCountdown();
+                const timer = setInterval(() => {
+                    const diff = new Date(expiryTime) - new Date();
+                    if (diff <= 0) { clearInterval(timer); countdown.textContent = 'Expired'; return; }
+                    updateCountdown();
+                }, 1000);
+            }
+
             revealSection.classList.remove('hidden');
+            hideLoading();
         }
 
         async function verifyPassword() {
             const password = document.getElementById('passwordInput').value;
+            const unlockBtn = document.querySelector('#passwordForm button');
+            if (!password) { showToast('Please enter a password', 'error'); return; }
             try {
+                unlockBtn.disabled = true;
+                unlockBtn.textContent = 'Verifying...';
                 const response = await fetch(`${API_BASE_URL}/api/secrets/${secretId}/verify`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -299,14 +356,20 @@
                     currentPassword = password;
                     document.getElementById('passwordForm').classList.add('hidden');
                     document.getElementById('passwordError').classList.add('hidden');
-                    if (data.remaining_views <= 1) alert('Warning: This secret can be viewed only one time.');
-                    showLoading();
-                    await viewSecret();
+                    if (data.remaining_views <= 1) {
+                        showToast('Warning: This is a one-time link. It deletes after this view.', 'info');
+                    }
+                    showRevealButton(data.remaining_views, data.content_type, data.expires_at);
                 } else {
                     document.getElementById('passwordError').classList.remove('hidden');
+                    document.getElementById('passwordInput').style.borderColor = '#ef4444';
+                    setTimeout(() => document.getElementById('passwordInput').style.borderColor = '', 2000);
                 }
             } catch (error) {
-                alert('Error verifying password.');
+                showToast('Error verifying password. Please try again.', 'error');
+            } finally {
+                unlockBtn.disabled = false;
+                unlockBtn.textContent = 'Unlock';
             }
         }
 
@@ -408,10 +471,54 @@
                 await navigator.clipboard.writeText(document.getElementById('textBody').textContent);
                 const original = copyBtn.textContent;
                 copyBtn.textContent = 'Copied!';
+                showToast('Copied to clipboard!', 'success');
                 setTimeout(() => copyBtn.textContent = original, 2000);
             } catch (err) {
-                alert('Failed to copy');
+                showToast('Failed to copy. Please select and copy manually.', 'error');
             }
+        }
+
+        function showToast(message, type = 'success') {
+            const existing = document.querySelectorAll('.otv-toast');
+            existing.forEach(t => t.remove());
+
+            const icons = {
+                success: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
+                error: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`,
+                info: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`
+            };
+            const colors = { success: '#10b981', error: '#ef4444', info: '#3b82f6' };
+
+            const toast = document.createElement('div');
+            toast.className = 'otv-toast';
+            toast.style.cssText = `
+                position: fixed; top: 20px; right: 20px; z-index: 9999;
+                display: flex; align-items: center; gap: 10px;
+                background: #1a1a1a; border: 1px solid #2a2a2a;
+                color: #ededed; padding: 12px 16px; border-radius: 10px;
+                font-size: 14px; font-weight: 500; font-family: inherit;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+                transform: translateX(120%); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+                opacity: 0; max-width: 360px;
+            `;
+            const iconSpan = document.createElement('span');
+            iconSpan.style.cssText = `color: ${colors[type] || colors.success}; flex-shrink: 0; display: flex; align-items: center;`;
+            iconSpan.innerHTML = icons[type] || icons.success;
+            const msgSpan = document.createElement('span');
+            msgSpan.textContent = message;
+            toast.appendChild(iconSpan);
+            toast.appendChild(msgSpan);
+            document.body.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.style.transform = 'translateX(0)';
+                toast.style.opacity = '1';
+            });
+            setTimeout(() => {
+                toast.style.transform = 'translateX(120%)';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
         }
 
         document.getElementById('passwordInput')?.addEventListener('keypress', (e) => {
