@@ -33,6 +33,9 @@ class Secret(Base):
     cloud_url = Column(String(500), nullable=True)
     cloud_public_id = Column(String(255), nullable=True)
     cloud_resource_type = Column(String(20), nullable=True)  # image, video, raw
+
+    # Burn-after-reading webhook: called once when the secret is first viewed
+    webhook_url = Column(String(500), nullable=True)
     
     def is_expired(self):
         """Check if secret has expired"""

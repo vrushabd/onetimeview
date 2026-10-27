@@ -8,6 +8,7 @@ from pathlib import Path
 import os
 import asyncio
 import httpx
+import logging
 from typing import Optional
 
 from backend.database import get_db, init_db
@@ -26,6 +27,8 @@ from dotenv import find_dotenv, load_dotenv
 
 load_dotenv(find_dotenv(usecwd=True))
 
+logger = logging.getLogger(__name__)
+
 # Helper to determine public API base URL (avoids localhost in shared links)
 def get_public_base_url(request: Request) -> str:
     env_base = os.getenv("API_BASE_URL")
@@ -40,6 +43,28 @@ def get_frontend_base_url(request: Request) -> str:
     if hostname in {"localhost", "127.0.0.1"}:
         return request_base
     return os.getenv("FRONTEND_URL", request_base).rstrip("/")
+
+
+async def _fire_webhook(webhook_url: str, secret_id: str, content_type: str, viewed_at: str):
+    """
+    POST a burn-after-reading notification to the creator's webhook URL.
+    Fires once when the secret is first viewed. Errors are logged but never
+    propagated — we must not block the viewer's response.
+    """
+    import logging as _logging
+    _log = _logging.getLogger(__name__)
+    payload = {
+        "event": "secret_viewed",
+        "secret_id": secret_id,
+        "content_type": content_type,
+        "viewed_at": viewed_at,
+    }
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.post(webhook_url, json=payload)
+            _log.info(f"Webhook fired for secret {secret_id} → {webhook_url} [{resp.status_code}]")
+    except Exception as exc:
+        _log.warning(f"Webhook failed for secret {secret_id} → {webhook_url}: {exc}")
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -289,6 +314,7 @@ async def create_secret(
     expiry_minutes: Optional[int] = Form(None),
     max_views: Optional[int] = Form(1),
     is_premium: bool = Form(False),
+    webhook_url: Optional[str] = Form(None),
     file: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db)
 ):
@@ -314,12 +340,19 @@ async def create_secret(
         max_views = 1
     if max_views > 100:
         max_views = 100
+
+    # Validate webhook URL if provided (must be http/https)
+    if webhook_url:
+        webhook_url = webhook_url.strip()
+        if not (webhook_url.startswith("http://") or webhook_url.startswith("https://")):
+            raise HTTPException(status_code=400, detail="Webhook URL must start with http:// or https://")
     
     # Create secret object
     secret = Secret(
         content_type=content_type,
         max_views=max_views,
-        is_premium=is_premium
+        is_premium=is_premium,
+        webhook_url=webhook_url or None,
     )
     
     # Handle text content
@@ -422,6 +455,11 @@ async def create_secret_from_storage(
     if max_views > 100:
         max_views = 100
 
+    # Validate webhook URL if provided
+    webhook_url = (body.webhook_url or "").strip() or None
+    if webhook_url and not (webhook_url.startswith("http://") or webhook_url.startswith("https://")):
+        raise HTTPException(status_code=400, detail="Webhook URL must start with http:// or https://")
+
     secret = Secret(
         content_type=body.content_type,
         max_views=max_views,
@@ -431,6 +469,7 @@ async def create_secret_from_storage(
         cloud_url=body.cloud_url,
         cloud_public_id=body.cloud_public_id,
         cloud_resource_type=body.cloud_resource_type,
+        webhook_url=webhook_url,
     )
 
     # Handle password
@@ -562,6 +601,17 @@ async def get_secret(
     
     # Refresh to get the new view_count
     db.refresh(secret)
+
+    # Fire burn-after-reading webhook (non-blocking) if configured
+    if secret.webhook_url:
+        asyncio.create_task(
+            _fire_webhook(
+                secret.webhook_url,
+                secret_id,
+                secret.content_type,
+                datetime.utcnow().isoformat() + "Z",
+            )
+        )
     
     # Calculate remaining views
     remaining_views = secret.max_views - secret.view_count

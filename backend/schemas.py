@@ -12,7 +12,8 @@ class SecretCreate(BaseModel):
     expiry_minutes: Optional[int] = None # Minutes until expiration
     max_views: Optional[int] = Field(default=1, ge=1, le=100)  # Number of times secret can be viewed
     is_premium: bool = False
-    
+    webhook_url: Optional[str] = None  # Called once when the secret is viewed (burn notification)
+
     @field_validator('content')
     def validate_content(cls, v, info):
         if info.data.get('content_type') == 'text' and not v:
@@ -33,6 +34,7 @@ class FileSecretCreate(BaseModel):
     expiry_minutes: Optional[int] = None
     max_views: Optional[int] = Field(default=1, ge=1, le=100)
     is_premium: bool = False
+    webhook_url: Optional[str] = None  # Called once when the secret is viewed (burn notification)
 
 # Keep old name as an alias for backward compatibility with older imports/routes.
 CloudinarySecretCreate = FileSecretCreate
