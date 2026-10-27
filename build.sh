@@ -12,4 +12,7 @@ echo "📁 Creating necessary directories..."
 mkdir -p uploads
 touch uploads/.gitkeep
 
+echo "🔄 Running database migrations..."
+python migrate.py || echo "⚠️ Migration script completed with warnings or DB unreachable during build"
+
 echo "✅ Build completed successfully!"
