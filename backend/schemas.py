@@ -70,3 +70,20 @@ class SecretView(BaseModel):
 class PasswordVerify(BaseModel):
     """Schema for password verification"""
     password: str
+
+
+class ReportCreate(BaseModel):
+    """Schema for submitting a bug/issue report"""
+    page: str = Field(..., min_length=1, max_length=100, description="Page or component with the issue")
+    issue_type: str = Field(..., pattern="^(create|view|file_upload|expired|navigation|performance|other)$")
+    description: str = Field(..., min_length=10, max_length=2000, description="Description of the problem")
+    contact_email: Optional[str] = Field(default=None, max_length=255)
+    url: Optional[str] = Field(default=None, max_length=500)
+    user_agent: Optional[str] = Field(default=None, max_length=500)
+
+
+class ReportResponse(BaseModel):
+    """Response after submitting a report"""
+    id: str
+    status: str
+    message: str

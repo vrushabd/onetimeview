@@ -12,8 +12,8 @@ import logging
 from typing import Optional
 
 from backend.database import get_db, init_db
-from backend.models import Secret
-from backend.schemas import SecretCreate, SecretResponse, SecretView, PasswordVerify, FileSecretCreate
+from backend.models import Secret, Report
+from backend.schemas import SecretCreate, SecretResponse, SecretView, PasswordVerify, FileSecretCreate, ReportCreate, ReportResponse
 from backend.security import (
     hash_password, verify_password, sanitize_text, 
     get_mime_type, validate_file_type
@@ -259,6 +259,47 @@ async def serve_vercel_analytics_stub():
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy"}
+
+
+# ============================================================================
+# REPORT API — Users can submit bug/issue reports saved to Supabase
+# ============================================================================
+
+@app.post("/api/report", response_model=ReportResponse)
+@limiter.limit("5/minute")
+async def submit_report(
+    request: Request,
+    report_data: ReportCreate,
+    db: Session = Depends(get_db)
+):
+    """
+    Submit a bug or issue report. Saved directly to the Supabase `reports` table.
+    Rate-limited to 5 per minute per IP to prevent spam.
+    """
+    try:
+        report = Report(
+            page=report_data.page,
+            issue_type=report_data.issue_type,
+            description=report_data.description,
+            contact_email=report_data.contact_email,
+            url=report_data.url,
+            user_agent=report_data.user_agent or request.headers.get("user-agent", ""),
+            status="open",
+        )
+        db.add(report)
+        db.commit()
+        db.refresh(report)
+        logger.info(f"📋 New report submitted: id={report.id} page={report.page} type={report.issue_type}")
+        return ReportResponse(
+            id=report.id,
+            status="open",
+            message="Thank you for your report! We'll look into it shortly."
+        )
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to save report: {e}")
+        raise HTTPException(status_code=500, detail="Failed to submit report. Please try again.")
+
 
 
 @app.get("/api/test-b2")

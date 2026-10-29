@@ -4,6 +4,7 @@ import uuid
 from backend.database import Base
 
 
+
 import secrets
 import string
 
@@ -44,4 +45,19 @@ class Secret(Base):
         if self.expiry_time and datetime.utcnow() > self.expiry_time:
             return True
         return False
-    
+
+
+class Report(Base):
+    """Model for user-submitted bug/issue reports"""
+    __tablename__ = "reports"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    page = Column(String(100), nullable=False)           # Which page/component had the issue
+    issue_type = Column(String(50), nullable=False)      # e.g. "broken", "slow", "error", "other"
+    description = Column(Text, nullable=False)           # User's description
+    contact_email = Column(String(255), nullable=True)   # Optional contact email
+    user_agent = Column(String(500), nullable=True)      # Browser info
+    url = Column(String(500), nullable=True)             # Page URL where issue occurred
+    status = Column(String(20), default="open")          # open, acknowledged, resolved
+    created_at = Column(DateTime, default=datetime.utcnow)
+
