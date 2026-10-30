@@ -107,6 +107,7 @@ app.add_middleware(
         "http://127.0.0.1:8000",
         "https://onetimeview.app",
         "https://www.onetimeview.app",
+        "https://onetimeview.onrender.com",
         "https://onetimeview-3h3s.onrender.com"
     ],
     allow_credentials=True,
@@ -266,7 +267,6 @@ async def health_check():
 # ============================================================================
 
 @app.post("/api/report", response_model=ReportResponse)
-@limiter.limit("5/minute")
 async def submit_report(
     request: Request,
     report_data: ReportCreate,
@@ -274,7 +274,6 @@ async def submit_report(
 ):
     """
     Submit a bug or issue report. Saved directly to the Supabase `reports` table.
-    Rate-limited to 5 per minute per IP to prevent spam.
     """
     try:
         report = Report(

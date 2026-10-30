@@ -7,13 +7,13 @@
   'use strict';
 
   const ISSUE_TYPES = [
-    { value: 'create',      label: '📝 Secret creation not working' },
-    { value: 'view',        label: '👁️  Cannot view / unlock a secret' },
-    { value: 'file_upload', label: '📎 File upload issue' },
-    { value: 'expired',     label: '⏰ Expired page shown incorrectly' },
-    { value: 'navigation',  label: '🔗 Broken link / navigation error' },
-    { value: 'performance', label: '🐢 Page is very slow' },
-    { value: 'other',       label: '🔧 Something else' },
+    { value: 'create',      label: 'Secret creation not working' },
+    { value: 'view',        label: 'Cannot view / unlock a secret' },
+    { value: 'file_upload', label: 'File upload issue' },
+    { value: 'expired',     label: 'Expired page shown incorrectly' },
+    { value: 'navigation',  label: 'Broken link / navigation error' },
+    { value: 'performance', label: 'Page is very slow' },
+    { value: 'other',       label: 'Something else' },
   ];
 
   function injectStyles() {
@@ -370,9 +370,24 @@
       };
 
       try {
-        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API_BASE_URL)
-          ? APP_CONFIG.API_BASE_URL
-          : '';
+        let apiBase = '';
+        if (typeof window !== 'undefined') {
+          if (window.API_BASE_URL) {
+            apiBase = window.API_BASE_URL.replace(/\/$/, '');
+          } else if (typeof apiUrl === 'function') {
+            try {
+              apiBase = apiUrl('').replace(/\/$/, '');
+            } catch (e) {}
+          } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            apiBase = `http://${window.location.hostname}:${window.location.port || 8000}`;
+          } else {
+            apiBase = 'https://onetimeview.onrender.com';
+          }
+        }
+        if (!apiBase) {
+          apiBase = 'https://onetimeview.onrender.com';
+        }
+
         const res = await fetch(`${apiBase}/api/report`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -409,3 +424,4 @@
     init();
   }
 })();
+
