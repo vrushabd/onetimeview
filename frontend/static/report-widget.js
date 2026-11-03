@@ -7,13 +7,13 @@
   'use strict';
 
   const ISSUE_TYPES = [
-    { value: 'create',      label: 'Secret creation not working' },
-    { value: 'view',        label: 'Cannot view / unlock a secret' },
+    { value: 'create', label: 'Secret creation not working' },
+    { value: 'view', label: 'Cannot view / unlock a secret' },
     { value: 'file_upload', label: 'File upload issue' },
-    { value: 'expired',     label: 'Expired page shown incorrectly' },
-    { value: 'navigation',  label: 'Broken link / navigation error' },
+    { value: 'expired', label: 'Expired page shown incorrectly' },
+    { value: 'navigation', label: 'Broken link / navigation error' },
     { value: 'performance', label: 'Page is very slow' },
-    { value: 'other',       label: 'Something else' },
+    { value: 'other', label: 'Something else' },
   ];
 
   function injectStyles() {
@@ -203,7 +203,7 @@
   }
 
   function buildModal() {
-    // Floating trigger button
+
     const btn = document.createElement('button');
     btn.id = 'otv-report-btn';
     btn.setAttribute('aria-label', 'Report a problem');
@@ -286,15 +286,15 @@
   }
 
   function bindEvents() {
-    const btn      = document.getElementById('otv-report-btn');
-    const overlay  = document.getElementById('otv-report-overlay');
+    const btn = document.getElementById('otv-report-btn');
+    const overlay = document.getElementById('otv-report-overlay');
     const closeBtn = document.getElementById('otv-close-btn');
-    const submitBtn= document.getElementById('otv-submit-btn');
+    const submitBtn = document.getElementById('otv-submit-btn');
     const textarea = document.getElementById('otv-description');
-    const charCount= document.getElementById('otv-char-count');
+    const charCount = document.getElementById('otv-char-count');
     const errorMsg = document.getElementById('otv-error-msg');
     const successV = document.getElementById('otv-report-success');
-    const formV    = document.getElementById('otv-report-form-view');
+    const formV = document.getElementById('otv-report-form-view');
     const closeSuc = document.getElementById('otv-close-success');
 
     function openModal() {
@@ -344,9 +344,9 @@
 
     // Submit
     submitBtn.addEventListener('click', async function () {
-      const issueType   = document.getElementById('otv-issue-type').value;
+      const issueType = document.getElementById('otv-issue-type').value;
       const description = textarea.value.trim();
-      const email       = document.getElementById('otv-email').value.trim();
+      const email = document.getElementById('otv-email').value.trim();
 
       errorMsg.style.display = 'none';
 
@@ -361,12 +361,12 @@
       submitBtn.textContent = 'Submitting…';
 
       const payload = {
-        page:          window.location.pathname || '/',
-        issue_type:    issueType,
-        description:   description,
+        page: window.location.pathname || '/',
+        issue_type: issueType,
+        description: description,
         contact_email: email || null,
-        url:           window.location.href,
-        user_agent:    navigator.userAgent,
+        url: window.location.href,
+        user_agent: navigator.userAgent,
       };
 
       try {
@@ -377,7 +377,7 @@
           } else if (typeof apiUrl === 'function') {
             try {
               apiBase = apiUrl('').replace(/\/$/, '');
-            } catch (e) {}
+            } catch (e) { }
           } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             apiBase = `http://${window.location.hostname}:${window.location.port || 8000}`;
           } else {

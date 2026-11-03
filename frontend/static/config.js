@@ -82,6 +82,32 @@ function copyHistoryLink(url) {
         alert('Link copied to clipboard!');
     }
 }
+
+function copyHistoryLinkWithPassword(id) {
+    const history = JSON.parse(localStorage.getItem('secretHistory') || '[]');
+    const secret = history.find(s => s.id === id);
+    if (!secret) return;
+
+    let message = '';
+    if (secret.password) {
+        message = `Here is your secure one-time link:\n${secret.url}\n\nPassphrase to unlock:\n${secret.password}\n\n(Note: This secret will self-destruct once viewed.)`;
+    } else {
+        message = `Here is your secure one-time link:\n${secret.url}\n\n(Note: This secret will self-destruct once viewed.)`;
+    }
+
+    const tempInput = document.createElement('textarea');
+    tempInput.value = message;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+
+    if (typeof showToast === 'function') {
+        showToast('Link and passphrase copied to clipboard!');
+    } else {
+        alert('Link and passphrase copied to clipboard!');
+    }
+}
 function showPassword(id) {
     const history = JSON.parse(localStorage.getItem('secretHistory') || '[]');
     const secret = history.find(s => s.id === id);

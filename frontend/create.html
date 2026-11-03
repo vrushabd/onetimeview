@@ -115,6 +115,27 @@
                     </button>
                 </div>
 
+                <!-- Passphrase Helper (visible when a passphrase is set) -->
+                <div id="passphraseContainer" class="hidden mb-6 p-4 rounded-lg bg-surface-raised border border-card-border">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Passphrase Required</span>
+                        <span class="text-xs text-text-muted">Recipient needs this to unlock</span>
+                    </div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <input type="text" id="createdPasswordDisplay" readonly class="w-full font-mono text-sm bg-background border border-card-border rounded px-3 py-2 text-white select-all">
+                        <button type="button" onclick="copyPasswordOnly()" class="px-3 py-2 text-xs font-medium bg-white/5 hover:bg-white/10 text-white rounded border border-card-border transition-colors whitespace-nowrap">
+                            Copy Passphrase
+                        </button>
+                    </div>
+                    <button type="button" onclick="copyLinkAndPassphrase()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-sm font-semibold bg-white text-black hover:bg-neutral-100 transition-colors shadow-sm">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        Copy Link & Passphrase Together
+                    </button>
+                </div>
+
                 <div class="text-sm text-text-secondary mb-6" id="expiryInfo"></div>
 
                 <!-- Share buttons -->
@@ -446,10 +467,25 @@
             }
         });
 
-        function showSuccess(data, password) {
+        let currentSecretPassword = '';
+
+        function showSuccess(data, password = '') {
+            currentSecretPassword = password || '';
             document.getElementById('secretForm').classList.add('hidden');
             document.getElementById('successMessage').classList.remove('hidden');
             document.getElementById('secretLink').value = data.url;
+
+            const passContainer = document.getElementById('passphraseContainer');
+            const passDisplay = document.getElementById('createdPasswordDisplay');
+            if (passContainer && passDisplay) {
+                if (currentSecretPassword) {
+                    passContainer.classList.remove('hidden');
+                    passDisplay.value = currentSecretPassword;
+                } else {
+                    passContainer.classList.add('hidden');
+                    passDisplay.value = '';
+                }
+            }
 
             let viewText = data.max_views === 1 ? 'first view' : `${data.max_views} views`;
             if (data.expires_at) {
@@ -457,7 +493,7 @@
             } else {
                 document.getElementById('expiryInfo').textContent = `Will be deleted after ${viewText}`;
             }
-            saveSecretToHistory(data.url, !!password, password);
+            saveSecretToHistory(data.url, !!currentSecretPassword, currentSecretPassword);
 
             // Generate QR code
             const qrContainer = document.getElementById('qrCodeContainer');
@@ -487,14 +523,60 @@
             }
         }
 
+        function copyPasswordOnly() {
+            if (!currentSecretPassword) return;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(currentSecretPassword).then(() => showToast('Passphrase copied to clipboard!'));
+            } else {
+                const passDisplay = document.getElementById('createdPasswordDisplay');
+                if (passDisplay) {
+                    passDisplay.select();
+                    document.execCommand('copy');
+                }
+                showToast('Passphrase copied to clipboard!');
+            }
+        }
+
+        function copyLinkAndPassphrase() {
+            const link = document.getElementById('secretLink').value;
+            if (!link) return;
+
+            let message = '';
+            if (currentSecretPassword) {
+                message = `Here is your secure one-time link:\n${link}\n\nPassphrase to unlock:\n${currentSecretPassword}\n\n(Note: This secret will self-destruct once viewed.)`;
+            } else {
+                message = `Here is your secure one-time link:\n${link}\n\n(Note: This secret will self-destruct once viewed.)`;
+            }
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(message).then(() => showToast('Link and passphrase copied to clipboard!'));
+            } else {
+                const temp = document.createElement('textarea');
+                temp.value = message;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                document.body.removeChild(temp);
+                showToast('Link and passphrase copied to clipboard!');
+            }
+        }
+
         function shareViaWhatsApp() {
             const url = document.getElementById('secretLink').value;
-            window.open(`https://wa.me/?text=${encodeURIComponent('View this one-time secret: ' + url)}`, '_blank');
+            let text = `View this one-time secret: ${url}`;
+            if (currentSecretPassword) {
+                text += `\nPassphrase: ${currentSecretPassword}`;
+            }
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
         }
 
         function shareViaTelegram() {
             const url = document.getElementById('secretLink').value;
-            window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent('View this one-time secret')}`, '_blank');
+            let text = 'View this one-time secret';
+            if (currentSecretPassword) {
+                text += ` (Passphrase: ${currentSecretPassword})`;
+            }
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
         }
 
         function showToast(message, type = 'success') {
@@ -543,24 +625,9 @@
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('success') === 'true' && urlParams.get('url')) {
             const secretUrl = decodeURIComponent(urlParams.get('url'));
-            document.getElementById('secretForm').classList.add('hidden');
-            document.getElementById('successMessage').classList.remove('hidden');
-            document.getElementById('secretLink').value = secretUrl;
-            document.getElementById('expiryInfo').textContent = 'Will be deleted after first view or in 24 hours';
-            saveSecretToHistory(secretUrl, urlParams.get('pwd') === 'true');
-            // Generate QR code for quick-create redirect
-            const qrContainer = document.getElementById('qrCodeContainer');
-            if (qrContainer && typeof QRCode !== 'undefined') {
-                qrContainer.innerHTML = '';
-                new QRCode(qrContainer, {
-                    text: secretUrl,
-                    width: 160,
-                    height: 160,
-                    colorDark: '#000000',
-                    colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.M,
-                });
-            }
+            const savedPassword = sessionStorage.getItem('lastCreatedPassword') || '';
+            sessionStorage.removeItem('lastCreatedPassword');
+            showSuccess({ url: secretUrl, max_views: 1 }, savedPassword);
             window.history.replaceState({}, document.title, '/create');
         }
 
@@ -582,6 +649,11 @@
                     <td class="px-4 py-3 text-text-secondary">${i === 0 ? 'Newest' : (secret.status || 'Active')}</td>
                     <td class="px-4 py-3">
                         <div class="flex items-center gap-3 text-text-secondary">
+                            ${secret.hasPassword && secret.password ? `
+                            <button onclick="copyHistoryLinkWithPassword('${secret.id}')" class="hover:text-white transition-colors" title="Copy link and passphrase together">
+                                Copy with Passphrase
+                            </button>
+                            ` : ``}
                             ${secret.hasPassword ? `<button onclick="showPassword('${secret.id}')" class="hover:text-white">Password</button>` : ``}
                             <button onclick="copyHistoryLink('${secret.url}')" class="hover:text-white">Copy</button>
                             <button onclick="removeHistoryItem('${secret.id}')" class="text-red-400 hover:text-red-300">Delete</button>

@@ -405,6 +405,12 @@
                     window.saveSecretToHistory(data.url, !!password, password);
                 }
 
+                if (password) {
+                    sessionStorage.setItem('lastCreatedPassword', password);
+                } else {
+                    sessionStorage.removeItem('lastCreatedPassword');
+                }
+
                 window.location.href = `/create?success=true&url=${encodeURIComponent(data.url)}&pwd=${!!password}`;
             } catch (error) {
                 showToast(error.message || 'Something went wrong. Please try again.', 'error');
@@ -444,6 +450,11 @@
                     </td>
                     <td class="px-4 py-4">
                         <div class="flex items-center gap-3 text-text-secondary">
+                            ${secret.hasPassword && secret.password ? `
+                            <button onclick="copyHistoryLinkWithPassword('${secret.id}')" class="hover:text-white transition-colors" title="Copy link and passphrase together">
+                                Copy with Passphrase
+                            </button>
+                            ` : ``}
                             ${secret.hasPassword ? `
                             <button onclick="showPassword('${secret.id}')" class="hover:text-white transition-colors">
                                 Password
