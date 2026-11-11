@@ -714,9 +714,9 @@ async def get_secret(
         else:
             # For files/images/videos, we MUST defer deletion
             # The frontend needs to fetch the file URL after this response
-            # We'll set a short expiry (5 mins) as a failsafe
+            # We'll set a short expiry (2 mins) as a failsafe
             # Image serving can trigger deletion; B2 video/file redirects are cleaned by the background task.
-            secret.expiry_time = datetime.utcnow() + timedelta(minutes=5)
+            secret.expiry_time = datetime.utcnow() + timedelta(minutes=2)
             db.commit()
     
     return response

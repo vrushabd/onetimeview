@@ -116,14 +116,44 @@ def upload_file(file_obj, resource_type="raw", original_filename=None):
 
 def delete_file(file_key, resource_type="raw"):
     """
-    Delete a file from Backblaze B2 by its file key.
+    Permanently delete a file from Backblaze B2 by its file key.
+    Deletes all object versions and delete markers so no hidden versions or (2) * marks remain.
     resource_type is kept for API compatibility but unused for B2.
     """
     try:
         _require_b2_config()
         client = _get_client()
-        client.delete_object(Bucket=os.getenv("B2_BUCKET_NAME"), Key=file_key)
-        logger.info(f"B2 delete successful — key: {file_key}")
+        bucket = os.getenv("B2_BUCKET_NAME")
+
+        # In Backblaze B2, versioned buckets retain previous versions and place
+        # a delete marker when standard delete_object is called. To hard-delete
+        # permanently, we must delete every version ID and delete marker explicitly.
+        versions_to_delete = []
+        try:
+            paginator = client.get_paginator("list_object_versions")
+            for page in paginator.paginate(Bucket=bucket, Prefix=file_key):
+                for v in page.get("Versions", []):
+                    if v["Key"] == file_key:
+                        versions_to_delete.append({"Key": file_key, "VersionId": v["VersionId"]})
+                for m in page.get("DeleteMarkers", []):
+                    if m["Key"] == file_key:
+                        versions_to_delete.append({"Key": file_key, "VersionId": m["VersionId"]})
+        except Exception as list_err:
+            logger.warning(f"Failed to list object versions for {file_key}: {list_err}")
+
+        if versions_to_delete:
+            for i in range(0, len(versions_to_delete), 1000):
+                chunk = versions_to_delete[i:i + 1000]
+                client.delete_objects(
+                    Bucket=bucket,
+                    Delete={"Objects": chunk, "Quiet": True}
+                )
+            logger.info(f"B2 permanent purge successful ({len(versions_to_delete)} versions/markers) — key: {file_key}")
+            return True
+
+        # Fallback to standard delete if no versions were found
+        client.delete_object(Bucket=bucket, Key=file_key)
+        logger.info(f"B2 standard delete successful — key: {file_key}")
         return True
     except ClientError as e:
         logger.error(f"B2 delete ClientError: {str(e)}")
@@ -131,6 +161,38 @@ def delete_file(file_key, resource_type="raw"):
     except Exception as e:
         logger.error(f"B2 delete unexpected error: {str(e)}")
         return False
+
+
+def purge_orphaned_b2_files(active_keys=None):
+    """
+    Scans Backblaze B2 and permanently deletes:
+    1. All lingering delete markers (which show as (2) * in the B2 console).
+    2. All file versions whose key is not in active_keys (if active_keys is provided).
+    """
+    try:
+        _require_b2_config()
+        client = _get_client()
+        bucket = os.getenv("B2_BUCKET_NAME")
+        paginator = client.get_paginator("list_object_versions")
+
+        to_delete = []
+        for page in paginator.paginate(Bucket=bucket):
+            for m in page.get("DeleteMarkers", []):
+                to_delete.append({"Key": m["Key"], "VersionId": m["VersionId"]})
+            if active_keys is not None:
+                for v in page.get("Versions", []):
+                    if v["Key"] not in active_keys:
+                        to_delete.append({"Key": v["Key"], "VersionId": v["VersionId"]})
+
+        if to_delete:
+            for i in range(0, len(to_delete), 1000):
+                chunk = to_delete[i:i + 1000]
+                client.delete_objects(Bucket=bucket, Delete={"Objects": chunk, "Quiet": True})
+            logger.info(f"B2 orphaned purge complete: purged {len(to_delete)} items.")
+        return len(to_delete)
+    except Exception as e:
+        logger.error(f"Error purging orphaned B2 files: {e}")
+        return 0
 
 
 def generate_presigned_url(file_key, expiry_seconds=300, filename=None, as_attachment=False):

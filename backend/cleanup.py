@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from backend.database import SessionLocal
 from backend.models import Secret
-from backend.storage import delete_file as b2_delete
+from backend.storage import delete_file as b2_delete, purge_orphaned_b2_files
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -15,6 +15,7 @@ from sqlalchemy import or_
 
 async def cleanup_expired_secrets():
     """Background task to clean up expired secrets and their files"""
+    sweep_counter = 0
     while True:
         try:
             db = SessionLocal()
@@ -55,6 +56,19 @@ async def cleanup_expired_secrets():
                     logger.info(f"Deleted expired secret: {secret.id}")
             
             db.commit()
+
+            # Every 10 minutes (10 sweeps at 60s), run a full orphan sweep on B2
+            sweep_counter += 1
+            if sweep_counter >= 10:
+                sweep_counter = 0
+                try:
+                    active_keys = {s.cloud_public_id for s in db.query(Secret).all() if s.cloud_public_id}
+                    purged = purge_orphaned_b2_files(active_keys)
+                    if purged > 0:
+                        logger.info(f"Periodic B2 orphan sweep purged {purged} ghost files/markers")
+                except Exception as sweep_err:
+                    logger.error(f"Error during periodic B2 orphan sweep: {sweep_err}")
+
             db.close()
             
             if deleted_count > 0:
@@ -63,8 +77,8 @@ async def cleanup_expired_secrets():
         except Exception as e:
             logger.error(f"Error in cleanup task: {e}")
         
-        # Run every 5 minutes
-        await asyncio.sleep(300)
+        # Run every 60 seconds
+        await asyncio.sleep(60)
 
 
 def delete_secret_immediately(secret_id: str):
