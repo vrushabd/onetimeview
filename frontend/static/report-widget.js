@@ -381,11 +381,11 @@
           } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             apiBase = `http://${window.location.hostname}:${window.location.port || 8000}`;
           } else {
-            apiBase = 'https://onetimeview.onrender.com';
+            apiBase = 'https://onetimeview-3h3s.onrender.com';
           }
         }
         if (!apiBase) {
-          apiBase = 'https://onetimeview.onrender.com';
+          apiBase = 'https://onetimeview-3h3s.onrender.com';
         }
 
         const res = await fetch(`${apiBase}/api/report`, {

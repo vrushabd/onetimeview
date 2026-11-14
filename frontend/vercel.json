@@ -2,7 +2,7 @@
     "rewrites": [
         {
             "source": "/api/:path*",
-            "destination": "https://onetimeview.onrender.com/api/:path*"
+            "destination": "https://onetimeview-3h3s.onrender.com/api/:path*"
         },
         {
             "source": "/create",
